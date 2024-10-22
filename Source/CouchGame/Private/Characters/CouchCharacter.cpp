@@ -3,6 +3,8 @@
 
 #include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
+#include "Kismet/GameplayStatics.h"
+#include "EnhancedInputSubsystems.h"
 
 
 // Sets default values
@@ -33,6 +35,8 @@ void ACouchCharacter::Tick(float DeltaTime)
 void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	SetupMappingContextIntoController();
 }
 
 float ACouchCharacter::GetOrientX() const
@@ -67,6 +71,20 @@ void ACouchCharacter::TickStateMachine(float DeltaTime) const
 {
 	if (!StateMachine) return;
 	StateMachine->Tick(DeltaTime);
+}
+
+void ACouchCharacter::SetupMappingContextIntoController() const
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!PlayerController) return;
+
+	ULocalPlayer* Player = PlayerController->GetLocalPlayer();
+	if (!Player) return;
+
+	UEnhancedInputLocalPlayerSubsystem* InputSystem = Player->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (!InputSystem) return;
+
+	InputSystem->AddMappingContext(InputMappingContext, 0);
 }
 
 

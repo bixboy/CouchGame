@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
+class UInputMappingContext;
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -51,5 +53,17 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
+#pragma endregion
+#pragma region InputData / MappingContext
+	public:
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY()
+	TObjectPtr<UCouchCharacterInputData> InputData;
+
+protected:
+	void SetupMappingContextIntoController() const;
+
 #pragma endregion
 };

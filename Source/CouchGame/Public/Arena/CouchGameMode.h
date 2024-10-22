@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "CouchGameMode.generated.h"
 
+class UInputMappingContext;
+class UCouchCharacterInputData;
 class ACouchPlayerStart;
 class ACouchCharacter;
 /**
@@ -24,6 +26,10 @@ protected:
 	TArray<ACouchCharacter*> CharactersInGame;
 
 private:
+	UCouchCharacterInputData* LoadInputDataFromConfig();
+
+	UInputMappingContext* LoadInputMappingContextFromConfig();
+	
 	void FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors);
 
 	void SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints);
