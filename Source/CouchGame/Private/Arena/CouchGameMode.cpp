@@ -68,7 +68,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 		NewCharacter->InputData = InputData;
 		NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		NewCharacter->SetOrientX(SpawnPoint->GetStartOrientX());
+		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 
 		CharactersInGame.Add(NewCharacter);

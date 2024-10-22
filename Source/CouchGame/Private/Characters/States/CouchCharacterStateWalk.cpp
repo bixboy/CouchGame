@@ -5,6 +5,8 @@
 
 #include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Characters/CouchCharacterStateMachine.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
@@ -15,13 +17,13 @@ ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
 void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
-
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
 		FColor::Blue,
 		TEXT("Enter StateWalk")
 	);
+	Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeedMax;
 }
 
 void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
@@ -45,9 +47,13 @@ void UCouchCharacterStateWalk::StateTick(float DeltaTime)
 		FColor::Blue,
 		TEXT("Tick StateWalk")
 	);
-	if (Character)
+	if (FMath::Abs(Character->GetInputMove().Size()) < 0.1f)
 	{
-		Character->AddMovementInput
-		(UKismetMathLibrary::GetRightVector(Character->GetMesh()->GetRelativeRotation()), MoveSpeedMax);
+		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+	}
+	else
+	{
+		Character->SetOrient(Character->GetOrient());
+		Character->MoveInDirectionOfRotation(Character->GetInputMove().Size());
 	}
 }

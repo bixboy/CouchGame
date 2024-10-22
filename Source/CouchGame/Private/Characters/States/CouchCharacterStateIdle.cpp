@@ -3,7 +3,9 @@
 
 #include "Characters/States/CouchCharacterStateIdle.h"
 
+#include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Characters/CouchCharacterStateMachine.h"
 
 ECouchCharacterStateID UCouchCharacterStateIdle::GetStateID()
 {
@@ -43,4 +45,9 @@ void UCouchCharacterStateIdle::StateTick(float DeltaTime)
 		FColor::Black,
 		TEXT("Tick StateIdle")
 	);
+
+	if (FMath::Abs(Character->GetInputMove().Size()) > 0.1f)
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Walk);
+	}
 }

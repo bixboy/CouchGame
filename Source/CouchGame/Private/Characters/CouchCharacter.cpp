@@ -5,6 +5,8 @@
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
+#include "Characters/CouchCharacterInputData.h"
+#include "EnhancedInputComponent.h"
 
 
 // Sets default values
@@ -28,7 +30,7 @@ void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	TickStateMachine(DeltaTime);
-	RotateMeshUsingOrientX();
+	RotateMeshUsingOrient(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -37,25 +39,40 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	SetupMappingContextIntoController();
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (!EnhancedInputComponent) return;
+
+	BindInputMoveAndActions(EnhancedInputComponent);
 }
 
-float ACouchCharacter::GetOrientX() const
+FVector2D ACouchCharacter::GetOrient() const
 {
-	return OrientX;
+	return Orient;
 }
 
-void ACouchCharacter::SetOrientX(float NewOrientX)
+void ACouchCharacter::SetOrient(FVector2D NewOrient)
 {
-	OrientX = NewOrientX;
+	Orient = NewOrient;
 }
 
-void ACouchCharacter::RotateMeshUsingOrientX() const
+void ACouchCharacter::MoveInDirectionOfRotation(float InputStrength)
 {
-	FRotator Rotation = GetMesh()->GetRelativeRotation();
-	Rotation.Yaw = (OrientX == 1.f) ? 0 : 180;
-	GetMesh()->SetRelativeRotation(Rotation);
+	FRotator MeshRotation = GetMesh()->GetRelativeRotation();
+	FVector LeftDirection = FRotationMatrix(MeshRotation).GetScaledAxis(EAxis::Y);
+	AddMovementInput(LeftDirection, InputStrength);
 }
 
+void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
+{
+	if (InputMove.SizeSquared() > 0.0f)
+	{
+		FRotator DesiredRotation = FRotationMatrix::MakeFromX(FVector(InputMove.X, -InputMove.Y, 0.0f)).Rotator();
+		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, CharacterRotationSpeed);
+		GetMesh()->SetRelativeRotation(NewRotation);
+	}
+}
 void ACouchCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<UCouchCharacterStateMachine>(this);
@@ -85,6 +102,45 @@ void ACouchCharacter::SetupMappingContextIntoController() const
 	if (!InputSystem) return;
 
 	InputSystem->AddMappingContext(InputMappingContext, 0);
+}
+
+FVector2D ACouchCharacter::GetInputMove() const
+{
+	return InputMove;
+}
+
+void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	if (!InputData) return;
+
+	if(InputData->InputActionMove)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Started,
+			this,
+			&ACouchCharacter::OnInputMove
+		);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputMove
+		);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Triggered,
+			this,
+			&ACouchCharacter::OnInputMove
+		);
+	}
+}
+
+void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
+{
+	InputMove = InputActionValue.Get<FVector2D>();
 }
 
 
