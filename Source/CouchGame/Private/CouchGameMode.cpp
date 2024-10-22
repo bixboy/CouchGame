@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchGame/Public/CouchGameMode.h"
+#include "CouchGameMode.h"
+#include "CouchGame/Public/CouchPlayerStart.h"
 #include "CouchGame/Public/CouchCharacter.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -11,28 +11,28 @@ void ACouchGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<APlayerStart*> PlayerStartsPoints;
+	TArray<ACouchPlayerStart*> PlayerStartsPoints;
 	FindPlayerStartActorsInArena(PlayerStartsPoints);
 	SpawnCharacter(PlayerStartsPoints);
 }
 
-void ACouchGameMode::FindPlayerStartActorsInArena(TArray<APlayerStart*>& ResultsActors)
+void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors)
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), FoundActors);
 
 	for (int i = 0; i < FoundActors.Num(); i++)
 	{
-		APlayerStart* PlayerStartActor = Cast<APlayerStart>(FoundActors[i]);
+		ACouchPlayerStart* PlayerStartActor = Cast<ACouchPlayerStart>(FoundActors[i]);
 		if (!PlayerStartActor) continue;
 		
 		ResultsActors.Add(PlayerStartActor);
 	}
 }
 
-void ACouchGameMode::SpawnCharacter(const TArray<APlayerStart*>& SpawnPoints)
+void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
-	for	(APlayerStart* SpawnPoint : SpawnPoints)
+	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
 	{
 		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
 		TSubclassOf<ACouchCharacter> CouchCharacterClass = GetCouchCharacterClassFromInputType(InputType);
@@ -45,6 +45,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<APlayerStart*>& SpawnPoints)
 
 		if (!NewCharacter) continue;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
+		NewCharacter->SetOrientX(SpawnPoint->GetStartOrientX());
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 
 		CharactersInGame.Add(NewCharacter);

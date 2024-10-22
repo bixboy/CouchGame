@@ -6,8 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "CouchGameMode.generated.h"
 
+class ACouchPlayerStart;
 class ACouchCharacter;
-class APlayerStart;
 /**
  * 
  */
@@ -36,9 +36,9 @@ protected:
 	TSubclassOf<class ACouchCharacter> CouchCharacterP3;
 
 private:
-	void FindPlayerStartActorsInArena(TArray<APlayerStart*>& ResultsActors);
+	void FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors);
 
-	void SpawnCharacter(const TArray<APlayerStart*>& SpawnPoints);
+	void SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints);
 
 	TSubclassOf<ACouchCharacter> GetCouchCharacterClassFromInputType(EAutoReceiveInput::Type InputType) const;
 	

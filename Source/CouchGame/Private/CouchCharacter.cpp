@@ -22,11 +22,29 @@ void ACouchCharacter::BeginPlay()
 void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	RotateMeshUsingOrientX();
 }
 
 // Called to bind functionality to input
 void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+float ACouchCharacter::GetOrientX() const
+{
+	return OrientX;
+}
+
+void ACouchCharacter::SetOrientX(float NewOrientX)
+{
+	OrientX = NewOrientX;
+}
+
+void ACouchCharacter::RotateMeshUsingOrientX() const
+{
+	FRotator Rotation = GetMesh()->GetRelativeRotation();
+	Rotation.Yaw = (OrientX == 1.f) ? 0 : 180;
+	GetMesh()->SetRelativeRotation(Rotation);
 }
 
