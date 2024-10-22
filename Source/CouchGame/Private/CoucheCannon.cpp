@@ -3,6 +3,7 @@
 
 #include "CoucheCannon.h"
 #include "CouchCannonBall.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -16,8 +17,8 @@ ACoucheCannon::ACoucheCannon()
 void ACoucheCannon::BeginPlay()
 {
 	Super::BeginPlay();
+	SetupTimeLine();
 	StartPoint = this->FindComponentByTag<USceneComponent>(StartPointName);
-	Shoot();
 }
 
 void ACoucheCannon::Tick(float DeltaTime)
@@ -25,13 +26,54 @@ void ACoucheCannon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACoucheCannon::Shoot()
+void ACoucheCannon::SpawnBullet()
 {
-	FTransform Transform = FTransform(	LineTrace(), StartPoint->GetComponentLocation());
+	TargetLocation = LineTrace();
+	FVector StartLocation = StartPoint->GetComponentLocation();
+	FVector SuggestedVelocity;
+	
+	bool bSuccess = UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+		this,
+		SuggestedVelocity,
+		StartLocation,
+		TargetLocation,
+		0.5f  // Ratio de l'arc (valeurs plus faibles pour des arcs plus bas, valeurs plus élevées pour des arcs plus hauts)
+	);
+	
+	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), StartPoint->GetComponentLocation());
 	GetWorld()->SpawnActor<AActor>(Bullet, Transform);
 }
 
-FRotator ACoucheCannon::LineTrace()
+#pragma region Charging
+
+void ACoucheCannon::SetupTimeLine()
+{
+	FOnTimelineFloat TimelineCallback;
+	TimelineCallback.BindUFunction(this, FName("UpdatePower"));
+
+	PowerTimeline.AddInterpFloat(PowerCurve, TimelineCallback);
+	PowerTimeline.SetLooping(false);
+}
+
+void ACoucheCannon::StartCharging()
+{
+	PowerTimeline.PlayFromStart();
+}
+
+void ACoucheCannon::StopCharging()
+{
+	PowerTimeline.Stop();
+	SpawnBullet();
+}
+
+void ACoucheCannon::UpdatePower(float Value)
+{
+	CurrentPower = FMath::Lerp(0, MaxPower, Value);
+	
+}
+#pragma endregion
+
+FVector ACoucheCannon::LineTrace()
 {
 	const FVector Start = StartPoint->GetComponentLocation();
 	const FVector End = Start + UKismetMathLibrary::GetForwardVector(StartPoint->GetComponentRotation()) * AttackRange;
@@ -58,11 +100,10 @@ FRotator ACoucheCannon::LineTrace()
 
 	if (bHit)
 	{
-		return UKismetMathLibrary::FindLookAtRotation(StartPoint->GetComponentLocation(),HitResult.ImpactPoint);
+		return HitResult.ImpactPoint;
 	}
 	else
 	{
-		return UKismetMathLibrary::FindLookAtRotation(StartPoint->GetComponentLocation(),HitResult.TraceEnd);
+		return HitResult.TraceEnd;
 	}
-	
 }

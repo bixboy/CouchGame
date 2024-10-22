@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "CoucheCannon.generated.h"
 
@@ -12,10 +13,33 @@ class COUCHGAME_API ACoucheCannon : public AActor
 	GENERATED_BODY()
 
 private:
-	void Shoot();
 
 	UPROPERTY()
 	USceneComponent* StartPoint;
+	FVector TargetLocation;
+
+	void SpawnBullet();
+	FVector LineTrace();
+	
+#pragma region Power
+	
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* PowerCurve;
+	
+	FTimeline PowerTimeline;
+	
+	float CurrentPower;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float MaxPower = 200.f;
+
+	void SetupTimeLine();
+	UFUNCTION(BlueprintCallable)
+	void StartCharging();
+	UFUNCTION(BlueprintCallable)
+	void StopCharging();
+	void UpdatePower(float Value);
+	
+#pragma endregion	
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,6 +57,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
 	UClass* Bullet;
-	
-	FRotator LineTrace();
+
+	bool CanShoot = false;
 };
