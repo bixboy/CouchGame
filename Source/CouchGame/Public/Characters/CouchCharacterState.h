@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CouchCharacterState.generated.h"
 
+class UCouchCharacterSettings;
 class UCouchCharacterStateMachine;
 class ACouchCharacter;
 enum class ECouchCharacterStateID : uint8;
@@ -39,6 +40,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
+
+	UPROPERTY()
+	const UCouchCharacterSettings* CharacterSettings;
 
 };
 

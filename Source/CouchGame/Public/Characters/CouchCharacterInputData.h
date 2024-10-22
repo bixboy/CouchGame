@@ -20,4 +20,7 @@ class COUCHGAME_API UCouchCharacterInputData : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputActionMove;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionDash;
 };

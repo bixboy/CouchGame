@@ -4,6 +4,7 @@
 #include "Characters/States/CouchCharacterStateWalk.h"
 
 #include "Characters/CouchCharacter.h"
+#include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Characters/CouchCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -47,7 +48,7 @@ void UCouchCharacterStateWalk::StateTick(float DeltaTime)
 		FColor::Blue,
 		TEXT("Tick StateWalk")
 	);
-	if (FMath::Abs(Character->GetInputMove().Size()) < 0.1f)
+	if (FMath::Abs(Character->GetInputMove().Size()) < CharacterSettings->InputMoveThreshold)
 	{
 		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 	}

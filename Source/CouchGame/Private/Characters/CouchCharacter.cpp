@@ -109,6 +109,17 @@ FVector2D ACouchCharacter::GetInputMove() const
 	return InputMove;
 }
 
+bool ACouchCharacter::GetCanDash() const
+{
+	return CanDash;
+}
+
+void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
+{
+	InputMove = InputActionValue.Get<FVector2D>();
+	InputDashEvent.Broadcast(InputMove);
+}
+
 void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	if (!InputData) return;
@@ -134,6 +145,16 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 			ETriggerEvent::Triggered,
 			this,
 			&ACouchCharacter::OnInputMove
+		);
+	}
+
+	if (InputData->InputActionDash)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionDash,
+			ETriggerEvent::Triggered,
+			this,
+			&ACouchCharacter::OnInputDash
 		);
 	}
 }

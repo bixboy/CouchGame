@@ -15,6 +15,8 @@ class COUCHGAME_API UCouchCharacterStateIdle : public UCouchCharacterState
 public:
 	virtual ECouchCharacterStateID GetStateID() override;
 
+	UFUNCTION()
+	void OnInputDash(FVector2D InputMove);
 	virtual void StateEnter(ECouchCharacterStateID PreviousStateID) override;
 
 	virtual void StateExit(ECouchCharacterStateID NextStateID) override;

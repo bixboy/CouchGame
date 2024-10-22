@@ -6,6 +6,7 @@
 #include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Characters/CouchCharacterStateMachine.h"
+#include "Characters/CouchCharacterSettings.h"
 
 
 // Sets default values for this component's properties
@@ -23,7 +24,7 @@ void UCouchCharacterState::StateInit(UCouchCharacterStateMachine* InStateMachine
 {
 	StateMachine = InStateMachine;
 	Character = InStateMachine->GetCharacter();
-
+	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
