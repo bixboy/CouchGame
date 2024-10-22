@@ -22,18 +22,6 @@ public:
 protected:
 	UPROPERTY()
 	TArray<ACouchCharacter*> CharactersInGame;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACouchCharacter> CouchCharacterP0;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACouchCharacter> CouchCharacterP1;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACouchCharacter> CouchCharacterP2;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACouchCharacter> CouchCharacterP3;
 
 private:
 	void FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors);

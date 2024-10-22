@@ -2,6 +2,8 @@
 
 
 #include "CouchGameMode.h"
+
+#include "Arena/ArenaSettings.h"
 #include "CouchGame/Public/CouchPlayerStart.h"
 #include "CouchGame/Public/CouchCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -56,19 +58,20 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 TSubclassOf<ACouchCharacter> ACouchGameMode::GetCouchCharacterClassFromInputType(
 	EAutoReceiveInput::Type InputType) const
 {
+	const UArenaSettings* ArenaSettings = GetDefault<UArenaSettings>();
 	switch (InputType)
 	{
 		case EAutoReceiveInput::Player0 :
-			return CouchCharacterP0;
+			return ArenaSettings->CouchCharacterClassPO;
 		
 		case EAutoReceiveInput::Player1 :
-			return CouchCharacterP1;
+			return ArenaSettings->CouchCharacterClassP1;
 		
 		case EAutoReceiveInput::Player2 :
-			return CouchCharacterP2;
+			return ArenaSettings->CouchCharacterClassP2;
 		
 		case EAutoReceiveInput::Player3 :
-			return CouchCharacterP3;
+			return ArenaSettings->CouchCharacterClassP3;
 
 		default:
 			return nullptr;
