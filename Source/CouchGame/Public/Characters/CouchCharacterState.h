@@ -23,6 +23,10 @@ public:
 
 	virtual void StateInit(UCouchCharacterStateMachine* InStateMachine);
 
+	virtual void StateEnter(ECouchCharacterStateID PreviousStateID);
+
+	virtual void StateExit(ECouchCharacterStateID NextStateID);
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> Character;

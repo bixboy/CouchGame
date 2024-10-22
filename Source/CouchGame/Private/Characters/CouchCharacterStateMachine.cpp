@@ -12,11 +12,44 @@ void UCouchCharacterStateMachine::Init(ACouchCharacter* InCharacter)
 	Character = InCharacter;
 	FindStates();
 	InitStates();
+
+	ChangeState(ECouchCharacterStateID::Idle);	
 }
 
 ACouchCharacter* UCouchCharacterStateMachine::GetCharacter() const
 {
 	return Character;
+}
+
+UCouchCharacterState* UCouchCharacterStateMachine::GetState(ECouchCharacterStateID StateID)
+{
+	for (UCouchCharacterState* State : AllStates)
+	{
+		if (StateID == State->GetStateID())
+			return State;
+	}
+	return nullptr;
+}
+
+void UCouchCharacterStateMachine::ChangeState(ECouchCharacterStateID NextStateID)
+{
+	UCouchCharacterState* NextState = GetState(NextStateID);
+
+	if (!NextState) return;
+
+	if (CurrentState)
+	{
+		CurrentState->StateExit(NextStateID);
+	}
+
+	ECouchCharacterStateID PreviousStateID = CurrentStateID;
+	CurrentStateID = NextStateID;
+	CurrentState = NextState;
+
+	if (CurrentState)
+	{
+		CurrentState->StateEnter(PreviousStateID);
+	}
 }
 
 void UCouchCharacterStateMachine::FindStates()

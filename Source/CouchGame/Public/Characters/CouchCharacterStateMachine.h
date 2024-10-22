@@ -8,6 +8,7 @@
 
 class ACouchCharacter;
 class UCouchCharacterState;
+enum class ECouchCharacterStateID : uint8;
 /**
  * 
  */
@@ -20,11 +21,22 @@ public:
 
 	ACouchCharacter* GetCharacter() const;
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeState(ECouchCharacterStateID NextStateID);
+
+	UCouchCharacterState* GetState(ECouchCharacterStateID StateID);
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> Character;
 
 	TArray<UCouchCharacterState*> AllStates;
+
+	UPROPERTY(BlueprintReadOnly)
+	ECouchCharacterStateID CurrentStateID;
+
+	UPROPERTY()
+	TObjectPtr<UCouchCharacterState> CurrentState;
 
 	void FindStates();
 

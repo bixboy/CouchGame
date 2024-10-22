@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class ECouchCharacterStateID : uint8
 {
 	None = 0,
@@ -12,5 +12,6 @@ enum class ECouchCharacterStateID : uint8
 	Walk,
 	Dash,
 	Fishing,
-	MovingObject,
+	InteractingObject,
+	HoldingObject,
 };

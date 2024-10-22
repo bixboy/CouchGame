@@ -9,3 +9,27 @@ ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
 {
 	return ECouchCharacterStateID::Walk;
 }
+
+void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID)
+{
+	Super::StateEnter(PreviousStateID);
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		3.f,
+		FColor::Blue,
+		TEXT("Enter StateWalk")
+	);
+}
+
+void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
+{
+	Super::StateExit(NextStateID);
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		3.f,
+		FColor::Blue,
+		TEXT("Exit StateWalk")
+	);
+}

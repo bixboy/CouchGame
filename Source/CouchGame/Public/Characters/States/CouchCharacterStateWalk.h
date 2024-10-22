@@ -14,4 +14,8 @@ class COUCHGAME_API UCouchCharacterStateWalk : public UCouchCharacterState
 
 public:
 	virtual ECouchCharacterStateID GetStateID() override;
+
+	virtual void StateEnter(ECouchCharacterStateID PreviousStateID) override;
+
+	virtual void StateExit(ECouchCharacterStateID NextStateID) override;
 };
