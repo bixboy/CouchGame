@@ -24,6 +24,7 @@ void ACoucheCannon::BeginPlay()
 void ACoucheCannon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	PowerTimeline.TickTimeline(DeltaTime);
 }
 
 void ACoucheCannon::SpawnBullet()
@@ -32,14 +33,16 @@ void ACoucheCannon::SpawnBullet()
 	FVector StartLocation = StartPoint->GetComponentLocation();
 	FVector SuggestedVelocity;
 	
-	bool bSuccess = UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this,
 		SuggestedVelocity,
 		StartLocation,
 		TargetLocation,
-		0.5f  // Ratio de l'arc (valeurs plus faibles pour des arcs plus bas, valeurs plus élevées pour des arcs plus hauts)
+		0,
+		CurrentPower
 	);
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Power: %f"), CurrentPower));
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), StartPoint->GetComponentLocation());
 	GetWorld()->SpawnActor<AActor>(Bullet, Transform);
 }
@@ -48,6 +51,7 @@ void ACoucheCannon::SpawnBullet()
 
 void ACoucheCannon::SetupTimeLine()
 {
+	PowerTimeline.SetPlayRate(SpeedInterp/1);
 	FOnTimelineFloat TimelineCallback;
 	TimelineCallback.BindUFunction(this, FName("UpdatePower"));
 
@@ -66,10 +70,9 @@ void ACoucheCannon::StopCharging()
 	SpawnBullet();
 }
 
-void ACoucheCannon::UpdatePower(float Value)
+void ACoucheCannon::UpdatePower(float Alpha)
 {
-	CurrentPower = FMath::Lerp(0, MaxPower, Value);
-	
+	CurrentPower = Alpha * MaxPower;
 }
 #pragma endregion
 

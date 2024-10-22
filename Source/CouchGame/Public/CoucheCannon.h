@@ -23,21 +23,24 @@ private:
 	
 #pragma region Power
 	
+	FTimeline PowerTimeline;
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* PowerCurve;
 	
-	FTimeline PowerTimeline;
-	
-	float CurrentPower;
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	float MaxPower = 200.f;
+	float MaxPower = 1.f;
+	float CurrentPower;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float SpeedInterp = 1.f;
 
 	void SetupTimeLine();
 	UFUNCTION(BlueprintCallable)
 	void StartCharging();
 	UFUNCTION(BlueprintCallable)
 	void StopCharging();
-	void UpdatePower(float Value);
+	UFUNCTION()
+	void UpdatePower(float Alpha);
 	
 #pragma endregion	
 
@@ -59,4 +62,5 @@ public:
 	UClass* Bullet;
 
 	bool CanShoot = false;
+	
 };
