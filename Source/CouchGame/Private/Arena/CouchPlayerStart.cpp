@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchGame/Public/CouchPlayerStart.h"
+#include "CouchGame/Public/Arena/CouchPlayerStart.h"
 
 float ACouchPlayerStart::GetStartOrientX() const
 {

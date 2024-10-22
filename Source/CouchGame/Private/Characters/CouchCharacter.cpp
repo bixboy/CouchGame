@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchGame/Public/CouchCharacter.h"
+#include "CouchGame/Public/Characters/CouchCharacter.h"
+#include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 
 
 // Sets default values
@@ -15,7 +16,9 @@ ACouchCharacter::ACouchCharacter()
 void ACouchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CreateStateMachine();
+
+	InitStateMachine();
 }
 
 // Called every frame
@@ -47,4 +50,16 @@ void ACouchCharacter::RotateMeshUsingOrientX() const
 	Rotation.Yaw = (OrientX == 1.f) ? 0 : 180;
 	GetMesh()->SetRelativeRotation(Rotation);
 }
+
+void ACouchCharacter::CreateStateMachine()
+{
+	StateMachine = NewObject<UCouchCharacterStateMachine>(this);
+}
+
+void ACouchCharacter::InitStateMachine()
+{
+	if (!StateMachine) return;
+	StateMachine->Init(this);
+}
+
 

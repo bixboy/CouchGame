@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchGameMode.h"
+#include "Arena/CouchGameMode.h"
 
 #include "Arena/ArenaSettings.h"
-#include "CouchGame/Public/CouchPlayerStart.h"
-#include "CouchGame/Public/CouchCharacter.h"
+#include "CouchGame/Public/Arena//CouchPlayerStart.h"
+#include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 

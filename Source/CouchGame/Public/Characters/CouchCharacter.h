@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class UCouchCharacterStateMachine;
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -38,5 +39,15 @@ protected:
 
 	void RotateMeshUsingOrientX() const;
 
+#pragma endregion
+#pragma region State Machine
+public:
+	void CreateStateMachine();
+
+	void InitStateMachine();
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
 #pragma endregion
 };
