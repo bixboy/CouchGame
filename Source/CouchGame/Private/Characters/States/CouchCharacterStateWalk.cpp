@@ -3,7 +3,9 @@
 
 #include "Characters/States/CouchCharacterStateWalk.h"
 
+#include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
 {
@@ -32,4 +34,20 @@ void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Blue,
 		TEXT("Exit StateWalk")
 	);
+}
+
+void UCouchCharacterStateWalk::StateTick(float DeltaTime)
+{
+	Super::StateTick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		DeltaTime,
+		FColor::Blue,
+		TEXT("Tick StateWalk")
+	);
+	if (Character)
+	{
+		Character->AddMovementInput
+		(UKismetMathLibrary::GetRightVector(Character->GetMesh()->GetRelativeRotation()), MoveSpeedMax);
+	}
 }

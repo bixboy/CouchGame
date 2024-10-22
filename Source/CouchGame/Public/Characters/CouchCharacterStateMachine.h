@@ -19,6 +19,8 @@ class COUCHGAME_API UCouchCharacterStateMachine : public UObject
 public:
 	void Init(ACouchCharacter* InCharacter);
 
+	void Tick(float DeltaTime);
+
 	ACouchCharacter* GetCharacter() const;
 
 	UFUNCTION(BlueprintCallable)

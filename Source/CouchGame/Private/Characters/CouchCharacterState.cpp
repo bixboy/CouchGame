@@ -3,6 +3,7 @@
 
 #include "Characters/CouchCharacterState.h"
 
+#include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Characters/CouchCharacterStateMachine.h"
 
@@ -34,9 +35,14 @@ void UCouchCharacterState::StateInit(UCouchCharacterStateMachine* InStateMachine
 
 void UCouchCharacterState::StateEnter(ECouchCharacterStateID PreviousStateID)
 {
+
 }
 
 void UCouchCharacterState::StateExit(ECouchCharacterStateID NextStateID)
+{
+}
+
+void UCouchCharacterState::StateTick(float DeltaTime)
 {
 }
 

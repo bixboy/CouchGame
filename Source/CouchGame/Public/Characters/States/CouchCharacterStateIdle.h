@@ -18,5 +18,7 @@ public:
 	virtual void StateEnter(ECouchCharacterStateID PreviousStateID) override;
 
 	virtual void StateExit(ECouchCharacterStateID NextStateID) override;
+
+	virtual void StateTick(float DeltaTime) override;
 	
 };

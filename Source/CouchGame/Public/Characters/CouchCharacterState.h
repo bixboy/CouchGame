@@ -27,12 +27,19 @@ public:
 
 	virtual void StateExit(ECouchCharacterStateID NextStateID);
 
+	virtual void StateTick(float DeltaTime);
+	
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* AnimMontage;
+	
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> Character;
 
 	UPROPERTY()
 	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
+
 };
 
 

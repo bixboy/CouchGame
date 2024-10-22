@@ -25,6 +25,7 @@ void ACouchCharacter::BeginPlay()
 void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	TickStateMachine(DeltaTime);
 	RotateMeshUsingOrientX();
 }
 
@@ -60,6 +61,12 @@ void ACouchCharacter::InitStateMachine()
 {
 	if (!StateMachine) return;
 	StateMachine->Init(this);
+}
+
+void ACouchCharacter::TickStateMachine(float DeltaTime) const
+{
+	if (!StateMachine) return;
+	StateMachine->Tick(DeltaTime);
 }
 
 
