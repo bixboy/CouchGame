@@ -35,5 +35,7 @@ private:
 	void SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints);
 
 	TSubclassOf<ACouchCharacter> GetCouchCharacterClassFromInputType(EAutoReceiveInput::Type InputType) const;
+
+	void CreateAndInitPlayers() const;
 	
 };
