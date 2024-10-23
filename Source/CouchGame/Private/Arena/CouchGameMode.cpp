@@ -7,6 +7,9 @@
 #include "CouchGame/Public/Arena//CouchPlayerStart.h"
 #include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Characters/CouchCharacterInputData.h"
+#include "InputMappingContext.h"
+#include "Characters/CouchCharacterSettings.h"
 
 
 void ACouchGameMode::BeginPlay()
@@ -16,6 +19,20 @@ void ACouchGameMode::BeginPlay()
 	TArray<ACouchPlayerStart*> PlayerStartsPoints;
 	FindPlayerStartActorsInArena(PlayerStartsPoints);
 	SpawnCharacter(PlayerStartsPoints);
+}
+
+UCouchCharacterInputData* ACouchGameMode::LoadInputDataFromConfig()
+{
+	const UCouchCharacterSettings* CharacterSettings = GetDefault<UCouchCharacterSettings>();
+	if (!CharacterSettings) return nullptr;
+	return CharacterSettings->InputData.LoadSynchronous();
+}
+
+UInputMappingContext* ACouchGameMode::LoadInputMappingContextFromConfig()
+{
+	const UCouchCharacterSettings* CharacterSettings = GetDefault<UCouchCharacterSettings>();
+	if (!CharacterSettings) return nullptr;
+	return CharacterSettings->InputMappingContext.LoadSynchronous();
 }
 
 void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors)
@@ -34,6 +51,8 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 
 void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
+	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
+	UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
 	{
 		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
@@ -46,8 +65,10 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 		);
 
 		if (!NewCharacter) continue;
+		NewCharacter->InputData = InputData;
+		NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		NewCharacter->SetOrientX(SpawnPoint->GetStartOrientX());
+		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 
 		CharactersInGame.Add(NewCharacter);

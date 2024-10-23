@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
+class UInputMappingContext;
+class UEnhancedInputComponent;
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -27,17 +31,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion
-#pragma region Orient
+#pragma region Move And Orient
 public:
-	float GetOrientX() const;
+	FVector2D GetOrient() const;
 
-	void SetOrientX(float NewOrientX);
+	void SetOrient(FVector2D NewOrient);
+
+	void MoveInDirectionOfRotation(float InputStrength);
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	float OrientX = 1.;
+	FVector2D Orient = FVector2D::ZeroVector;
 
-	void RotateMeshUsingOrientX() const;
+	UPROPERTY(EditAnywhere)
+	float CharacterRotationSpeed = 20.0f;
+	void RotateMeshUsingOrient(float DeltaTime) const;
 
 #pragma endregion
 #pragma region State Machine
@@ -46,8 +54,49 @@ public:
 
 	void InitStateMachine();
 
+	void TickStateMachine(float DeltaTime) const;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
 #pragma endregion
+#pragma region InputData / MappingContext
+	public:
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY()
+	TObjectPtr<UCouchCharacterInputData> InputData;
+
+protected:
+	void SetupMappingContextIntoController() const;
+
+#pragma endregion
+#pragma region InputMove
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDashEvent, FVector2D, InputMove);
+	
+public:
+	FVector2D GetInputMove() const;
+	
+	bool GetCanDash() const;
+
+	UPROPERTY()
+	FInputDashEvent InputDashEvent;
+
+protected:
+	UPROPERTY()
+	FVector2D InputMove = FVector2D::ZeroVector;
+
+private:
+	UPROPERTY(EditAnywhere)
+	bool CanDash = true;
+
+	void OnInputDash(const FInputActionValue& InputActionValue);
+	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+
+	void OnInputMove(const FInputActionValue& InputActionValue);
+
+#pragma endregion
+	
 };

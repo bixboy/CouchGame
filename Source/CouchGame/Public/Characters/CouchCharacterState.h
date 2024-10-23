@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CouchCharacterState.generated.h"
 
+class UCouchCharacterSettings;
 class UCouchCharacterStateMachine;
 class ACouchCharacter;
 enum class ECouchCharacterStateID : uint8;
@@ -27,12 +28,22 @@ public:
 
 	virtual void StateExit(ECouchCharacterStateID NextStateID);
 
+	virtual void StateTick(float DeltaTime);
+	
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* AnimMontage;
+	
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> Character;
 
 	UPROPERTY()
 	TObjectPtr<UCouchCharacterStateMachine> StateMachine;
+
+	UPROPERTY()
+	const UCouchCharacterSettings* CharacterSettings;
+
 };
 
 

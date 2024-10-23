@@ -16,6 +16,12 @@ void UCouchCharacterStateMachine::Init(ACouchCharacter* InCharacter)
 	ChangeState(ECouchCharacterStateID::Idle);	
 }
 
+void UCouchCharacterStateMachine::Tick(float DeltaTime)
+{
+	if(!CurrentState) return;
+	CurrentState->StateTick(DeltaTime);
+}
+
 ACouchCharacter* UCouchCharacterStateMachine::GetCharacter() const
 {
 	return Character;
@@ -50,6 +56,8 @@ void UCouchCharacterStateMachine::ChangeState(ECouchCharacterStateID NextStateID
 	{
 		CurrentState->StateEnter(PreviousStateID);
 	}
+
+	Character->PlayAnimMontage(CurrentState->AnimMontage);
 }
 
 void UCouchCharacterStateMachine::FindStates()

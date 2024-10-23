@@ -3,11 +3,23 @@
 
 #include "Characters/States/CouchCharacterStateIdle.h"
 
+#include "Characters/CouchCharacter.h"
+#include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Characters/CouchCharacterStateMachine.h"
 
 ECouchCharacterStateID UCouchCharacterStateIdle::GetStateID()
 {
 	return ECouchCharacterStateID::Idle;
+}
+
+void UCouchCharacterStateIdle::OnInputDash(FVector2D InputMove)
+{
+	if (Character->GetCanDash())
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Dash);
+	}
+	
 }
 
 void UCouchCharacterStateIdle::StateEnter(ECouchCharacterStateID PreviousStateID)
@@ -20,6 +32,8 @@ void UCouchCharacterStateIdle::StateEnter(ECouchCharacterStateID PreviousStateID
 		FColor::Black,
 		TEXT("Enter StateIdle")
 	);
+
+	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
 }
 
 void UCouchCharacterStateIdle::StateExit(ECouchCharacterStateID NextStateID)
@@ -32,4 +46,21 @@ void UCouchCharacterStateIdle::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Black,
 		TEXT("Exit StateIdle")
 	);
+	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
+}
+
+void UCouchCharacterStateIdle::StateTick(float DeltaTime)
+{
+	Super::StateTick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		DeltaTime,
+		FColor::Black,
+		TEXT("Tick StateIdle")
+	);
+
+	if (FMath::Abs(Character->GetInputMove().Size()) > CharacterSettings->InputMoveThreshold)
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Walk);
+	}
 }
