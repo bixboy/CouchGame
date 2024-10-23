@@ -7,16 +7,20 @@
 #include "GameFramework/Actor.h"
 #include "CoucheCannon.generated.h"
 
+
 UCLASS()
 class COUCHGAME_API ACoucheCannon : public AActor
 {
 	GENERATED_BODY()
 
 private:
-
 	UPROPERTY()
 	USceneComponent* StartPoint;
+	
 	FVector TargetLocation;
+
+	bool CanShoot = false;
+	float AttackRange;
 
 	void SpawnBullet();
 	FVector LineTrace();
@@ -28,12 +32,15 @@ private:
 	UCurveFloat* PowerCurve;
 	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	float MaxPower = 1.f;
+	float MaxPower = 500.f;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float MinPower = 100.f;
 	float CurrentPower;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	float SpeedInterp = 1.f;
+	float SpeedCharge = 1.f;
 
+	UFUNCTION()
 	void SetupTimeLine();
 	UFUNCTION(BlueprintCallable)
 	void StartCharging();
@@ -42,6 +49,16 @@ private:
 	UFUNCTION()
 	void UpdatePower(float Alpha);
 	
+#pragma endregion
+
+#pragma region Widgets
+	
+	UPROPERTY()
+	USceneComponent* WidgetPose;
+	UPROPERTY()
+	AActor* CurrentWidget = nullptr;
+	UPROPERTY()
+	AActor* PowerChargeActor;
 #pragma endregion	
 
 protected:
@@ -53,14 +70,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	float AttackRange;
+	FName StartPointName = "barrel";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	FName StartPointName = "barrel";
+	FName WidgetPoseName = "WidgetPose";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
 	UClass* Bullet;
 
-	bool CanShoot = false;
+	UFUNCTION(BlueprintCallable)
+	void SpawnWidget(UClass* WidgetToSpawn);
 	
 };

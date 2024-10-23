@@ -22,4 +22,11 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void Initialize(const FVector& LaunchVelocity);
+
+private:
+	FVector Velocity;      // Vélocité du projectile
+	FVector Location;      // Position actuelle du projectile
+	float TimeElapsed;     // Temps écoulé depuis le lancement
+	const float Gravity = -980.0f;
 };
