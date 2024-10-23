@@ -15,6 +15,14 @@ ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
 	return ECouchCharacterStateID::Walk;
 }
 
+void UCouchCharacterStateWalk::OnInputDash(FVector2D InputMove)
+{
+	if (Character->GetCanDash())
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Dash);
+	}
+}
+
 void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
@@ -25,6 +33,7 @@ void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID
 		TEXT("Enter StateWalk")
 	);
 	Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeedMax;
+	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
 }
 
 void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
@@ -37,6 +46,7 @@ void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Blue,
 		TEXT("Exit StateWalk")
 	);
+	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
 }
 
 void UCouchCharacterStateWalk::StateTick(float DeltaTime)
@@ -55,6 +65,6 @@ void UCouchCharacterStateWalk::StateTick(float DeltaTime)
 	else
 	{
 		Character->SetOrient(Character->GetOrient());
-		Character->MoveInDirectionOfRotation(Character->GetInputMove().Size());
+		Character->MoveInDirectionOfRotation(MoveSpeedMax);
 	}
 }

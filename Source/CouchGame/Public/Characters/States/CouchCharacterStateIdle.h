@@ -17,6 +17,7 @@ public:
 
 	UFUNCTION()
 	void OnInputDash(FVector2D InputMove);
+	
 	virtual void StateEnter(ECouchCharacterStateID PreviousStateID) override;
 
 	virtual void StateExit(ECouchCharacterStateID NextStateID) override;

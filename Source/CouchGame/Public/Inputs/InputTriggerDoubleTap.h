@@ -20,7 +20,7 @@ protected:
 
 public:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Trigger Settings", meta=(DisplayThumbnail="false"))
-	float Delay = 0.5f;
+	float Delay = 0.8f;
 
 private:
 	float LastTappedTime = 0.f;

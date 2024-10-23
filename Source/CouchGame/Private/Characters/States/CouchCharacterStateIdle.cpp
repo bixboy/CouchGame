@@ -29,7 +29,7 @@ void UCouchCharacterStateIdle::StateEnter(ECouchCharacterStateID PreviousStateID
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
-		FColor::Black,
+		FColor::White,
 		TEXT("Enter StateIdle")
 	);
 
@@ -43,7 +43,7 @@ void UCouchCharacterStateIdle::StateExit(ECouchCharacterStateID NextStateID)
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
-		FColor::Black,
+		FColor::White,
 		TEXT("Exit StateIdle")
 	);
 	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
@@ -55,7 +55,7 @@ void UCouchCharacterStateIdle::StateTick(float DeltaTime)
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		DeltaTime,
-		FColor::Black,
+		FColor::White,
 		TEXT("Tick StateIdle")
 	);
 
