@@ -4,6 +4,7 @@
 #include "LocalMultiplayerGameViewportClient.h"
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void ULocalMultiplayerGameViewportClient::PostInitProperties()
 {
@@ -72,25 +73,28 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 	if (bGamepad)
 	{
 		int PlayerIndex = -1;
-		if (ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GetGameInstance()->GetSubsystem<ULocalMultiplayerSubsystem>())
+		if (ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GetGameInstance()
+			->GetSubsystem<ULocalMultiplayerSubsystem>())
 		{
-			if (LocalMultiplayerSubsystem
-				->GetAssignedPlayerIndexFromGamepadDeviceID(InputDevice.GetId()) < 0)
+			if (!LocalMultiplayerSubsystem->IsGamepadDeviceIDValid(InputDevice.GetId()))
 			{
-				PlayerIndex = LocalMultiplayerSubsystem
-				->AssignNewPlayerToGamepadDeviceID(InputDevice.GetId());
-				LocalMultiplayerSubsystem
-				->AssignGamepadInputMapping(PlayerIndex,ELocalMultiplayerInputMappingType::InGame);
+				// Assign a new player to this Gamepad Device ID
+				PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToGamepadDeviceID(InputDevice.GetId());
+				LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
 			}
 			else
 			{
+				// Retrieve the existing player index
 				PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(InputDevice.GetId());
 			}
 
+			// Pass input to the player's controller
 			GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex)->GetPlayerController(GetWorld())
 					->InputAxis(Key, Delta, DeltaTime, NumSamples, bGamepad);
-		
 		}
 	}
+
 	return Super::InputAxis(InViewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
 }
+
+

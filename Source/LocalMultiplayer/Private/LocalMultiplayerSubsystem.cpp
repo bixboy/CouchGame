@@ -68,7 +68,7 @@ void ULocalMultiplayerSubsystem::AssignKeyboardMapping(int PlayerIndex, int Keyb
 
 int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID)
 {
-	if (PlayerIndexFromGamepadProfileIndex[DeviceID])
+	if (PlayerIndexFromGamepadProfileIndex.Contains(DeviceID))
 	{
 		return PlayerIndexFromGamepadProfileIndex[DeviceID];
 	}
@@ -99,6 +99,13 @@ void ULocalMultiplayerSubsystem::AssignGamepadInputMapping(int PlayerIndex,
 		}
 	}
 }
+
+bool ULocalMultiplayerSubsystem::IsGamepadDeviceIDValid(int32 DeviceID) const
+{
+	return PlayerIndexFromGamepadProfileIndex.Contains(DeviceID);
+}
+
+
 
 
 

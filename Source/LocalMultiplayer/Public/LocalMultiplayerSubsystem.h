@@ -30,8 +30,9 @@ public:
 	int AssignNewPlayerToGamepadDeviceID(int DeviceID);
 
 	void AssignGamepadInputMapping(int PlayerIndex, ELocalMultiplayerInputMappingType MappingType) const;
+	bool IsGamepadDeviceIDValid(int32 DeviceID) const;
 
-	protected:
+protected:
 	UPROPERTY()
 	uint8 LastAssignedPlayerIndex = 0;
 
