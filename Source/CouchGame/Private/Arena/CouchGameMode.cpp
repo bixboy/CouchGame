@@ -53,7 +53,7 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
-	UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
+	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
 	{
 		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
@@ -67,7 +67,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 
 		if (!NewCharacter) continue;
 		NewCharacter->InputData = InputData;
-		NewCharacter->InputMappingContext = InputMappingContext;
+		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
