@@ -105,6 +105,11 @@ bool ULocalMultiplayerSubsystem::IsGamepadDeviceIDValid(int32 DeviceID) const
 	return PlayerIndexFromGamepadProfileIndex.Contains(DeviceID);
 }
 
+int ULocalMultiplayerSubsystem::GetLastAssignedPlayerIndex() const
+{
+	return LastAssignedPlayerIndex;
+}
+
 
 
 

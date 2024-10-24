@@ -38,7 +38,7 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
                 {
                     if (APlayerController* PlayerController = LocalPlayer->GetPlayerController(GetWorld()))
                     {
-                        PlayerController->InputKey(EventArgs.Key, EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
+                        return PlayerController->InputKey(EventArgs.Key, EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
                     }
                 }
             }
@@ -59,7 +59,7 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
                     {
                         if (APlayerController* PlayerController = LocalPlayer->GetPlayerController(GetWorld()))
                         {
-                            PlayerController->InputKey(EventArgs.Key, EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
+                            return PlayerController->InputKey(EventArgs.Key, EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
                         }
                     }
                 }
@@ -96,7 +96,7 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 			{
 				if (APlayerController* PlayerController = LocalPlayer->GetPlayerController(GetGameInstance()->GetWorld()))
 				{
-					PlayerController->InputAxis(Key, Delta, DeltaTime, NumSamples, bGamepad);
+					return PlayerController->InputAxis(Key, Delta, DeltaTime, NumSamples, bGamepad);
 				}
 			}
 		}

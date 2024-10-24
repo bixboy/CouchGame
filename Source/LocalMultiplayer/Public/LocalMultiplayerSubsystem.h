@@ -31,6 +31,7 @@ public:
 
 	void AssignGamepadInputMapping(int PlayerIndex, ELocalMultiplayerInputMappingType MappingType) const;
 	bool IsGamepadDeviceIDValid(int32 DeviceID) const;
+	int GetLastAssignedPlayerIndex() const;
 
 protected:
 	UPROPERTY()
