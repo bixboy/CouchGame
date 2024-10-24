@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CouchSplineLinePath.h"
+#include "CouchWidgetSpawn.h"
 #include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
@@ -16,6 +16,7 @@ class COUCHGAME_API ACoucheCannon : public AActor
 	GENERATED_BODY()
 
 private:
+	
 	UPROPERTY()
 	USceneComponent* StartPoint;
 
@@ -79,16 +80,6 @@ private:
 	
 #pragma endregion
 
-#pragma region Widgets
-	
-	UPROPERTY()
-	USceneComponent* WidgetPose;
-	UPROPERTY()
-	AActor* CurrentWidget = nullptr;
-	UPROPERTY()
-	AActor* PowerChargeActor;
-#pragma endregion	
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -106,10 +97,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
 	UClass* Bullet;
 
-	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn);
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
 	AActor* LinePath;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCouchWidgetSpawn* WidgetComponent;
 	
 };

@@ -4,7 +4,6 @@
 #include "CoucheCannon.h"
 
 #include "CouchCannonBall.h"
-#include "CouchWidget3D.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -16,13 +15,13 @@
 ACoucheCannon::ACoucheCannon()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
 }
 
 void ACoucheCannon::BeginPlay()
 {
 	Super::BeginPlay();
 	StartPoint = this->FindComponentByTag<USceneComponent>(StartPointName);
-	WidgetPose = this->FindComponentByTag<USceneComponent>(WidgetPoseName);
 	LinePathComponent = Cast<USplineComponent>(LinePath->GetComponentByClass(USplineComponent::StaticClass()));
 	SetupTimeLine();
 }
@@ -60,23 +59,6 @@ void ACoucheCannon::Tick(float DeltaTime)
 
 #pragma region Shoot
 
-#pragma region Spawn Functions
-
-void ACoucheCannon::SpawnWidget(UClass* WidgetToSpawn)
-{
-	if (CurrentWidget == nullptr && WidgetPose != nullptr)
-		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());
-	else
-	{
-		CurrentWidget->Destroy();
-		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());	
-	}
-
-	if (CurrentWidget->IsA<ACouchWidget3D>())
-		PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
-}
-
-
 void ACoucheCannon::SpawnBullet()
 {
 	TargetLocation = LineTrace();
@@ -100,8 +82,6 @@ void ACoucheCannon::SpawnBullet()
 		Projectile->Initialize(SuggestedVelocity);
 	}
 }
-
-#pragma endregion
 
 #pragma region Charging
 
@@ -127,7 +107,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 
 	FOutputDeviceNull ar;
 	FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), Alpha);
-	PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+	WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
 	LineTrace();
 }
