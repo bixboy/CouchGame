@@ -24,6 +24,8 @@ private:
 	FVector TargetLocation;
 
 	UPROPERTY()
+	UStaticMeshComponent* AmmoMesh;
+	UPROPERTY()
 	bool CanShoot = false;
 	UPROPERTY()
 	float AttackRange;
@@ -52,7 +54,7 @@ private:
 	
 #pragma endregion	
 	
-#pragma region Power
+#pragma region Power Charge
 
 	UPROPERTY()
 	FTimeline PowerTimeline;

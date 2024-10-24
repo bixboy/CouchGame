@@ -22,7 +22,9 @@ void ACoucheCannon::BeginPlay()
 {
 	Super::BeginPlay();
 	StartPoint = this->FindComponentByTag<USceneComponent>(StartPointName);
-	LinePathComponent = Cast<USplineComponent>(LinePath->GetComponentByClass(USplineComponent::StaticClass()));
+	if (LinePath)
+		LinePathComponent = Cast<USplineComponent>(LinePath->GetComponentByClass(USplineComponent::StaticClass()));
+	
 	SetupTimeLine();
 }
 
