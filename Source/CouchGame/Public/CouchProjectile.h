@@ -3,23 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "CouchCannonBall.generated.h"
+#include "Components/StaticMeshComponent.h"
+#include "CouchProjectile.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class COUCHGAME_API ACouchCannonBall : public AActor
+class COUCHGAME_API UCouchProjectile : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
 public:
-	ACouchCannonBall();
-
-protected:
-	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
+	UCouchProjectile();
+	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void Initialize(const FVector& LaunchVelocity);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	FVector Velocity;      // Vélocité du projectile

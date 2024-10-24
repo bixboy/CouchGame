@@ -4,14 +4,11 @@
 #include "CouchCannonBall.h"
 
 
-// Sets default values
 ACouchCannonBall::ACouchCannonBall()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void ACouchCannonBall::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,7 +22,6 @@ void ACouchCannonBall::Initialize(const FVector& LaunchVelocity)
 	TimeElapsed = 0.0f; // Réinitialiser le temps écoulé
 }
 
-// Called every frame
 void ACouchCannonBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
