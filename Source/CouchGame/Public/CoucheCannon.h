@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchSplineLinePath.h"
+#include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "CoucheCannon.generated.h"
@@ -16,17 +18,42 @@ class COUCHGAME_API ACoucheCannon : public AActor
 private:
 	UPROPERTY()
 	USceneComponent* StartPoint;
-	
+
+	UPROPERTY()
 	FVector TargetLocation;
 
+	UPROPERTY()
 	bool CanShoot = false;
+	UPROPERTY()
 	float AttackRange;
 
 	void SpawnBullet();
 	FVector LineTrace();
+
+#pragma region Movement
+
+	UPROPERTY()
+	FTimeline MoveTimeline;
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* MoveCurve;
+	UPROPERTY()
+	USplineComponent* LinePathComponent;
+
+	UFUNCTION(BlueprintCallable)
+	void StartMovement(int InputDirection);
+	UFUNCTION(BlueprintCallable)
+	void StopMovement();
+	UFUNCTION()
+	void MoveCannon(float Alpha);
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float SpeedMovement;
+	
+#pragma endregion	
 	
 #pragma region Power
-	
+
+	UPROPERTY()
 	FTimeline PowerTimeline;
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* PowerCurve;
@@ -35,6 +62,7 @@ private:
 	float MaxPower = 500.f;
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float MinPower = 100.f;
+	UPROPERTY()
 	float CurrentPower;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
@@ -80,5 +108,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnWidget(UClass* WidgetToSpawn);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
+	AActor* LinePath;
 	
 };

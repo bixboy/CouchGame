@@ -5,6 +5,7 @@
 
 #include "CouchCannonBall.h"
 #include "CouchWidget3D.h"
+#include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -20,16 +21,44 @@ ACoucheCannon::ACoucheCannon()
 void ACoucheCannon::BeginPlay()
 {
 	Super::BeginPlay();
-	SetupTimeLine();
 	StartPoint = this->FindComponentByTag<USceneComponent>(StartPointName);
 	WidgetPose = this->FindComponentByTag<USceneComponent>(WidgetPoseName);
+	LinePathComponent = Cast<USplineComponent>(LinePath->GetComponentByClass(USplineComponent::StaticClass()));
+	SetupTimeLine();
+}
+
+void ACoucheCannon::SetupTimeLine()
+{
+#pragma region Power Timeline
+	PowerTimeline.SetPlayRate(SpeedCharge/1);
+	FOnTimelineFloat TimelineCallback;
+	TimelineCallback.BindUFunction(this, FName("UpdatePower"));
+
+	PowerTimeline.AddInterpFloat(PowerCurve, TimelineCallback);
+	PowerTimeline.SetLooping(false);
+#pragma endregion
+
+#pragma region Move Timeline
+	if(LinePathComponent)
+	{
+		MoveTimeline.SetPlayRate(SpeedMovement/1);
+		FOnTimelineFloat MoveTimelineCallback;
+		MoveTimelineCallback.BindUFunction(this, FName("MoveCannon"));
+
+		MoveTimeline.AddInterpFloat(MoveCurve, MoveTimelineCallback);
+		MoveTimeline.SetLooping(false);	
+	}
+#pragma endregion
 }
 
 void ACoucheCannon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	PowerTimeline.TickTimeline(DeltaTime);
+	MoveTimeline.TickTimeline(DeltaTime);
 }
+
+#pragma region Shoot
 
 #pragma region Spawn Functions
 
@@ -46,6 +75,7 @@ void ACoucheCannon::SpawnWidget(UClass* WidgetToSpawn)
 	if (CurrentWidget->IsA<ACouchWidget3D>())
 		PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
 }
+
 
 void ACoucheCannon::SpawnBullet()
 {
@@ -75,25 +105,19 @@ void ACoucheCannon::SpawnBullet()
 
 #pragma region Charging
 
-void ACoucheCannon::SetupTimeLine()
-{
-	PowerTimeline.SetPlayRate(SpeedCharge/1);
-	FOnTimelineFloat TimelineCallback;
-	TimelineCallback.BindUFunction(this, FName("UpdatePower"));
-
-	PowerTimeline.AddInterpFloat(PowerCurve, TimelineCallback);
-	PowerTimeline.SetLooping(false);
-}
-
 void ACoucheCannon::StartCharging()
 {
+	if(CanShoot == true)
 	PowerTimeline.PlayFromStart();
 }
 
 void ACoucheCannon::StopCharging()
 {
-	PowerTimeline.Stop();
-	SpawnBullet();
+	if (CanShoot)
+	{
+		PowerTimeline.Stop();
+		SpawnBullet();	
+	}
 }
 
 void ACoucheCannon::UpdatePower(float Alpha)
@@ -119,7 +143,7 @@ FVector ACoucheCannon::LineTrace()
 	FHitResult HitResult;
       
 	// Line Trace
-	const bool bHit = UKismetSystemLibrary::LineTraceSingle(
+	UKismetSystemLibrary::LineTraceSingle(
 		GetWorld(),
 		Start,
 		End,
@@ -135,3 +159,37 @@ FVector ACoucheCannon::LineTrace()
 	);
 		return HitResult.TraceEnd;
 }
+
+#pragma endregion 
+
+#pragma region Movement
+
+void ACoucheCannon::StartMovement(int InputDirection)
+{
+	CanShoot = false;
+	int Direction = FMath::Clamp(InputDirection, -1, 1);
+	if (Direction == 1)
+		MoveTimeline.Play();
+	else
+		MoveTimeline.Reverse();
+}
+
+void ACoucheCannon::StopMovement()
+{
+	CanShoot = true;
+	MoveTimeline.Stop();
+}
+
+void ACoucheCannon::MoveCannon(float Alpha)
+{
+	if (LinePathComponent)
+	{
+		float Distance = FMath::Lerp(0, LinePathComponent->GetSplineLength(), Alpha);
+		FVector Location = LinePathComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		FRotator Rotation =	FRotator(GetActorRotation()); //LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
+		FTransform Transform = FTransform(Rotation, Location, FVector(1, 1, 1));
+		SetActorTransform(Transform, false);
+	}
+}
+
+#pragma endregion
