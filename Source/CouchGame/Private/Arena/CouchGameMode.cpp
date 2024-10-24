@@ -9,13 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "InputMappingContext.h"
+#include "LocalMultiplayerSubsystem.h"
 #include "Characters/CouchCharacterSettings.h"
 
 
 void ACouchGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
+	CreateAndInitPlayers();
 	TArray<ACouchPlayerStart*> PlayerStartsPoints;
 	FindPlayerStartActorsInArena(PlayerStartsPoints);
 	SpawnCharacter(PlayerStartsPoints);
@@ -52,7 +53,7 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
-	UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
+	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
 	{
 		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
@@ -66,7 +67,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 
 		if (!NewCharacter) continue;
 		NewCharacter->InputData = InputData;
-		NewCharacter->InputMappingContext = InputMappingContext;
+		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
@@ -97,4 +98,16 @@ TSubclassOf<ACouchCharacter> ACouchGameMode::GetCouchCharacterClassFromInputType
 		default:
 			return nullptr;
 	}
+}
+
+void ACouchGameMode::CreateAndInitPlayers() const
+{
+	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+	if (!GameInstance) return;
+
+	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance
+	->GetSubsystem<ULocalMultiplayerSubsystem>();
+	if (!LocalMultiplayerSubsystem) return;
+
+	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::InGame);
 }

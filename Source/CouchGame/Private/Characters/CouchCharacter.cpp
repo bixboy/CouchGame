@@ -60,7 +60,7 @@ void ACouchCharacter::MoveInDirectionOfRotation(float InputStrength)
 {
 	FRotator MeshRotation = GetMesh()->GetRelativeRotation();
 	FVector LeftDirection = FRotationMatrix(MeshRotation).GetScaledAxis(EAxis::Y);
-	AddMovementInput(LeftDirection, InputStrength);
+	AddMovementInput(LeftDirection, InputStrength, true);
 }
 
 void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
@@ -116,7 +116,6 @@ bool ACouchCharacter::GetCanDash() const
 
 void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	InputMove = InputActionValue.Get<FVector2D>();
 	InputDashEvent.Broadcast(InputMove);
 }
 
@@ -152,7 +151,7 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 	{
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionDash,
-			ETriggerEvent::Triggered,
+			ETriggerEvent::Started,
 			this,
 			&ACouchCharacter::OnInputDash
 		);

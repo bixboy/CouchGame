@@ -73,30 +73,33 @@ protected:
 
 #pragma endregion
 #pragma region InputMove
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDashEvent, FVector2D, InputMove);
 	
 public:
 	FVector2D GetInputMove() const;
-	
-	bool GetCanDash() const;
-
-	UPROPERTY()
-	FInputDashEvent InputDashEvent;
 
 protected:
 	UPROPERTY()
 	FVector2D InputMove = FVector2D::ZeroVector;
 
 private:
-	UPROPERTY(EditAnywhere)
-	bool CanDash = true;
-
-	void OnInputDash(const FInputActionValue& InputActionValue);
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputMove(const FInputActionValue& InputActionValue);
 
 #pragma endregion
+#pragma region Dash
 	
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDashEvent, FVector2D, InputMove);
+	public:
+	bool GetCanDash() const;
+
+	UPROPERTY()
+	FInputDashEvent InputDashEvent;
+
+private:
+	UPROPERTY(EditAnywhere)
+	bool CanDash = true;
+
+	void OnInputDash(const FInputActionValue& InputActionValue);
+#pragma endregion
 };
