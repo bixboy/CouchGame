@@ -1,8 +1,0 @@
-{
-	"BuildId": "27405482",
-	"Modules": 
-	{
-		"CouchGame": "UnrealEditor-CouchGame.dll",
-		"LocalMultiplayer": "UnrealEditor-LocalMultiplayer.dll"
-	}
-}
