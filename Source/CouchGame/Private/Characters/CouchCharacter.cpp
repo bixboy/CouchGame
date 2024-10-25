@@ -151,7 +151,7 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 	{
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionDash,
-			ETriggerEvent::Started,
+			ETriggerEvent::Triggered,
 			this,
 			&ACouchCharacter::OnInputDash
 		);
