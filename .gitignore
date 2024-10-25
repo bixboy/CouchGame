@@ -55,6 +55,7 @@ Binaries/Win64/*
 !Binaries/Win64/UnrealEditor-CouchGame.dll
 Binaries/Win64/UnrealEditor-CouchGame.dll
 Binaries/Win64/CouchGameEditor.target
+Binaries/Win64/LocalMultiplayer.dll
 Config/DefaultEditor.ini
 # Builds
 Build/*
