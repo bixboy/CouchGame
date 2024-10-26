@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchFishingRod.h"
+#include "Interactables/CouchFishingRod.h"
 
 
 // Sets default values
