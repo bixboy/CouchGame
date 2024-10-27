@@ -14,16 +14,30 @@ class COUCHGAME_API ACouchCannonBall : public AActor
 public:
 	ACouchCannonBall();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:
 	virtual void Tick(float DeltaTime) override;
 	void Initialize(const FVector& LaunchVelocity);
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
+	UPROPERTY()
 	FVector Velocity;      // Vélocité du projectile
+	UPROPERTY()
 	FVector Location;      // Position actuelle du projectile
+	UPROPERTY()
 	float TimeElapsed;     // Temps écoulé depuis le lancement
 	const float Gravity = -980.0f;
+
+#pragma region Mesh
+private:
+	UPROPERTY()
+	UStaticMesh* Mesh;
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
+	UStaticMeshComponent* Base;
+	
+#pragma endregion	
+	
 };

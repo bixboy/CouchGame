@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CouchProjectile.h"
+#include "Components/CouchProjectile.h"
 
 UCouchProjectile::UCouchProjectile()
 {

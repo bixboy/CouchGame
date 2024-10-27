@@ -52,17 +52,17 @@ Plugins/*/Binaries/*
 Binaries/Win64/*
 !Binaries/Win64/CouchGameEditor.target
 !Binaries/Win64/UnrealEditor.modules
+!Binaries/Win64/UnrealEditor-CouchGame.dll
 Binaries/Win64/UnrealEditor-CouchGame.dll
 Binaries/Win64/CouchGameEditor.target
 Binaries/Win64/UnrealEditor-LocalMultiplayer.dll
 Config/DefaultEditor.ini
-
 # Builds
 Build/*
+
 !Build/*/
 Build/*/**
 !Build/*/PakBlacklist*.txt
-
 
 # Don't ignore icon files in Build
 !Build/**/*.ico
