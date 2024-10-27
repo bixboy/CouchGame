@@ -27,9 +27,6 @@ void ACoucheCannon::BeginPlay()
 	
 	SkeletalMesh = Cast<USkeletalMeshComponent>(this->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
 	
-	if (LinePath)
-		LinePathComponent = Cast<USplineComponent>(LinePath->GetComponentByClass(USplineComponent::StaticClass()));
-	
 	SetupTimeLine();
 }
 
@@ -37,7 +34,6 @@ void ACoucheCannon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	PowerTimeline.TickTimeline(DeltaTime);
-	MoveTimeline.TickTimeline(DeltaTime);
 }
 
 #pragma region Setup Functions
@@ -45,6 +41,7 @@ void ACoucheCannon::Tick(float DeltaTime)
 void ACoucheCannon::SetupCannon()
 {
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
+	MovementComponent = CreateDefaultSubobject<UCouchMovement>(TEXT("MovementComponent"));
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
@@ -63,41 +60,35 @@ void ACoucheCannon::SetupTimeLine()
 	PowerTimeline.AddInterpFloat(PowerCurve, TimelineCallback);
 	PowerTimeline.SetLooping(false);
 #pragma endregion
-
-#pragma region Move Timeline
-	if(LinePathComponent)
-	{
-		MoveTimeline.SetPlayRate(SpeedMovement/1.f);
-		FOnTimelineFloat MoveTimelineCallback;
-		MoveTimelineCallback.BindUFunction(this, FName("MoveCannon"));
-
-		MoveTimeline.AddInterpFloat(MoveCurve, MoveTimelineCallback);
-		MoveTimeline.SetLooping(false);	
-	}
-#pragma endregion
 }
 
 #pragma endregion
 
 void ACoucheCannon::Interact_Implementation(FHitResult HitResult, ACouchCharacter* Player)
 {
-	if (!PlayerIsIn)
+	if (!CurrentPlayer || CurrentPlayer == Player)
 	{
-		PlayerIsIn = true;
-		CanShoot = true;
-		WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
+		if (!PlayerIsIn)
+		{
+			CurrentPlayer = Player;
+			PlayerIsIn = true;
+			CanShoot = true;
+			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 		
-		FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
-		Player->SetActorTransform(PoseTransform, false);
-	}
-	else
-	{
-		PlayerIsIn = false;
-		CanShoot = false;
-		WidgetComponent->DestroyWidget();
-		StopMovement();
+			Player->SetActorTransform(PoseTransform, false);
+			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		}
+		else
+		{
+			PlayerIsIn = false;
+			CanShoot = false;
+			WidgetComponent->DestroyWidget();
+			StopMovement();
+			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}	
 	}
 }
 
@@ -233,11 +224,7 @@ void ACoucheCannon::StartMovement(int InputDirection)
 	if (PlayerIsIn)
 	{
 		CanShoot = false;
-		int Direction = FMath::Clamp(InputDirection, -1, 1);
-		if (Direction == 1)
-			MoveTimeline.Play();
-		else
-			MoveTimeline.Reverse();	
+		MovementComponent->StartMovement(InputDirection);
 	}
 }
 
@@ -246,19 +233,7 @@ void ACoucheCannon::StopMovement()
 	if (PlayerIsIn)
 	{
 		CanShoot = true;
-		MoveTimeline.Stop();	
-	}
-}
-
-void ACoucheCannon::MoveCannon(float Alpha)
-{
-	if (LinePathComponent)
-	{
-		float Distance = FMath::Lerp(0, LinePathComponent->GetSplineLength(), Alpha);
-		FVector Location = LinePathComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FRotator Rotation =	FRotator(GetActorRotation()); //LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
-		FTransform Transform = FTransform(Rotation, Location, FVector(1, 1, 1));
-		SetActorTransform(Transform, false);
+		MovementComponent->StopMovement();	
 	}
 }
 

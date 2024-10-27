@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CouchPickableCannonBall.h"
 #include "InputAction.h"
+#include "Components/CouchMovement.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
@@ -25,6 +26,9 @@ private:
 	
 	UPROPERTY()
 	bool PlayerIsIn = false;
+
+	UPROPERTY()
+	ACouchCharacter* CurrentPlayer;
 
 	UFUNCTION()
 	void SetupCannon();
@@ -100,27 +104,15 @@ public:
 
 #pragma region Movement
 private:
-	UPROPERTY()
-	FTimeline MoveTimeline;
-	UPROPERTY(EditAnywhere)
-	UCurveFloat* MoveCurve;
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	float SpeedMovement;
 	
-	UPROPERTY()
-	USplineComponent* LinePathComponent;
-
 	UFUNCTION(BlueprintCallable)
 	void StartMovement(int InputDirection);
 	UFUNCTION(BlueprintCallable)
 	void StopMovement();
-	
-	UFUNCTION()
-	void MoveCannon(float Alpha);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	AActor* LinePath;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCouchMovement* MovementComponent;
 	
 #pragma endregion	
 
