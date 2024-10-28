@@ -40,6 +40,7 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult)
 		if (SpawnTransform.GetLocation() != FVector::ZeroVector)
 		{
 			ACouchPlank* NewHit =  GetWorld()->SpawnActor<ACouchPlank>(FloorHit, SpawnTransform);
+			NewHit->Init(this);
 			Hits.Add(NewHit);
 		}
 	}
@@ -47,6 +48,11 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("FloorHit class is null."));
 	}
+}
+
+void ABoatFloor::RemoveHitFromArray(ACouchPlank* Plank)
+{
+	Hits.Remove(Plank);
 }
 
 

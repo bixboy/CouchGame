@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
+#include "Boat/BoatFloor.h"
 #include "Components/SceneComponent.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Characters/CouchCharacter.h"
@@ -29,11 +30,33 @@ ACouchPlank::ACouchPlank()
 	WaterParticle->SetupAttachment(HitMesh);
 	WidgetPos->SetupAttachment(HitMesh);
 
-
+	InterractiveBoxRange->OnComponentBeginOverlap.AddDynamic(this, &ACouchPlank::OnOverlapBegin);
+	InterractiveBoxRange->OnComponentEndOverlap.AddDynamic(this, &ACouchPlank::OnOverlapEnd);
 }
 
 void ACouchPlank::Init(ABoatFloor* floor)
 {
+	Floor = floor;
+}
+
+void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les méchants");
+		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+	}
+}
+
+void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les gentils");
+		CouchWidgetSpawn->DestroyWidget();
+	}
 	
 }
 
@@ -43,6 +66,23 @@ void ACouchPlank::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ACouchPlank::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (IsPlayerRepairing)
+	{
+		Timer += DeltaTime;
+		if (Timer >= TimeToRepair)
+		{
+			Floor->RemoveHitFromArray(this);
+			Destroy();
+		}
+	}
+	else if (!IsPlayerRepairing && Timer != 0)
+	{
+		Timer = 0;
+	}
+}
 
 
 UStaticMesh* ACouchPlank::GetRandomStaticMesh()
@@ -55,7 +95,8 @@ UStaticMesh* ACouchPlank::GetRandomStaticMesh()
 void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 {
 	ICouchInteractable::Interact_Implementation(Player);
-	
+	APlayer = Player;
+	IsPlayerRepairing = !IsPlayerRepairing;
 }
 
 

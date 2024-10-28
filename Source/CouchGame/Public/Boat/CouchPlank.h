@@ -26,16 +26,23 @@ public:
 
 	void Init(ABoatFloor* floor);
 
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 private:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BlockAll;
 	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UObject> InterractWidget;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	UClass* InteractWidget;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* HitMesh;
@@ -61,8 +68,11 @@ private:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	bool IsPlayerRepairing;
 
+	UPROPERTY()
 	ABoatFloor* Floor; 
 	UPROPERTY(EditAnywhere)
 	float TimeToRepair;
 	float Timer;
+	UPROPERTY()
+	ACouchCharacter* APlayer;
 };

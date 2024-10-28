@@ -22,6 +22,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Hit_Implementation(FHitResult HitResult) override;
+
+	void RemoveHitFromArray(ACouchPlank* Plank);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
