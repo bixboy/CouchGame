@@ -76,7 +76,6 @@ void ACoucheCannon::Interact_Implementation(FHitResult HitResult, ACouchCharacte
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 		
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
 			Player->SetActorTransform(PoseTransform, false);
 			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
