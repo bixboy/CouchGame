@@ -8,6 +8,8 @@
 #include "Interfaces/CouchDamageable.h"
 #include "BoatFloor.generated.h"
 
+class ACouchBoat;
+
 UCLASS()
 class COUCHGAME_API ABoatFloor : public AActor, public ICouchDamageable
 {
@@ -25,14 +27,19 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* StaticMesh;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* Collision;
 	
-	UPROPERTY(EditAnywhere)
-	ACouchPlank* PlankHit;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ACouchPlank> FloorHit;
+
+	TArray<ACouchPlank*> Hits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	ACouchBoat* Boat;
 	
 
 };

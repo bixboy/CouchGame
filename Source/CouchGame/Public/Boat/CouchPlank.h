@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/CouchInteractable.h"
 #include "CouchPlank.generated.h"
 
+class ABoatFloor;
 class UBoxComponent;
 class UCouchWidgetSpawn;
 class UStaticMeshComponent;
@@ -15,16 +17,14 @@ class USceneComponent;
 class UNiagaraComponent;
 
 UCLASS()
-class COUCHGAME_API ACouchPlank : public AActor
+class COUCHGAME_API ACouchPlank : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
 public:
-
-	// Sets default values for this actor's properties
 	ACouchPlank();
 
-	~ACouchPlank();
+	void Init(ABoatFloor* floor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,30 +32,21 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere)
+	UBoxComponent* BlockAll;
+	
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UObject> InterractWidget;
 
-	UPROPERTY()
-	UStaticMeshComponent* PlankMesh;
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* HitMesh;
 
 	UStaticMesh* GetRandomStaticMesh();
 	
 	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "AAA_PlankMeshes", meta = (AllowPrivateAccess = "true"))
 	TArray<UStaticMesh*> DamagedPlanckMeshes;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BlockAllBox;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComponent;
-
-	UFUNCTION()
-	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
-						   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
-						   bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnBoxEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UBoxComponent* InterractiveBoxRange;
 	
 	
 	UPROPERTY(EditAnywhere)
@@ -66,8 +57,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UCouchWidgetSpawn* CouchWidgetSpawn;
-	
-	UPROPERTY(VisibleAnywhere)
-	bool IsInInterractZone;
-	
+
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	bool IsPlayerRepairing;
+
+	ABoatFloor* Floor; 
+	UPROPERTY(EditAnywhere)
+	float TimeToRepair;
+	float Timer;
 };
