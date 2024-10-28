@@ -21,6 +21,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Init(ACouchBoat* Boat);
+
 	virtual void Hit_Implementation(FHitResult HitResult) override;
 
 	void RemoveHitFromArray(ACouchPlank* Plank);
@@ -41,7 +43,10 @@ private:
 	TArray<ACouchPlank*> Hits;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
-	ACouchBoat* Boat;
-	
+	ACouchBoat* ABoat;
 
+	UPROPERTY(EditAnywhere)
+	float DamageFrequency = 1;
+	float Timer;
+	
 };

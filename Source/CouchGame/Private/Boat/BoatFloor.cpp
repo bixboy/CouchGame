@@ -3,6 +3,7 @@
 
 #include "Boat/BoatFloor.h"
 
+#include "Boat/CouchBoat.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -11,7 +12,7 @@
 ABoatFloor::ABoatFloor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Floor StaticMesh"));
 	Collision = CreateDefaultSubobject<UBoxComponent>(TEXT("FloorCollision"));
 	RootComponent = Collision;
@@ -21,6 +22,20 @@ ABoatFloor::ABoatFloor()
 void ABoatFloor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (ABoat && Hits.Num() > 0)
+	{
+		Timer += DeltaTime;
+		if (Timer >= DamageFrequency)
+		{
+			ABoat->BoatDamage(Hits.Num());
+			Timer = 0;
+		}
+	}
+}
+
+void ABoatFloor::Init(ACouchBoat* Boat)
+{
+	ABoat = Boat;
 }
 
 void ABoatFloor::Hit_Implementation(FHitResult HitResult)
@@ -53,6 +68,7 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult)
 void ABoatFloor::RemoveHitFromArray(ACouchPlank* Plank)
 {
 	Hits.Remove(Plank);
+	ABoat->BoatRepair();
 }
 
 

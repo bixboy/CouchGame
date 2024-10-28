@@ -4,6 +4,14 @@
 #include "GameFramework/Actor.h"
 #include "CouchBoat.generated.h"
 
+UENUM()
+enum class EBoatTeam : uint8
+{
+	Team1,
+	Team2
+};
+
+class ABoatFloor;
 class UStaticMeshComponent;
 class UBoxComponent;
 
@@ -18,11 +26,13 @@ public:
 	virtual void BeginPlay() override;
 	void BoatDamage(float DamageAmount);
 	void BoatRepair(float HealAmount);
+	void BoatRepair();
+	void SinkBoatAndGameOver();
 	float GetBoatLife() const;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoatBox;
+	UPROPERTY(EditAnywhere)
+	ABoatFloor* BoatFloor;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BoatMesh;
@@ -34,9 +44,11 @@ private:
 	float BoatLife;
 
 	UPROPERTY(EditAnywhere)
-	TArray<AActor*> Planks;
+	FVector2D BoatMinAndMaxDamagePerSecond;
+	UPROPERTY(EditAnywhere)
+	float HealAmountPerHitRepaired;
 
-	
-	
-
+	UPROPERTY(EditAnywhere)
+	EBoatTeam Team;
 };
+

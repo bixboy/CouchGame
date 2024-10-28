@@ -2,14 +2,16 @@
 
 
 #include "Boat/CouchBoat.h"
-#include "Components/BoxComponent.h"
+
+#include "Boat/BoatFloor.h"
 #include "Components/StaticMeshComponent.h"
+#include "IO/IoStore.h"
 
 // Sets default values
 ACouchBoat::ACouchBoat()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	BoatMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoatMesh"));
 	RootComponent = BoatMesh;
 	
@@ -21,12 +23,24 @@ void ACouchBoat::BeginPlay()
 {
 	Super::BeginPlay();
 	BoatLife = BoatStartLife;
+	if (BoatFloor)
+	{
+		BoatFloor->Init(this);
+	}
+	else // Rajouter QQ chose s'il le floor du bâteau n'a pas été assigné
+	{
+		
+	}
 	
 }
 void ACouchBoat::BoatDamage(float DamageAmount)
 {
-	DamageAmount = FMath::Abs(DamageAmount);
+	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
+	if (BoatLife == 0)
+	{
+		SinkBoatAndGameOver();
+	}
 }
 
 void ACouchBoat::BoatRepair(float HealAmount)
@@ -35,10 +49,32 @@ void ACouchBoat::BoatRepair(float HealAmount)
 	BoatLife = FMath::Clamp(BoatLife + HealAmount, 0, BoatStartLife);
 }
 
+void ACouchBoat::BoatRepair()
+{
+	BoatRepair(HealAmountPerHitRepaired);
+}
+
+void ACouchBoat::SinkBoatAndGameOver()
+{
+	switch (Team){
+	case EBoatTeam::Team1:
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 2 Win");	
+		}
+		case EBoatTeam::Team2:
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 1 Win");	
+		}
+		default:
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "No Team Win");	;
+	}
+}
+
 float ACouchBoat::GetBoatLife() const
 {
 	return BoatLife;
 }
+
 
 
 
