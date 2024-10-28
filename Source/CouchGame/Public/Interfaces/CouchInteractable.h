@@ -23,5 +23,5 @@ class COUCHGAME_API ICouchInteractable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Interact(FHitResult HitResult, ACouchCharacter* Player);
+	void Interact(ACouchCharacter* Player);
 };
