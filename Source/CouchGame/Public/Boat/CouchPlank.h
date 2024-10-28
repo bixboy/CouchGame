@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CouchWidgetSpawn.h"
+#include "Widget/CouchWidgetSpawn.h"
 #include "GameFramework/Actor.h"
 #include "CouchPlank.generated.h"
 

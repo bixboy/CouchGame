@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 #include "Components/SceneComponent.h"
-#include "CouchWidgetSpawn.h"
+#include "Widget/CouchWidgetSpawn.h"
 #include "Characters/CouchCharacter.h"
 
 
