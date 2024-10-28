@@ -17,15 +17,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UPROPERTY()
 	AActor* PowerChargeActor;
+	UFUNCTION(BlueprintCallable)
+	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
+	UFUNCTION(BlueprintCallable)
+	void DestroyWidget();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
-	UFUNCTION(BlueprintCallable)
-	void DestroyWidget();
+
 	UPROPERTY()
 	AActor* CurrentWidget = nullptr;
 };

@@ -96,10 +96,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDashEvent, FVector2D, InputMov
 	UPROPERTY()
 	FInputDashEvent InputDashEvent;
 
+	UPROPERTY()
+	float DashDuration;
+
+
 private:
 	UPROPERTY(EditAnywhere)
 	bool CanDash = true;
 
+	UPROPERTY()
+	bool CanDashAgain = true;
+
+	UPROPERTY()
+	float DashTimer;
+	
+	
 	void OnInputDash(const FInputActionValue& InputActionValue);
 #pragma endregion
 };

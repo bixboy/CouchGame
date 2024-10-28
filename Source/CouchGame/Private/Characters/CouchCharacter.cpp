@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 
 // Sets default values
@@ -31,6 +32,15 @@ void ACouchCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	TickStateMachine(DeltaTime);
 	RotateMeshUsingOrient(DeltaTime);
+	if (!CanDashAgain)
+	{
+		DashTimer += DeltaTime;
+		if (DashTimer >= DashDuration)
+		{
+			DashTimer = 0;
+			CanDashAgain = true;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -114,9 +124,15 @@ bool ACouchCharacter::GetCanDash() const
 	return CanDash;
 }
 
+
 void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	InputDashEvent.Broadcast(InputMove);
+	if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+	{
+		CanDashAgain = false;
+		InputDashEvent.Broadcast(InputMove);
+	}
+	
 }
 
 void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -151,7 +167,7 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 	{
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionDash,
-			ETriggerEvent::Triggered,
+			ETriggerEvent::Started,
 			this,
 			&ACouchCharacter::OnInputDash
 		);
