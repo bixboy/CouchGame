@@ -59,6 +59,12 @@ public:
 #pragma endregion
 
 #pragma region Power Charge
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void StartCharging();
+	UFUNCTION(BlueprintCallable)
+	void StopCharging();
 private:	
 	UPROPERTY()
 	FTimeline PowerTimeline;
@@ -79,10 +85,7 @@ private:
 
 	UFUNCTION()
 	void SetupTimeLine();
-	UFUNCTION(BlueprintCallable)
-	void StartCharging();
-	UFUNCTION(BlueprintCallable)
-	void StopCharging();
+
 	UFUNCTION()
 	void UpdatePower(float Alpha);
 	
@@ -145,7 +148,7 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact_Implementation(FHitResult HitResult, ACouchCharacter* Player) override;
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* PlayerPose;

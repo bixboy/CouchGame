@@ -19,7 +19,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	
-	virtual void Interact_Implementation(FHitResult HitResult, ACouchCharacter* Player) override;
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 #pragma region Setup Shield
 	
