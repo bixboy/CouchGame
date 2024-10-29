@@ -25,7 +25,7 @@ void ACouchShield::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACouchShield::Interact_Implementation(FHitResult HitResult, ACouchCharacter* Player)
+void ACouchShield::Interact_Implementation(ACouchCharacter* Player)
 {
 	if (!CurrentPlayer || CurrentPlayer == Player)
 	{

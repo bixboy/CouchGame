@@ -17,10 +17,7 @@ ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
 
 void UCouchCharacterStateWalk::OnInputDash(FVector2D InputMove)
 {
-	if (Character->GetCanDash())
-	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Dash);
-	}
+	StateMachine->ChangeState(ECouchCharacterStateID::Dash);
 }
 
 void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID)

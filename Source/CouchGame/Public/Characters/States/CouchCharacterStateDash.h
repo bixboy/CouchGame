@@ -26,6 +26,4 @@ private:
 	float DashDuration =.3f;
 	UPROPERTY(EditAnywhere)
 	float DashForce = 100;
-	UPROPERTY()
-	float DashTimer;
 };
