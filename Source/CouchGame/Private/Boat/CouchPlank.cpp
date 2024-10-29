@@ -48,7 +48,12 @@ void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les méchants");
 		UClass* InteractWidget = InteractWidgetClass.Get();
-		InteractWidgetPtr =  CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+		InteractWidgetPtr = CouchWidgetSpawn->GetCurrentWidget();
+		if (InteractWidgetPtr)
+		{
+			
+		}
 	}
 }
 
@@ -59,7 +64,6 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les gentils");
 		CouchWidgetSpawn->DestroyWidget();
-		InteractWidgetPtr = nullptr;
 	}
 	
 }

@@ -88,6 +88,7 @@ void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 			PlayerIsIn = false;
 			CanShoot = false;
 			WidgetComponent->DestroyWidget();
+			CurrentPlayer = nullptr;
 			StopMovement();
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
@@ -177,10 +178,10 @@ void ACoucheCannon::StopCharging()
 	if (CanShoot && CurrentAmmo >= 1)
 	{
 		PowerTimeline.Stop();
-		if (SkeletalMesh) SkeletalMesh->PlayAnimation(ShootAnimation, false);
+		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
 		FOutputDeviceNull ar;
-		FString CmdAndParams = FString::Printf(TEXT("StopCharge %f"), SpeedCharge);
-		if (WidgetComponent)
+		FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
+		if (WidgetComponent && WidgetComponent->PowerChargeActor)
 		{
 			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 			WidgetComponent->DestroyWidget();
@@ -190,7 +191,7 @@ void ACoucheCannon::StopCharging()
 
 void ACoucheCannon::UpdatePower(float Alpha)
 {
-	if (WidgetComponent != nullptr)
+	if (WidgetComponent && WidgetComponent->PowerChargeActor)
 	{
 		CurrentPower = Alpha * MaxPower;
 		AttackRange = CurrentPower;
@@ -239,6 +240,10 @@ void ACoucheCannon::StopMovement()
 	{
 		CanShoot = true;
 		MovementComponent->StopMovement();	
+	}
+	else
+	{
+		MovementComponent->StopMovement();
 	}
 }
 
