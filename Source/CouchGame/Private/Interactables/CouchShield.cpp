@@ -45,6 +45,7 @@ void ACouchShield::Interact_Implementation(ACouchCharacter* Player)
 			PlayerIsIn = false;
 			WidgetComponent->DestroyWidget();
 			StopMovement();
+			CurrentPlayer = nullptr;
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
 	}
@@ -62,10 +63,8 @@ void ACouchShield::StartMovement(int InputDirection)
 
 void ACouchShield::StopMovement()
 {
-	if (PlayerIsIn)
-	{
 		MovementComponent->StopMovement();	
-	}
+	
 }
 
 #pragma endregion
