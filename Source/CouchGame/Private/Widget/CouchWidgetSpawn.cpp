@@ -14,10 +14,17 @@ void UCouchWidgetSpawn::BeginPlay()
 	Super::BeginPlay();
 }
 
+AActor* UCouchWidgetSpawn::GetCurrentWidget()
+{
+	return CurrentWidget;
+}
+
 void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent)
 {
 	if (CurrentWidget == nullptr && AttachParent != nullptr)
+	{
 		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+	}
 	else if (CurrentWidget != nullptr)
 	{
 		CurrentWidget->Destroy();
@@ -32,17 +39,19 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 		if (CurrentWidget->IsA<ACouchWidget3D>())
 		{
 			PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
+			
 		}
 	}
 }
 
 void UCouchWidgetSpawn::DestroyWidget()
 {
-	if (CurrentWidget != nullptr)
+	if (CurrentWidget)
 	{
 		if (CurrentWidget->IsA<ACouchWidget3D>())
+		{
 			PowerChargeActor = nullptr;
-		
+		}
 		CurrentWidget->Destroy();
 		CurrentWidget = nullptr;
 	}

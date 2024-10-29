@@ -4,6 +4,14 @@
 #include "GameFramework/Actor.h"
 #include "CouchBoat.generated.h"
 
+UENUM(Blueprintable)
+enum class EBoatTeam : uint8
+{
+	Team1,
+	Team2
+};
+
+class ABoatFloor;
 class UStaticMeshComponent;
 class UBoxComponent;
 
@@ -18,25 +26,30 @@ public:
 	virtual void BeginPlay() override;
 	void BoatDamage(float DamageAmount);
 	void BoatRepair(float HealAmount);
+	void BoatRepair();
+	void SinkBoatAndGameOver();
+	UFUNCTION(BlueprintCallable)
 	float GetBoatLife() const;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoatBox;
+	UPROPERTY(EditAnywhere)
+	ABoatFloor* BoatFloor;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BoatMesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float BoatStartLife = 100.f;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	float BoatLife;
 
 	UPROPERTY(EditAnywhere)
-	TArray<AActor*> Planks;
+	FVector2D BoatMinAndMaxDamagePerSecond;
+	UPROPERTY(EditAnywhere)
+	float HealAmountPerHitRepaired;
 
-	
-	
-
+	UPROPERTY(EditAnywhere)
+	EBoatTeam Team;
 };
+
