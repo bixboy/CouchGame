@@ -21,6 +21,6 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	TimeElapsed += DeltaTime;
 	FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
-	SetWorldLocation(NewLocation);
+	GetOwner()->SetActorLocation(NewLocation);
 }
 

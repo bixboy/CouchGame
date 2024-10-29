@@ -25,15 +25,16 @@ public:
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere)
 	UPhysicsConstraintComponent* PhysicsConstraint;
 
-private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchChargePower* ChargePower;
+
+private:
 
 	UPROPERTY()
 	UCableComponent* Cable;
@@ -42,9 +43,23 @@ private:
 	UPROPERTY()
 	UMaterial* CableMaterial;
 
+	UPROPERTY(EditAnywhere)
+	UClass* Lure;
 	UPROPERTY()
-	ACouchLure* Lure;
+	ACouchLure* LureRef;
+
+	UPROPERTY(EditAnywhere)
+	float Threshold;
+	UPROPERTY(EditAnywhere)
+	float RewindSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float MaxCableLength;
+	UPROPERTY(EditAnywhere)
+	float MinCableLength;
 	
 	UFUNCTION()
 	void SpawnLure();
+	UFUNCTION()
+	void RewindCable(float JoystickInput);
 };
