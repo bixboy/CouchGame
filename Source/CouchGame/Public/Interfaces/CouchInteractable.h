@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/CouchCharacter.h"
 #include "UObject/Interface.h"
 #include "CouchInteractable.generated.h"
 
@@ -22,5 +23,17 @@ class COUCHGAME_API ICouchInteractable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Interact(FHitResult HitResult);
+	void Interact(ACouchCharacter* Player);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartMoveActor(int InputDirection);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopMoveActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartChargeActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopChargeActor();
 };

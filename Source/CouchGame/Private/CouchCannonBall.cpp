@@ -1,12 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CouchCannonBall.h"
 
+#include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 ACouchCannonBall::ACouchCannonBall()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	RootComponent = Sphere;
+	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	Base->SetupAttachment(Sphere);
 }
 
 void ACouchCannonBall::BeginPlay()

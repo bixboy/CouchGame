@@ -7,10 +7,12 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class USphereComponent;
 class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
+class UCouchCharacterSettings;
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -86,6 +88,9 @@ private:
 
 	void OnInputMove(const FInputActionValue& InputActionValue);
 
+	UPROPERTY()
+	const UCouchCharacterSettings* CharacterSettings;
+
 #pragma endregion
 #pragma region Dash
 	
@@ -96,10 +101,50 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDashEvent, FVector2D, InputMov
 	UPROPERTY()
 	FInputDashEvent InputDashEvent;
 
+	UPROPERTY()
+	float DashDuration;
+
+
 private:
 	UPROPERTY(EditAnywhere)
 	bool CanDash = true;
 
+	UPROPERTY()
+	bool CanDashAgain = true;
+
+	UPROPERTY()
+	float DashTimer;
+	
+	
 	void OnInputDash(const FInputActionValue& InputActionValue);
+#pragma endregion
+#pragma region Interraction
+public:
+	UPROPERTY(EditAnywhere)
+	USphereComponent* InteractionZone;
+	UFUNCTION()
+	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep,const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY()
+	AActor* InteractingActor;
+
+	bool IsInInteractingRange;
+private :
+	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+
+	void OnInputInteract(const FInputActionValue& InputActionValue);
+
+	void OnInputFire(const FInputActionValue& InputActionValue);
+	float InputFireValue = 0.f;
+
+	bool IsInteracting;
+
+	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
 #pragma endregion
 };
