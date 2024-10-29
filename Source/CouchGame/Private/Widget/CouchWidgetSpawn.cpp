@@ -14,7 +14,12 @@ void UCouchWidgetSpawn::BeginPlay()
 	Super::BeginPlay();
 }
 
-AActor* UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent)
+AActor* UCouchWidgetSpawn::GetCurrentWidget()
+{
+	return CurrentWidget;
+}
+
+void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent)
 {
 	if (CurrentWidget == nullptr && AttachParent != nullptr)
 	{
@@ -34,11 +39,9 @@ AActor* UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* A
 		if (CurrentWidget->IsA<ACouchWidget3D>())
 		{
 			PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
-			return CurrentWidget;
+			
 		}
-		return CurrentWidget;
 	}
-	return nullptr;
 }
 
 void UCouchWidgetSpawn::DestroyWidget()

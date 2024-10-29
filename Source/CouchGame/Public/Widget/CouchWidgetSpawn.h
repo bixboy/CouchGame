@@ -17,9 +17,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UPROPERTY()
 	AActor* PowerChargeActor;
-
 	UFUNCTION(BlueprintCallable)
-	AActor* SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
+	AActor* GetCurrentWidget();
+	UFUNCTION(BlueprintCallable)
+	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 
