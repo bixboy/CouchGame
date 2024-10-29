@@ -3,6 +3,8 @@
 #include "Interactables/CouchFishingRod.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CouchLure.h"
+#include "Components/CouchChargePower.h"
+#include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
 
 ACouchFishingRod::ACouchFishingRod()
@@ -58,5 +60,14 @@ void ACouchFishingRod::SpawnLure()
 		0.5
 	);
 	Lure->CouchProjectile->Initialize(SuggestedVelocity);
+}
+
+void ACouchFishingRod::RewindCable(float JoystickInput)
+{
+	if (JoystickInput > Threshold)
+	{
+		float NewCableLength = FMath::Clamp(Cable->CableLength - RewindSpeed * JoystickInput, MinCableLength, MaxCableLength);
+		Cable->CableLength(NewCableLength);
+	}
 }
 

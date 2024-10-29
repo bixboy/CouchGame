@@ -31,9 +31,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	UPhysicsConstraintComponent* PhysicsConstraint;
 
-private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchChargePower* ChargePower;
+
+private:
 
 	UPROPERTY()
 	UCableComponent* Cable;
@@ -44,7 +45,19 @@ private:
 
 	UPROPERTY()
 	ACouchLure* Lure;
+
+	UPROPERTY(EditAnywhere)
+	float Threshold;
+	UPROPERTY(EditAnywhere)
+	float RewindSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float MaxCableLength;
+	UPROPERTY(EditAnywhere)
+	float MinCableLength;
 	
 	UFUNCTION()
 	void SpawnLure();
+	UFUNCTION()
+	void RewindCable(float JoystickInput);
 };
