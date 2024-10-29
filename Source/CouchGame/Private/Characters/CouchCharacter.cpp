@@ -184,6 +184,12 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 			this,
 			&ACouchCharacter::OnInputInteract
 		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionInteract,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputInteract
+		);
 	}
 	if (InputData->InputActionFire)
 	{

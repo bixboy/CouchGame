@@ -2,6 +2,7 @@
 
 
 #include "Boat/CouchPlank.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
@@ -9,6 +10,7 @@
 #include "Components/SceneComponent.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Characters/CouchCharacter.h"
+#include "Widget/CouchWidget3D.h"
 
 
 // Sets default values
@@ -45,7 +47,8 @@ void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les méchants");
-		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+		UClass* InteractWidget = InteractWidgetClass.Get();
+		InteractWidgetPtr =  CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
 	}
 }
 
@@ -56,8 +59,19 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les gentils");
 		CouchWidgetSpawn->DestroyWidget();
+		InteractWidgetPtr = nullptr;
 	}
 	
+}
+
+float ACouchPlank::GetRepairingPercent() const
+{
+	return Timer/TimeToRepair;
+}
+
+AActor* ACouchPlank::GetInteractWidget() const
+{
+	return InteractWidgetPtr;
 }
 
 // Called when the game starts or when spawned
@@ -80,7 +94,7 @@ void ACouchPlank::Tick(float DeltaTime)
 	}
 	else if (!IsPlayerRepairing && Timer != 0)
 	{
-		Timer = 0;
+		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
 	}
 }
 
