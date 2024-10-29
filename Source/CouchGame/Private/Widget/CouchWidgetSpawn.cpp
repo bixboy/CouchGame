@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "CouchWidget3D.h"
-#include "CouchWidgetSpawn.h"
+#include "Widget/CouchWidgetSpawn.h"
+#include "Widget/CouchWidget3D.h"
 
 
 UCouchWidgetSpawn::UCouchWidgetSpawn()
@@ -18,25 +18,34 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 {
 	if (CurrentWidget == nullptr && AttachParent != nullptr)
 		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
-	else
+	else if (CurrentWidget != nullptr)
 	{
 		CurrentWidget->Destroy();
-		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());	
+		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
 	}
 
-	CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
+	// Vérification de CurrentWidget avant l’attachement
+	if (CurrentWidget != nullptr)
+	{
+		CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
 
-	if (CurrentWidget->IsA<ACouchWidget3D>())
-		PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
+		if (CurrentWidget->IsA<ACouchWidget3D>())
+		{
+			PowerChargeActor = Cast<ACouchWidget3D>(CurrentWidget);
+		}
+	}
 }
 
 void UCouchWidgetSpawn::DestroyWidget()
 {
-	if (CurrentWidget->IsA<ACouchWidget3D>())
-		PowerChargeActor = nullptr;
-	
-	CurrentWidget->Destroy();
-	CurrentWidget = nullptr;
+	if (CurrentWidget != nullptr)
+	{
+		if (CurrentWidget->IsA<ACouchWidget3D>())
+			PowerChargeActor = nullptr;
+		
+		CurrentWidget->Destroy();
+		CurrentWidget = nullptr;
+	}
 }
 
 void UCouchWidgetSpawn::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

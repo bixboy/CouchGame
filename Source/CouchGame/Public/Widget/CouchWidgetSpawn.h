@@ -18,14 +18,15 @@ public:
 	UPROPERTY()
 	AActor* PowerChargeActor;
 
-protected:
-	virtual void BeginPlay() override;
-
-private:
 	UFUNCTION(BlueprintCallable)
 	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
 	UPROPERTY()
 	AActor* CurrentWidget = nullptr;
 };
