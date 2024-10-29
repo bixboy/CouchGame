@@ -35,7 +35,7 @@ void UCouchCharacterStateInteract::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Green,
 		TEXT("Exit StateInteract")
 	);
-	ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
+	if (Character->InteractingActor) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
 }
 
 void UCouchCharacterStateInteract::StateTick(float DeltaTime)

@@ -165,6 +165,11 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 		IsInInteractingRange = false;
 		InteractingActor = nullptr;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
+		if (IsInteracting)
+		{
+			IsInteracting = false;
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		}
 	}
 }
 
@@ -176,6 +181,12 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionInteract,
 			ETriggerEvent::Started,
+			this,
+			&ACouchCharacter::OnInputInteract
+		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionInteract,
+			ETriggerEvent::Completed,
 			this,
 			&ACouchCharacter::OnInputInteract
 		);
