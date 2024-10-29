@@ -200,7 +200,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
 		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
-		TargetLocation = LineTrace();
+		TargetLocation = LineTrace();	
 	}
 }
 
