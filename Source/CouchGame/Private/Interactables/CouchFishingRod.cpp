@@ -36,20 +36,6 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 
 void ACouchFishingRod::SpawnLure()
 {
-	Cable = NewObject<UCableComponent>(this, TEXT("Cable"));
-	Cable->SetupAttachment(RootComponent);
-	Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
-	Cable->SetMaterial(0, CableMaterial);
-
-	FTransform SpawnTransform = FTransform(FRotator(0, 0, 0), ChargePower->TargetLocation);
-	LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure,SpawnTransform);
-	Cable->SetAttachEndTo(LureRef, FName(TEXT("None")), FName(TEXT("barrel")));
-	Cable->SetVisibility(true, true);
-
-	PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
-	PhysicsConstraint->SetupAttachment(RootComponent);
-	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("Tip")), LureRef->TopMesh, FName(TEXT("None")));
-
 	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
 	FVector SuggestedVelocity;
 	
@@ -61,6 +47,28 @@ void ACouchFishingRod::SpawnLure()
 		0,
 		0.5
 	);
+	
+	FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
+	LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Alpha: %f"), SpawnTransform.GetLocation().X));
+	
+	Cable = NewObject<UCableComponent>(LureRef, TEXT("Cable"));
+	Cable->SetupAttachment(RootComponent);
+	Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
+	Cable->RegisterComponent();
+	Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
+	Cable->SetMaterial(0, CableMaterial);
+	Cable->CableWidth = 10.f;
+	Cable->EndLocation = FVector(0, 0, 0);
+	
+	Cable->SetAttachEndTo(LureRef, FName(TEXT("None")), FName(TEXT("barrel")));
+	Cable->SetVisibility(true, true);
+
+	PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
+	PhysicsConstraint->SetupAttachment(RootComponent);
+	PhysicsConstraint->RegisterComponent();
+	PhysicsConstraint->SetConstrainedComponents(LureRef->TopMesh, FName(TEXT("None")), SkeletalMesh, FName(TEXT("None")));
+	
 	LureRef->CouchProjectile->Initialize(SuggestedVelocity);
 }
 
