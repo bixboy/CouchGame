@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/Fishable.h"
 #include "CouchCannonBall.generated.h"
 
 UCLASS()
-class COUCHGAME_API ACouchCannonBall : public AActor
+class COUCHGAME_API ACouchCannonBall : public AActor, public IFishable
 {
 	GENERATED_BODY()
 
@@ -15,6 +16,7 @@ public:
 	ACouchCannonBall();
 
 	virtual void Tick(float DeltaTime) override;
+	AActor* GetProps_Implementation() override;
 	void Initialize(const FVector& LaunchVelocity);
 
 protected:
@@ -22,22 +24,22 @@ protected:
 
 private:
 	UPROPERTY()
-	FVector Velocity;      // Vélocité du projectile
+	FVector Velocity; // Vélocité du projectile
 	UPROPERTY()
-	FVector Location;      // Position actuelle du projectile
+	FVector Location; // Position actuelle du projectile
 	UPROPERTY()
-	float TimeElapsed;     // Temps écoulé depuis le lancement
+	float TimeElapsed; // Temps écoulé depuis le lancement
 	const float Gravity = -980.0f;
 
 #pragma region Mesh
+
 private:
 	UPROPERTY()
 	UStaticMesh* Mesh;
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	UStaticMeshComponent* Base;
-	
-#pragma endregion	
-	
+
+#pragma endregion
 };

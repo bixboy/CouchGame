@@ -11,6 +11,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
+#include "Interfaces/Fishable.h"
 #include "CoucheCannon.generated.h"
 
 

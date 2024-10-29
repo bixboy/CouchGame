@@ -32,6 +32,10 @@ void ACouchCannonBall::Tick(float DeltaTime)
 	TimeElapsed += DeltaTime;
 	FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
 	SetActorLocation(NewLocation);
+}
 
+AActor* ACouchCannonBall::GetProps_Implementation()
+{
+	return IFishable::GetProps_Implementation();
 }
 
