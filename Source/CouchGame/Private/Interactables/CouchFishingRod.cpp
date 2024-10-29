@@ -37,6 +37,7 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 void ACouchFishingRod::SpawnLure()
 {
 	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("StartLocation: %s"), *StartLocation.ToString()));
 	FVector SuggestedVelocity;
 	
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -52,22 +53,25 @@ void ACouchFishingRod::SpawnLure()
 	LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Alpha: %f"), SpawnTransform.GetLocation().X));
 	
-	Cable = NewObject<UCableComponent>(LureRef, TEXT("Cable"));
+	Cable = NewObject<UCableComponent>(this, TEXT("Cable"));
 	Cable->SetupAttachment(RootComponent);
 	Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
 	Cable->RegisterComponent();
 	Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
 	Cable->SetMaterial(0, CableMaterial);
 	Cable->CableWidth = 10.f;
-	Cable->EndLocation = FVector(0, 0, 0);
+	Cable->bAttachStart = true;
 	
-	Cable->SetAttachEndTo(LureRef, FName(TEXT("None")), FName(TEXT("barrel")));
+	Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
+	Cable->EndLocation = FVector(0, 0, 0);
 	Cable->SetVisibility(true, true);
 
 	PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
 	PhysicsConstraint->SetupAttachment(RootComponent);
 	PhysicsConstraint->RegisterComponent();
-	PhysicsConstraint->SetConstrainedComponents(LureRef->TopMesh, FName(TEXT("None")), SkeletalMesh, FName(TEXT("None")));
+	
+	LureRef->SphereComponent->SetSimulatePhysics(true);
+	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("Tip")), LureRef->SphereComponent, FName(TEXT("None")));
 	
 	LureRef->CouchProjectile->Initialize(SuggestedVelocity);
 }
