@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "CouchCannonBall.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class COUCHGAME_API ACouchCannonBall : public AActor
 {
@@ -37,7 +39,10 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	UStaticMeshComponent* Base;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
+	USphereComponent* Sphere;
+
 #pragma endregion	
 	
 };

@@ -8,6 +8,8 @@
 #include "Interfaces/CouchDamageable.h"
 #include "BoatFloor.generated.h"
 
+class ACouchBoat;
+
 UCLASS()
 class COUCHGAME_API ABoatFloor : public AActor, public ICouchDamageable
 {
@@ -19,20 +21,32 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Init(ACouchBoat* Boat);
+
 	virtual void Hit_Implementation(FHitResult HitResult) override;
+
+	void RemoveHitFromArray(ACouchPlank* Plank);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* StaticMesh;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* Collision;
 	
-	UPROPERTY(EditAnywhere)
-	ACouchPlank* PlankHit;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ACouchPlank> FloorHit;
 
+	TArray<ACouchPlank*> Hits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	ACouchBoat* ABoat;
+
+	UPROPERTY(EditAnywhere)
+	float DamageFrequency = 1;
+	float Timer;
+	
 };

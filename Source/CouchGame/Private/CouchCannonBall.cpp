@@ -2,14 +2,17 @@
 
 #include "CouchCannonBall.h"
 
+#include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
+
 ACouchCannonBall::ACouchCannonBall()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	RootComponent = Sphere;
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
-	Base->SetupAttachment(RootComponent);
+	Base->SetupAttachment(Sphere);
 }
 
 void ACouchCannonBall::BeginPlay()
