@@ -64,22 +64,24 @@ void ACoucheCannon::SetupTimeLine()
 
 #pragma endregion
 
-void ACoucheCannon::Interact_Implementation(FHitResult HitResult, ACouchCharacter* Player)
+void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 {
 	if (!CurrentPlayer || CurrentPlayer == Player)
 	{
 		if (!PlayerIsIn)
 		{
+			ACouchPickableCannonBall* Ball = Cast<ACouchPickableCannonBall>(GetWorld()->SpawnActor(ACouchPickableCannonBall::StaticClass()));
+			Reload(Ball);
 			CurrentPlayer = Player;
 			PlayerIsIn = true;
 			CanShoot = true;
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 		
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
 			Player->SetActorTransform(PoseTransform, false);
 			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			
 		}
 		else
 		{
@@ -175,11 +177,14 @@ void ACoucheCannon::StopCharging()
 	if (CanShoot && CurrentAmmo >= 1)
 	{
 		PowerTimeline.Stop();
-		SkeletalMesh->PlayAnimation(ShootAnimation, false);
+		if (SkeletalMesh) SkeletalMesh->PlayAnimation(ShootAnimation, false);
 		FOutputDeviceNull ar;
 		FString CmdAndParams = FString::Printf(TEXT("StopCharge %f"), SpeedCharge);
-		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
-		WidgetComponent->DestroyWidget();
+		if (WidgetComponent)
+		{
+			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+			WidgetComponent->DestroyWidget();
+		}
 	}
 }
 
@@ -194,7 +199,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
 		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
-		TargetLocation = LineTrace();	
+		TargetLocation = LineTrace();
 	}
 }
 

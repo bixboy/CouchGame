@@ -23,4 +23,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputActionDash;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionInteract;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionFire;
 };
