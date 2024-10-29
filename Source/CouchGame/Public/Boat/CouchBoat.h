@@ -4,6 +4,14 @@
 #include "GameFramework/Actor.h"
 #include "CouchBoat.generated.h"
 
+UENUM()
+enum class EBoatTeam : uint8
+{
+	Team1,
+	Team2
+};
+
+class ABoatFloor;
 class UStaticMeshComponent;
 class UBoxComponent;
 
@@ -13,29 +21,34 @@ class COUCHGAME_API ACouchBoat : public AActor
 	GENERATED_BODY()
 
 public:
-	// Constructeur
 	ACouchBoat();
-
-	// Appelé au début du jeu ou lors de la spawn de l'acteur
+	
 	virtual void BeginPlay() override;
-
-	// Fonctions de gestion des dégâts/réparations
 	void BoatDamage(float DamageAmount);
 	void BoatRepair(float HealAmount);
+	void BoatRepair();
+	void SinkBoatAndGameOver();
 	float GetBoatLife() const;
 
 private:
-	// Composants
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoatBox;
+	UPROPERTY(EditAnywhere)
+	ABoatFloor* BoatFloor;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BoatMesh;
-
-	// Vie du bateau
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	float BoatStartLife = 100.f;
 
 	UPROPERTY()
 	float BoatLife;
+
+	UPROPERTY(EditAnywhere)
+	FVector2D BoatMinAndMaxDamagePerSecond;
+	UPROPERTY(EditAnywhere)
+	float HealAmountPerHitRepaired;
+
+	UPROPERTY(EditAnywhere)
+	EBoatTeam Team;
 };
+

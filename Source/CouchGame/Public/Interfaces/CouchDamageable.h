@@ -22,5 +22,5 @@ class COUCHGAME_API ICouchDamageable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Hit();
+	void Hit(FHitResult HitResult);
 };
