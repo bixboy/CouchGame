@@ -5,7 +5,7 @@
 
 #include "Boat/BoatFloor.h"
 #include "Components/StaticMeshComponent.h"
-#include "IO/IoStore.h"
+
 
 // Sets default values
 ACouchBoat::ACouchBoat()
@@ -56,17 +56,22 @@ void ACouchBoat::BoatRepair()
 
 void ACouchBoat::SinkBoatAndGameOver()
 {
-	switch (Team){
-	case EBoatTeam::Team1:
+	switch (Team)
+	{
+		case EBoatTeam::Team1:
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 2 Win");	
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 2 Win");
+			break;
 		}
 		case EBoatTeam::Team2:
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 1 Win");	
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 1 Win");
+			break;
 		}
 		default:
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "No Team Win");	;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "No Team Win");
+			break;
+		
 	}
 }
 

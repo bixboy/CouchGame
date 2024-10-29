@@ -8,6 +8,7 @@
 #include "Interfaces/CouchInteractable.h"
 #include "CouchPlank.generated.h"
 
+class ACouchWidget3D;
 class ABoatFloor;
 class UBoxComponent;
 class UCouchWidgetSpawn;
@@ -30,6 +31,12 @@ public:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION(BlueprintCallable)
+	float GetRepairingPercent() const;
+	UFUNCTION(BlueprintCallable)
+	
+	
+	AActor* GetInteractWidget() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,9 +47,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BlockAll;
-	
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	UClass* InteractWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchWidget3D> InteractWidgetClass;
+	UPROPERTY()
+	AActor* InteractWidgetPtr;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* HitMesh;
@@ -72,6 +81,7 @@ private:
 	ABoatFloor* Floor; 
 	UPROPERTY(EditAnywhere)
 	float TimeToRepair;
+	
 	float Timer;
 	UPROPERTY()
 	ACouchCharacter* APlayer;

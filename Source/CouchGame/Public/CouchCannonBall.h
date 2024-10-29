@@ -42,6 +42,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	USphereComponent* Sphere;
+
 #pragma endregion	
 	
 };

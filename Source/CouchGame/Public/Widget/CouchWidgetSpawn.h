@@ -19,7 +19,7 @@ public:
 	AActor* PowerChargeActor;
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
+	AActor* SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 
