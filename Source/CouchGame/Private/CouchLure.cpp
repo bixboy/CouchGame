@@ -16,7 +16,7 @@ ACouchLure::ACouchLure()
 	LureMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LureMesh"));
 	LureMesh->SetupAttachment(RootComponent);
 	TopMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TopMesh"));
-	TopMesh->SetupAttachment(RootComponent);
+	TopMesh->SetupAttachment(LureMesh);
 
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
