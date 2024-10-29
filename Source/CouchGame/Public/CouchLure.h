@@ -23,6 +23,8 @@ public:
 	USphereComponent* SphereComponent;
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* LureMesh;
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* TopMesh;
 
 protected:
 	virtual void BeginPlay() override;

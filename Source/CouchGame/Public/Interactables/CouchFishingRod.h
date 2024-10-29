@@ -25,7 +25,7 @@ public:
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere)
@@ -43,8 +43,10 @@ private:
 	UPROPERTY()
 	UMaterial* CableMaterial;
 
+	UPROPERTY(EditAnywhere)
+	UClass* Lure;
 	UPROPERTY()
-	ACouchLure* Lure;
+	ACouchLure* LureRef;
 
 	UPROPERTY(EditAnywhere)
 	float Threshold;

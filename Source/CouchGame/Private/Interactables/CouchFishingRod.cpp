@@ -31,22 +31,24 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 {
 	ICouchInteractable::StopChargeActor_Implementation();
 	ChargePower->StopCharging();
+	SpawnLure();
 }
 
 void ACouchFishingRod::SpawnLure()
 {
-	CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	Cable = NewObject<UCableComponent>(this, TEXT("Cable"));
 	Cable->SetupAttachment(RootComponent);
 	Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
 	Cable->SetMaterial(0, CableMaterial);
 
-	Lure = GetWorld()->SpawnActor<ACouchLure>();
-	Cable->SetAttachEndTo(Lure, FName(TEXT("None")), FName(TEXT("Attach")));
+	FTransform SpawnTransform = FTransform(FRotator(0, 0, 0), ChargePower->TargetLocation);
+	LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure,SpawnTransform);
+	Cable->SetAttachEndTo(LureRef, FName(TEXT("None")), FName(TEXT("barrel")));
 	Cable->SetVisibility(true, true);
 
-	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("ChargePower"));
+	PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
 	PhysicsConstraint->SetupAttachment(RootComponent);
-	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), Lure->GetComponentByClass<USkeletalMeshComponent>(), FName(TEXT("None")));
+	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("Tip")), LureRef->TopMesh, FName(TEXT("None")));
 
 	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
 	FVector SuggestedVelocity;
@@ -59,7 +61,7 @@ void ACouchFishingRod::SpawnLure()
 		0,
 		0.5
 	);
-	Lure->CouchProjectile->Initialize(SuggestedVelocity);
+	LureRef->CouchProjectile->Initialize(SuggestedVelocity);
 }
 
 void ACouchFishingRod::RewindCable(float JoystickInput)
@@ -67,7 +69,7 @@ void ACouchFishingRod::RewindCable(float JoystickInput)
 	if (JoystickInput > Threshold)
 	{
 		float NewCableLength = FMath::Clamp(Cable->CableLength - RewindSpeed * JoystickInput, MinCableLength, MaxCableLength);
-		Cable->CableLength(NewCableLength);
+		Cable->CableLength = NewCableLength;
 	}
 }
 

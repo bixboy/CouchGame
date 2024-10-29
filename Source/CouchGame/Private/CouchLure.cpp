@@ -10,10 +10,13 @@ ACouchLure::ACouchLure()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
+	
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	RootComponent = SphereComponent;
 	LureMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LureMesh"));
 	LureMesh->SetupAttachment(RootComponent);
+	TopMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TopMesh"));
+	TopMesh->SetupAttachment(RootComponent);
 
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
