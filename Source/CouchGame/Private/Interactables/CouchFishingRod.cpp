@@ -1,43 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Interactables/CouchFishingRod.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
-#include "CouchLure.h"
-#include "Components/CouchChargePower.h"
-#include "Interfaces/CouchInteractable.h"
-#include "Kismet/GameplayStatics.h"
 
+#include "Interactables/CouchFishingRod.h"
+
+
+// Sets default values
 ACouchFishingRod::ACouchFishingRod()
 {
-	PrimaryActorTick.bCanEverTick = false;
-	ChargePower = CreateDefaultSubobject<UCouchChargePower>(TEXT("ChargePower"));
-
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	RootComponent = SkeletalMesh;
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ACouchFishingRod::Tick(float DeltaTime)
+// Called when the game starts or when spawned
+void ACouchFishingRod::BeginPlay()
 {
-	Super::Tick(DeltaTime);
-}
-
-void ACouchFishingRod::StartChargeActor_Implementation()
-{
-	ICouchInteractable::StartChargeActor_Implementation();
-	ChargePower->StartCharging(SkeletalMesh);
-}
-
-void ACouchFishingRod::StopChargeActor_Implementation()
-{
-	ICouchInteractable::StopChargeActor_Implementation();
-	ChargePower->StopCharging();
-	SpawnLure();
-}
-
-void ACouchFishingRod::SpawnLure()
-{
-	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
-	FVector SuggestedVelocity;
+	Super::BeginPlay();
 	
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
 		this,
@@ -96,10 +73,6 @@ void ACouchFishingRod::InitializeCableAndConstraint()
 
 void ACouchFishingRod::RewindCable(float JoystickInput)
 {
-	if (JoystickInput > Threshold)
-	{
-		float NewCableLength = FMath::Clamp(Cable->CableLength - RewindSpeed * JoystickInput, MinCableLength, MaxCableLength);
-		Cable->CableLength = NewCableLength;
-	}
+	Super::Tick(DeltaTime);
 }
 
