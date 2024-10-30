@@ -6,11 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "CouchProjectile.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class COUCHGAME_API UCouchProjectile : public UStaticMeshComponent
+class COUCHGAME_API UCouchProjectile : public UActorComponent
 {
 	GENERATED_BODY()
 

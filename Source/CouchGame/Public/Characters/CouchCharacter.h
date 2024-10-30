@@ -12,7 +12,6 @@ class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
-class UCouchCharacterSettings;
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -87,9 +86,6 @@ private:
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputMove(const FInputActionValue& InputActionValue);
-
-	UPROPERTY()
-	const UCouchCharacterSettings* CharacterSettings;
 
 #pragma endregion
 #pragma region Dash
