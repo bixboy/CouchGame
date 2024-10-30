@@ -3,21 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/CouchChargePower.h"
+#include "CableComponent.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/CouchInteractable.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CouchFishingRod.generated.h"
 
+class ACouchLure;
+
 UCLASS()
-class COUCHGAME_API ACouchFishingRod : public AActor
+class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ACouchFishingRod();
+	virtual void Tick(float DeltaTime) override;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+public:
+	virtual void StartChargeActor_Implementation() override;
+	virtual void StopChargeActor_Implementation() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* SkeletalMesh;

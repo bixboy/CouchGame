@@ -88,7 +88,6 @@ void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 			PlayerIsIn = false;
 			CanShoot = false;
 			WidgetComponent->DestroyWidget();
-			CurrentPlayer = nullptr;
 			StopMovement();
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
@@ -111,7 +110,7 @@ void ACoucheCannon::SpawnBullet()
 		0.5
 	);
 
-	// DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
+	DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
 	
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
@@ -145,7 +144,7 @@ FVector ACoucheCannon::LineTrace()
 		UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForDuration,
 		HitResult,
 		true,
 		FLinearColor::Red,
@@ -178,10 +177,10 @@ void ACoucheCannon::StopCharging()
 	if (CanShoot && CurrentAmmo >= 1)
 	{
 		PowerTimeline.Stop();
-		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
+		if (SkeletalMesh) SkeletalMesh->PlayAnimation(ShootAnimation, false);
 		FOutputDeviceNull ar;
-		FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
-		if (WidgetComponent && WidgetComponent->PowerChargeActor)
+		FString CmdAndParams = FString::Printf(TEXT("StopCharge %f"), SpeedCharge);
+		if (WidgetComponent)
 		{
 			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 			WidgetComponent->DestroyWidget();
@@ -191,7 +190,7 @@ void ACoucheCannon::StopCharging()
 
 void ACoucheCannon::UpdatePower(float Alpha)
 {
-	if (WidgetComponent && WidgetComponent->PowerChargeActor)
+	if (WidgetComponent != nullptr)
 	{
 		CurrentPower = Alpha * MaxPower;
 		AttackRange = CurrentPower;
@@ -200,7 +199,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
 		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
-		TargetLocation = LineTrace();	
+		TargetLocation = LineTrace();
 	}
 }
 
@@ -240,10 +239,6 @@ void ACoucheCannon::StopMovement()
 	{
 		CanShoot = true;
 		MovementComponent->StopMovement();	
-	}
-	else
-	{
-		MovementComponent->StopMovement();
 	}
 }
 
