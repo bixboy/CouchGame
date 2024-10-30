@@ -6,7 +6,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
-#include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -24,7 +23,6 @@ ACouchCharacter::ACouchCharacter()
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
-	
 }
 
 
@@ -35,7 +33,6 @@ void ACouchCharacter::BeginPlay()
 	CreateStateMachine();
 
 	InitStateMachine();
-	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
 
 // Called every frame
@@ -240,17 +237,18 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {
 	if (IsInteracting)
 	{
-		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor); Cannon)
+		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor))
 		{
-			if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
+			if (InputActionValue.Get<float>() > 0.1f)
 			{
 				Cannon->StartCharging();
-				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
 			}
 			else
 			{
 				Cannon->StopCharging();
-				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
+
 			}
 		}
 	}
@@ -316,15 +314,7 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 
 void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	FVector2D Input = InputActionValue.Get<FVector2D>();
-	if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
-	{
-		InputMove = Input;
-	}
-	else
-	{
-		InputMove = FVector2D::Zero();
-	}
+	InputMove = InputActionValue.Get<FVector2D>();
 }
 
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
@@ -333,8 +323,9 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	{
 		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
 		{
-			if (InputMove != FVector2D::Zero()) CouchMovement->StartMovement(-InputActionValue.Get<FVector2D>().X);
+			if (InputActionValue.Get<float>() != 0) CouchMovement->StartMovement(-InputActionValue.Get<FVector2D>().X);
 			else CouchMovement->StopMovement();	
+			
 		}
 	}
 }

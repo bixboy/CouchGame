@@ -24,4 +24,16 @@ class COUCHGAME_API ICouchInteractable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(ACouchCharacter* Player);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartMoveActor(int InputDirection);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopMoveActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartChargeActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopChargeActor();
 };
