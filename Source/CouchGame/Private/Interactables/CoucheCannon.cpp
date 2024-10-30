@@ -111,7 +111,7 @@ void ACoucheCannon::SpawnBullet()
 		0.5
 	);
 
-	DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
+	// DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
 	
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
@@ -145,7 +145,7 @@ FVector ACoucheCannon::LineTrace()
 		UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		HitResult,
 		true,
 		FLinearColor::Red,
@@ -200,7 +200,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
 		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
-		TargetLocation = LineTrace();
+		TargetLocation = LineTrace();	
 	}
 }
 
