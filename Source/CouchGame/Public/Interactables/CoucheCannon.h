@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "CouchPickableCannonBall.h"
+#include "InputAction.h"
 #include "Components/CouchMovement.h"
 #include "Widget/CouchWidgetSpawn.h"
+#include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
@@ -17,12 +19,14 @@ class COUCHGAME_API ACoucheCannon : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
+
+public:
+	virtual bool IsUsedByPlayer_Implementation() override;
 private:
 	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	USkeletalMeshComponent* SkeletalMesh;
 	
-	UPROPERTY()
 	bool PlayerIsIn = false;
 
 	UPROPERTY()
@@ -41,6 +45,8 @@ private:
 	
 	UPROPERTY()
 	float AttackRange;
+	UPROPERTY(EditAnywhere)
+	float CurveShoot = 0.7f;
 
 	UFUNCTION()
 	void SpawnBullet();
@@ -77,6 +83,9 @@ private:
 	
 	UPROPERTY()
 	float CurrentPower;
+
+	UPROPERTY()
+	bool IsInCharge = false;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float SpeedCharge = 1.f;

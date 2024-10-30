@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -23,6 +24,7 @@ ACouchCharacter::ACouchCharacter()
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
+	
 }
 
 
@@ -33,6 +35,7 @@ void ACouchCharacter::BeginPlay()
 	CreateStateMachine();
 
 	InitStateMachine();
+	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
 
 // Called every frame
@@ -150,9 +153,13 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		IsInInteractingRange = true;
-		InteractingActor = OtherActor;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		if (!IsInInteractingRange)
+		{
+			IsInInteractingRange = true;
+			InteractingActor = OtherActor;
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		}
+
 	}
 	
 }
@@ -163,13 +170,14 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
 		IsInInteractingRange = false;
-		InteractingActor = nullptr;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
 		if (IsInteracting)
 		{
 			IsInteracting = false;
 			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 		}
+		InteractingActor = nullptr;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
+
 	}
 }
 
@@ -217,19 +225,22 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (IsInInteractingRange && !IsInteracting)
+	if (InteractingActor && InteractingActor->Implements<UCouchInteractable>())
 	{
-		StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-		IsInteracting = true;
-	}
-	else if (IsInInteractingRange && IsInteracting)
-	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-		IsInteracting = false;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
+		if (IsInInteractingRange && !IsInteracting && !ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor))
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
+			IsInteracting = true;
+		}
+		else if (IsInInteractingRange && IsInteracting)
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+			IsInteracting = false;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
+		}
 	}
 }
 
@@ -237,18 +248,17 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {
 	if (IsInteracting)
 	{
-		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor))
+		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor); Cannon)
 		{
-			if (InputActionValue.Get<float>() > 0.1f)
+			if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 			{
 				Cannon->StartCharging();
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
+				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
 			}
 			else
 			{
 				Cannon->StopCharging();
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
-
+				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
 			}
 		}
 	}
@@ -314,7 +324,15 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 
 void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	InputMove = InputActionValue.Get<FVector2D>();
+	FVector2D Input = InputActionValue.Get<FVector2D>();
+	if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+	{
+		InputMove = Input;
+	}
+	else
+	{
+		InputMove = FVector2D::Zero();
+	}
 }
 
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
@@ -323,9 +341,8 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	{
 		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
 		{
-			if (InputActionValue.Get<float>() != 0) CouchMovement->StartMovement(-InputActionValue.Get<FVector2D>().X);
+			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f) CouchMovement->StartMovement(-InputMove.Y);
 			else CouchMovement->StopMovement();	
-			
 		}
 	}
 }

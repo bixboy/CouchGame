@@ -46,11 +46,12 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 
 void UCouchWidgetSpawn::DestroyWidget()
 {
-	if (CurrentWidget != nullptr)
+	if (CurrentWidget)
 	{
 		if (CurrentWidget->IsA<ACouchWidget3D>())
+		{
 			PowerChargeActor = nullptr;
-		
+		}
 		CurrentWidget->Destroy();
 		CurrentWidget = nullptr;
 	}

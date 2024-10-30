@@ -38,6 +38,14 @@ void ACoucheCannon::Tick(float DeltaTime)
 
 #pragma region Setup Functions
 
+
+
+bool ACoucheCannon::IsUsedByPlayer_Implementation()
+{
+	ICouchInteractable::IsUsedByPlayer_Implementation();
+	return PlayerIsIn;
+}
+
 void ACoucheCannon::SetupCannon()
 {
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
@@ -77,7 +85,7 @@ void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 			CanShoot = true;
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 		
-			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), Player->GetActorScale());
 
 			Player->SetActorTransform(PoseTransform, false);
 			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -88,6 +96,7 @@ void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 			PlayerIsIn = false;
 			CanShoot = false;
 			WidgetComponent->DestroyWidget();
+			CurrentPlayer = nullptr;
 			StopMovement();
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
@@ -107,17 +116,16 @@ void ACoucheCannon::SpawnBullet()
 		StartLocation,
 		TargetLocation,
 		0,
-		0.5
+		CurveShoot
 	);
 
-	DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
+	// DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
 	
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
 	if (Projectile)
 	{
 		Projectile->Initialize(SuggestedVelocity);
-		CanShoot = false;
 		if (AmmoActor)
 		{
 			CurrentAmmo --;
@@ -144,7 +152,7 @@ FVector ACoucheCannon::LineTrace()
 		UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		HitResult,
 		true,
 		FLinearColor::Red,
@@ -158,11 +166,12 @@ FVector ACoucheCannon::LineTrace()
 
 void ACoucheCannon::StartCharging()
 {
-	if(CanShoot && CurrentAmmo >= 1)
+	if(CanShoot && CurrentAmmo >= 1 && !IsInCharge)
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
 			PowerTimeline.PlayFromStart();
+			IsInCharge = true;
 		}
 		else
 		{
@@ -174,23 +183,25 @@ void ACoucheCannon::StartCharging()
 
 void ACoucheCannon::StopCharging()
 {
-	if (CanShoot && CurrentAmmo >= 1)
+	if (CanShoot && CurrentAmmo >= 1 && IsInCharge)
 	{
 		PowerTimeline.Stop();
-		if (SkeletalMesh) SkeletalMesh->PlayAnimation(ShootAnimation, false);
+		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
 		FOutputDeviceNull ar;
-		FString CmdAndParams = FString::Printf(TEXT("StopCharge %f"), SpeedCharge);
-		if (WidgetComponent)
+		FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
+		if (WidgetComponent && WidgetComponent->PowerChargeActor)
 		{
 			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 			WidgetComponent->DestroyWidget();
 		}
+		CanShoot = false;
+		IsInCharge = false;
 	}
 }
 
 void ACoucheCannon::UpdatePower(float Alpha)
 {
-	if (WidgetComponent != nullptr)
+	if (WidgetComponent && WidgetComponent->PowerChargeActor && IsInCharge)
 	{
 		CurrentPower = Alpha * MaxPower;
 		AttackRange = CurrentPower;
@@ -199,7 +210,7 @@ void ACoucheCannon::UpdatePower(float Alpha)
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
 		WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 
-		TargetLocation = LineTrace();
+		TargetLocation = LineTrace();	
 	}
 }
 
@@ -239,6 +250,10 @@ void ACoucheCannon::StopMovement()
 	{
 		CanShoot = true;
 		MovementComponent->StopMovement();	
+	}
+	else
+	{
+		MovementComponent->StopMovement();
 	}
 }
 

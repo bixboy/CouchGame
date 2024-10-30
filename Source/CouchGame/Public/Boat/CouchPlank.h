@@ -27,6 +27,8 @@ public:
 
 	void Init(ABoatFloor* floor);
 
+	virtual bool IsUsedByPlayer_Implementation() override;
+
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()

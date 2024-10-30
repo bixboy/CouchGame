@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/ActorComponent.h"
 #include "CouchProjectile.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
 class COUCHGAME_API UCouchProjectile : public UActorComponent
 {
