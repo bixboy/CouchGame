@@ -38,8 +38,6 @@ void ACoucheCannon::Tick(float DeltaTime)
 
 #pragma region Setup Functions
 
-
-
 bool ACoucheCannon::IsUsedByPlayer_Implementation()
 {
 	ICouchInteractable::IsUsedByPlayer_Implementation();
