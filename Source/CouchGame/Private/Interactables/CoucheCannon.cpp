@@ -77,7 +77,7 @@ void ACoucheCannon::Interact_Implementation(ACouchCharacter* Player)
 			CanShoot = true;
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 		
-			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), Player->GetActorScale());
 
 			Player->SetActorTransform(PoseTransform, false);
 			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -107,7 +107,7 @@ void ACoucheCannon::SpawnBullet()
 		StartLocation,
 		TargetLocation,
 		0,
-		0.5
+		ArcShoot
 	);
 
 	DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
@@ -117,7 +117,6 @@ void ACoucheCannon::SpawnBullet()
 	if (Projectile)
 	{
 		Projectile->Initialize(SuggestedVelocity);
-		CanShoot = false;
 		if (AmmoActor)
 		{
 			CurrentAmmo --;
@@ -158,11 +157,12 @@ FVector ACoucheCannon::LineTrace()
 
 void ACoucheCannon::StartCharging()
 {
-	if(CanShoot && CurrentAmmo >= 1)
+	if(CanShoot && CurrentAmmo >= 1 && !IsInCharge)
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
 			PowerTimeline.PlayFromStart();
+			IsInCharge = true;
 		}
 		else
 		{
@@ -174,7 +174,7 @@ void ACoucheCannon::StartCharging()
 
 void ACoucheCannon::StopCharging()
 {
-	if (CanShoot && CurrentAmmo >= 1)
+	if (CanShoot && CurrentAmmo >= 1 && IsInCharge)
 	{
 		PowerTimeline.Stop();
 		if (SkeletalMesh) SkeletalMesh->PlayAnimation(ShootAnimation, false);
@@ -185,14 +185,16 @@ void ACoucheCannon::StopCharging()
 			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 			WidgetComponent->DestroyWidget();
 		}
+		IsInCharge = false;
+		CanShoot = false;
 	}
 }
 
 void ACoucheCannon::UpdatePower(float Alpha)
 {
-	if (WidgetComponent != nullptr)
+	if (WidgetComponent && WidgetComponent->PowerChargeActor && IsInCharge)
 	{
-		CurrentPower = Alpha * MaxPower;
+		CurrentPower = FMath::Clamp(Alpha * MaxPower, MinPower, MaxPower);
 		AttackRange = CurrentPower;
 
 		FOutputDeviceNull ar;
