@@ -43,6 +43,7 @@ void ACouchShield::Interact_Implementation(ACouchCharacter* Player)
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), Player->GetActorScale());
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
+			WidgetComponent->DestroyWidget();
 			Player->SetActorTransform(PoseTransform, false);
 			Player->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		}

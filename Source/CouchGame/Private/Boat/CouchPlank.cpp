@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Boat/CouchPlank.h"
 
 #include "Components/StaticMeshComponent.h"
@@ -12,11 +11,9 @@
 #include "Characters/CouchCharacter.h"
 #include "Widget/CouchWidget3D.h"
 
-
 // Sets default values
 ACouchPlank::ACouchPlank()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	BlockAll = CreateDefaultSubobject<UBoxComponent>("BlockAll");
 	InterractiveBoxRange = CreateDefaultSubobject<UBoxComponent>("InterractiveBoxRange");
@@ -24,10 +21,10 @@ ACouchPlank::ACouchPlank()
 	WaterParticle = CreateDefaultSubobject<UNiagaraComponent>("Water");
 	WidgetPos = CreateDefaultSubobject<USceneComponent>("WidgetPos");
 	CouchWidgetSpawn = CreateDefaultSubobject<UCouchWidgetSpawn>("CouchWidgetSpawn");
-	
+
 	RootComponent = BlockAll;
 	HitMesh->SetupAttachment(BlockAll);
-	if (UStaticMesh* RandomStaticMesh = GetRandomStaticMesh()) HitMesh->SetStaticMesh(RandomStaticMesh); // Je mets un mesh aléatoire
+	if (UStaticMesh* RandomStaticMesh = GetRandomStaticMesh()) HitMesh->SetStaticMesh(RandomStaticMesh);
 	InterractiveBoxRange->SetupAttachment(HitMesh);
 	WaterParticle->SetupAttachment(HitMesh);
 	WidgetPos->SetupAttachment(HitMesh);
@@ -46,38 +43,30 @@ bool ACouchPlank::IsUsedByPlayer_Implementation()
 	ICouchInteractable::IsUsedByPlayer_Implementation();
 	return IsPlayerRepairing;
 }
-	
 
 void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les méchants");
 		UClass* InteractWidget = InteractWidgetClass.Get();
 		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
 		InteractWidgetPtr = CouchWidgetSpawn->GetCurrentWidget();
-		if (InteractWidgetPtr)
-		{
-			
-		}
 	}
 }
 
 void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Les gentils");
-		CouchWidgetSpawn->DestroyWidget();
+		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 	}
-	
 }
 
 float ACouchPlank::GetRepairingPercent() const
 {
-	return Timer/TimeToRepair;
+	return Timer / TimeToRepair;
 }
 
 AActor* ACouchPlank::GetInteractWidget() const
@@ -85,7 +74,6 @@ AActor* ACouchPlank::GetInteractWidget() const
 	return InteractWidgetPtr;
 }
 
-// Called when the game starts or when spawned
 void ACouchPlank::BeginPlay()
 {
 	Super::BeginPlay();
@@ -94,21 +82,24 @@ void ACouchPlank::BeginPlay()
 void ACouchPlank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Si le joueur est en train de réparer
 	if (IsPlayerRepairing)
 	{
 		Timer += DeltaTime;
 		if (Timer >= TimeToRepair)
 		{
 			Floor->RemoveHitFromArray(this);
+			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
+			APlayer->IsInteracting = false;
 			Destroy();
 		}
 	}
-	else if (!IsPlayerRepairing && Timer != 0)
+	else if (Timer > 0)
 	{
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
 	}
 }
-
 
 UStaticMesh* ACouchPlank::GetRandomStaticMesh()
 {
@@ -119,11 +110,26 @@ UStaticMesh* ACouchPlank::GetRandomStaticMesh()
 
 void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 {
+	// Si un autre joueur utilise déjà la planche, empêcher l'interaction
+	if (IsPlayerRepairing && Player != APlayer)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Already in use by another player");
+		return;
+	}
+
 	ICouchInteractable::Interact_Implementation(Player);
-	APlayer = Player;
-	IsPlayerRepairing = !IsPlayerRepairing;
+
+	// Démarrer ou arrêter l'interaction
+	if (!IsPlayerRepairing)
+	{
+		APlayer = Player;
+		IsPlayerRepairing = true;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting");
+	}
+	else if (IsPlayerRepairing && Player == APlayer)
+	{
+		APlayer = nullptr;
+		IsPlayerRepairing = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player stopped interacting");
+	}
 }
-
-
-
-

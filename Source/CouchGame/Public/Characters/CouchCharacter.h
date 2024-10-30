@@ -133,8 +133,11 @@ public:
 
 	UPROPERTY()
 	AActor* InteractingActor;
+	UPROPERTY()
+	TArray<AActor*> InteractingActors;
 
 	bool IsInInteractingRange;
+	bool IsInteracting;
 private :
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
@@ -143,7 +146,7 @@ private :
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
-	bool IsInteracting;
+	
 
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
 #pragma endregion
