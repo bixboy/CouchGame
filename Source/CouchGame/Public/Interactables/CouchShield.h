@@ -30,18 +30,17 @@ private:
 	void SetupShield();
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* PlayerPose;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* WidgetPose;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchWidgetSpawn* WidgetComponent;
 	
 #pragma endregion
 
-	
 #pragma region Movement
 private:
 	UFUNCTION(BlueprintCallable)
