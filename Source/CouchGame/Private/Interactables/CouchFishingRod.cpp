@@ -37,7 +37,6 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 void ACouchFishingRod::SpawnLure()
 {
 	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("StartLocation: %s"), *StartLocation.ToString()));
 	FVector SuggestedVelocity;
 	
 	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -51,29 +50,48 @@ void ACouchFishingRod::SpawnLure()
 	
 	FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
 	LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Alpha: %f"), SpawnTransform.GetLocation().X));
-	
-	Cable = NewObject<UCableComponent>(this, TEXT("Cable"));
-	Cable->SetupAttachment(RootComponent);
-	Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
-	Cable->RegisterComponent();
-	Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
-	Cable->SetMaterial(0, CableMaterial);
-	Cable->CableWidth = 10.f;
-	Cable->bAttachStart = true;
-	
-	Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
-	Cable->EndLocation = FVector(0, 0, 0);
-	Cable->SetVisibility(true, true);
+	LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
-	PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
-	PhysicsConstraint->SetupAttachment(RootComponent);
-	PhysicsConstraint->RegisterComponent();
-	
-	LureRef->SphereComponent->SetSimulatePhysics(true);
-	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("Tip")), LureRef->SphereComponent, FName(TEXT("None")));
+	InitializeCableAndConstraint();
 	
 	LureRef->CouchProjectile->Initialize(SuggestedVelocity);
+}
+
+void ACouchFishingRod::InitializeCableAndConstraint()
+{
+    // Ajoute le composant Cable
+	if ((Cable = NewObject<UCableComponent>(this, TEXT("Cable"))))
+	{
+		Cable->SetupAttachment(RootComponent);
+		Cable->RegisterComponent();
+		Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
+
+		// Définit le matériau du câble
+		if (CableMaterial)
+		{
+			Cable->SetMaterial(0, CableMaterial);
+		}
+
+		Cable->CableLength = 10.f;
+
+		// Attache l'extrémité du câble
+		Cable->SetAttachEndToComponent(LureRef->SphereComponent);
+		    //Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
+		    //Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
+
+		Cable->EndLocation = FVector(0.0f, 0.0f, 2.0f);
+		Cable->SetVisibility(true, true);	
+	}
+
+    // Ajoute le composant PhysicsConstraint
+    if ((PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"))))
+    {
+    	PhysicsConstraint->SetupAttachment(RootComponent);
+    	PhysicsConstraint->RegisterComponent();
+
+    	// Configure les composants contraints
+    	PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), LureRef->SphereComponent, FName(TEXT("None")));   
+    }
 }
 
 void ACouchFishingRod::RewindCable(float JoystickInput)

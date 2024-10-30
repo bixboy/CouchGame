@@ -61,5 +61,7 @@ private:
 	UFUNCTION()
 	void SpawnLure();
 	UFUNCTION()
+	void InitializeCableAndConstraint();
+	UFUNCTION()
 	void RewindCable(float JoystickInput);
 };
