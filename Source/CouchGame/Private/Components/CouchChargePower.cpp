@@ -41,18 +41,12 @@ void UCouchChargePower::StopCharging()
 
 float UCouchChargePower::UpdatePower(float Alpha)
 {
-	CurrentPower = Alpha * MaxPower;
+	return CurrentPower = Alpha * MaxPower;
 	TargetLocation = LineTrace();
-	return CurrentPower;
 }
 
 FVector UCouchChargePower::LineTrace()
 {
-	if (!Mesh)
-	{
-		return FVector::ZeroVector;
-	}
-	
 	const FVector Start = Mesh->GetSocketLocation(FName("barrel"));
 	const FVector End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;
        
