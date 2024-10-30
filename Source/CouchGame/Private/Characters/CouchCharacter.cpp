@@ -153,9 +153,13 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		IsInInteractingRange = true;
-		InteractingActor = OtherActor;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		if (!IsInInteractingRange)
+		{
+			IsInInteractingRange = true;
+			InteractingActor = OtherActor;
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		}
+
 	}
 	
 }
@@ -166,13 +170,14 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
 		IsInInteractingRange = false;
-		InteractingActor = nullptr;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
 		if (IsInteracting)
 		{
 			IsInteracting = false;
 			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 		}
+		InteractingActor = nullptr;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
+
 	}
 }
 
@@ -333,7 +338,7 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	{
 		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
 		{
-			if (InputMove != FVector2D::Zero()) CouchMovement->StartMovement(-InputActionValue.Get<FVector2D>().X);
+			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f) CouchMovement->StartMovement(-InputMove.Y);
 			else CouchMovement->StopMovement();	
 		}
 	}
