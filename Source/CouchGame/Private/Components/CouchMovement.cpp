@@ -58,7 +58,7 @@ void UCouchMovement::MoveActor(float Alpha)
 		float Distance = FMath::Lerp(0, LinePathComponent->GetSplineLength(), Alpha);
 		FVector Location = LinePathComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 		FRotator Rotation =	FRotator(GetOwner()->GetActorRotation()); //LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
-		FTransform Transform = FTransform(Rotation, Location, FVector(1, 1, 1));
+		FTransform Transform = FTransform(Rotation, Location, GetOwner()->GetActorScale());
 		GetOwner()->SetActorTransform(Transform, false);
 	}
 }

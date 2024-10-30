@@ -8,6 +8,12 @@ ACouchShield::ACouchShield()
 	SetupShield();
 }
 
+bool ACouchShield::IsUsedByPlayer_Implementation()
+{
+	ICouchInteractable::IsUsedByPlayer_Implementation();
+	return PlayerIsIn;
+}
+
 void ACouchShield::SetupShield()
 {
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
@@ -34,7 +40,7 @@ void ACouchShield::Interact_Implementation(ACouchCharacter* Player)
 			CurrentPlayer = Player;
 			PlayerIsIn = true;
 		
-			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), Player->GetActorScale());
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
 			Player->SetActorTransform(PoseTransform, false);

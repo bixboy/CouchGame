@@ -225,19 +225,22 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (IsInInteractingRange && !IsInteracting)
+	if (InteractingActor && InteractingActor->Implements<UCouchInteractable>())
 	{
-		StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-		IsInteracting = true;
-	}
-	else if (IsInInteractingRange && IsInteracting)
-	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-		IsInteracting = false;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
+		if (IsInInteractingRange && !IsInteracting && !ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor))
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
+			IsInteracting = true;
+		}
+		else if (IsInInteractingRange && IsInteracting)
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+			IsInteracting = false;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
+		}
 	}
 }
 

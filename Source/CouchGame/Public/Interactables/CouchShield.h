@@ -17,6 +17,8 @@ class COUCHGAME_API ACouchShield : public AActor, public ICouchInteractable
 public:
 	ACouchShield();
 
+	virtual bool IsUsedByPlayer_Implementation() override;
+
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
