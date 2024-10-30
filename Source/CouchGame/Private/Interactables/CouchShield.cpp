@@ -34,7 +34,7 @@ void ACouchShield::Interact_Implementation(ACouchCharacter* Player)
 			CurrentPlayer = Player;
 			PlayerIsIn = true;
 		
-			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation());
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), Player->GetActorLocation());
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerPose Location: %s"), *PoseTransform.GetLocation().ToString()));
 
 			Player->SetActorTransform(PoseTransform, false);

@@ -40,6 +40,9 @@ private:
 	
 	UPROPERTY()
 	bool CanShoot = false;
+
+	UPROPERTY(EditAnywhere)
+	float ArcShoot = 0.7f;
 	
 	UPROPERTY()
 	float AttackRange;
@@ -82,6 +85,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float SpeedCharge = 1.f;
+	UPROPERTY()
+	bool IsInCharge = false;
 
 	UFUNCTION()
 	void SetupTimeLine();
