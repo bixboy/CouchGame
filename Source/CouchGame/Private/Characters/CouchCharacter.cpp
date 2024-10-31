@@ -20,7 +20,7 @@ ACouchCharacter::ACouchCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionZone"));
-	InteractionZone->SetupAttachment(RootComponent);
+	InteractionZone->SetupAttachment(GetMesh());
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
@@ -157,7 +157,16 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 		{
 			IsInInteractingRange = true;
 			InteractingActor = OtherActor;
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+			// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		}
+		else if (InteractingActor && GetDistanceTo(OtherActor) < GetDistanceTo(InteractingActor))
+		{
+			InteractingActors.Add(InteractingActor);
+			InteractingActor = OtherActor;
+		}
+		else if (InteractingActor && GetDistanceTo(OtherActor) >= GetDistanceTo(InteractingActor))
+		{
+			InteractingActors.Add(OtherActor);
 		}
 
 	}
@@ -169,15 +178,22 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		IsInInteractingRange = false;
-		if (IsInteracting)
+		if (OtherActor == InteractingActor && !IsInteracting)
 		{
-			IsInteracting = false;
-			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+			IsInInteractingRange = false;
+			InteractingActor = nullptr;
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
+			if (InteractingActors.Num() > 0)
+			{
+				IsInInteractingRange = true;
+				InteractingActor = InteractingActors.Top();
+				InteractingActors.Remove(InteractingActor);
+			}
 		}
-		InteractingActor = nullptr;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
-
+		else if (OtherActor != InteractingActor && InteractingActors.Contains(OtherActor))
+		{
+			InteractingActors.Remove(OtherActor);
+		}
 	}
 }
 
@@ -225,24 +241,41 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (InteractingActor && InteractingActor->Implements<UCouchInteractable>())
+	if (!InteractingActor || !InteractingActor->Implements<UCouchInteractable>()) return;
+
+	float ActionValue = InputActionValue.Get<float>();
+
+	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
+
+	// Début de l'interaction
+	if (!IsInteracting && InteractingActor && ActionValue > 0.1f && !bAlreadyUsed)
 	{
-		if (IsInInteractingRange && !IsInteracting && !ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor))
-		{
-			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-			IsInteracting = true;
-		}
-		else if (IsInInteractingRange && IsInteracting)
-		{
-			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-			IsInteracting = false;
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
-		}
+		StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
+		IsInteracting = true;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
+	}
+	// Fin de l'interaction
+	else if (IsInteracting && ActionValue < 0.1f)
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		IsInteracting = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
+	}
+	else if (!IsInteracting && ActionValue < 0.1f)
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+	}
+	// Conditions d'échec d'interaction
+	else if (bAlreadyUsed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
 	}
 }
+
 
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {

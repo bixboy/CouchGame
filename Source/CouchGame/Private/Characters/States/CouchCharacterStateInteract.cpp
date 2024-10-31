@@ -5,6 +5,7 @@
 
 #include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Characters/CouchCharacterStateMachine.h"
 #include "Interfaces/CouchInteractable.h"
 
 
@@ -35,7 +36,7 @@ void UCouchCharacterStateInteract::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Green,
 		TEXT("Exit StateInteract")
 	);
-	if (Character->InteractingActor) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
+	if (Character->InteractingActor && Character->IsInteracting && Character->IsInInteractingRange) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
 }
 
 void UCouchCharacterStateInteract::StateTick(float DeltaTime)
@@ -48,6 +49,10 @@ void UCouchCharacterStateInteract::StateTick(float DeltaTime)
 		FColor::Green,
 		TEXT("Tick StateInteract")
 	);
+	if (!Character->InteractingActor && !Character->IsInteracting && !Character->IsInInteractingRange)
+	{
+		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+	}
 	
 	
 }
