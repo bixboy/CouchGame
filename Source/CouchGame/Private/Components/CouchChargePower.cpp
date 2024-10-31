@@ -76,7 +76,7 @@ FVector UCouchChargePower::LineTrace()
 	   UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 	   false,
 	   ActorsToIgnore,
-	   EDrawDebugTrace::ForDuration,
+	   EDrawDebugTrace::None,
 	   HitResult,
 	   true,
 	   FLinearColor::Red,

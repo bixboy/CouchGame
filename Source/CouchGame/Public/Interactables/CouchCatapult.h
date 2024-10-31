@@ -16,7 +16,6 @@ class COUCHGAME_API ACouchCatapult : public ACouchInteractableWeapons
 public:
 	ACouchCatapult();
 
-	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
 

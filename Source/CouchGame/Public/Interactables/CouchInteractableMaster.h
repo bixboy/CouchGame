@@ -23,6 +23,8 @@ public:
 	AActor* GetCurrentPlayer() const;
 	UFUNCTION()
 	void SetCurrentPlayer(ACouchCharacter* Player);
+	UFUNCTION()
+	void RemoveCurrentPlayer();
 
 	UFUNCTION()
 	void SetPlayerIsIn(bool IsIn);

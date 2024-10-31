@@ -14,10 +14,8 @@
 #include "Interfaces/CouchInteractable.h"
 
 
-// Sets default values
 ACouchCharacter::ACouchCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionZone"));
 	InteractionZone->SetupAttachment(GetMesh());
@@ -28,7 +26,6 @@ ACouchCharacter::ACouchCharacter()
 }
 
 
-// Called when the game starts or when spawned
 void ACouchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -38,7 +35,6 @@ void ACouchCharacter::BeginPlay()
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
 
-// Called every frame
 void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -281,16 +277,18 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {
 	if (IsInteracting)
 	{
-		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor); Cannon)
+		if (!InteractingActor->Implements<UCouchInteractable>()) return;
 		{
 			if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 			{
-				Cannon->StartCharging();
-				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
+				ICouchInteractable::Execute_StartChargeActor(InteractingActor);
+				//Cannon->StartCharging();
+				//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
 			}
 			else
 			{
-				Cannon->StopCharging();
+				ICouchInteractable::Execute_StopChargeActor(InteractingActor);
+				//Cannon->StopCharging();
 				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
 			}
 		}

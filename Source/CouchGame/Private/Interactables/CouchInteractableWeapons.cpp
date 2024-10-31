@@ -8,11 +8,6 @@ ACouchInteractableWeapons::ACouchInteractableWeapons()
 	Setup();
 }
 
-void ACouchInteractableWeapons::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ACouchInteractableWeapons::Setup()
 {
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
@@ -27,27 +22,26 @@ void ACouchInteractableWeapons::Setup()
 	WidgetPose->SetupAttachment(RootComponent);
 	PlayerPose = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerPose"));
 	PlayerPose->SetupAttachment(RootComponent);
+
+	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
+	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);
 }
 
 bool ACouchInteractableWeapons::GetCanUse() const {return CanUse;}
 
 void ACouchInteractableWeapons::SetCanUse(bool Value) {CanUse = Value;}
 
-void ACouchInteractableWeapons::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 {
 	Super::Interact_Implementation(Player);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Appel de l'interface Interact dans la classe parent."));
-
+	
 	if (!GetCurrentPlayer() || GetCurrentPlayer() == Player)
 	{
+		WidgetComponent->DestroyWidget();
 		if (!Execute_IsUsedByPlayer(this))
 		{
 			CanUse = true;
+			SetPlayerIsIn(true);
 			
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
 			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
@@ -55,11 +49,11 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		}
 		else
 		{
-			WidgetComponent->DestroyWidget();
-			
-			SetPlayerIsIn(false);
-			SetCurrentPlayer(nullptr);
+			WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
+
+			RemoveCurrentPlayer();
 			CanUse = false;
+			SetPlayerIsIn(false);
 			
 			StopMovement();
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -92,4 +86,19 @@ void ACouchInteractableWeapons::StopMovement()
 }
 
 #pragma endregion
+
+void ACouchInteractableWeapons::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+	if (!Execute_IsUsedByPlayer(this))
+		WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
+}
+
+void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!Execute_IsUsedByPlayer(this))
+		WidgetComponent->DestroyWidget();
+}
 

@@ -16,7 +16,6 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 
 public:
 	ACouchInteractableWeapons();
-	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	
@@ -24,9 +23,6 @@ public:
 	bool GetCanUse() const;
 	UFUNCTION()
 	void SetCanUse(bool Value);
-
-protected:
-	virtual void BeginPlay() override;
 	
 private:
 	UFUNCTION()
@@ -53,6 +49,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxInteract;
 	
+	UFUNCTION()
+	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+								int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
 #pragma endregion
 
 #pragma region Movement
@@ -62,5 +64,12 @@ private:
 	UFUNCTION()
 	void StopMovement();
 	
+#pragma endregion
+
+#pragma region Widgets
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	UClass* InteractWidget;
+
 #pragma endregion	
 };

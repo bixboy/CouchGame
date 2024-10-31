@@ -13,25 +13,12 @@ ACouchCatapult::ACouchCatapult()
 	PowerChargeComponent = CreateDefaultSubobject<UCouchChargePower>(TEXT("PowerCharge"));
 }
 
-void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
-{
-	Super::Interact_Implementation(Player);
-	
-	if (!GetCurrentPlayer() || GetCurrentPlayer() == Player)
-	{
-		if (!Execute_IsUsedByPlayer(this))
-		{
-			ACouchPickableCannonBall* Ball = Cast<ACouchPickableCannonBall>(GetWorld()->SpawnActor(ACouchPickableCannonBall::StaticClass()));
-			Reload(Ball);
-		}
-	}	
-}
-
 #pragma region Charging Component
 
 void ACouchCatapult::StartChargeActor_Implementation()
 {
 	ICouchInteractable::StartChargeActor_Implementation();
+
 	if(GetCanUse() && CurrentAmmo >= 1 && !IsInCharge)
 	{
 		if (WidgetComponent->PowerChargeActor)
@@ -86,8 +73,6 @@ void ACouchCatapult::SpawnBullet()
 		0,
 		CurveShoot
 	);
-
-	// DrawDebugLine(GetWorld(), StartLocation, TargetLocation, FColor::Green, false, 3.0f, 0, 5.0f);
 	
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
@@ -105,7 +90,7 @@ void ACouchCatapult::SpawnBullet()
 
 void ACouchCatapult::Reload(ACouchPickableCannonBall* CannonBallReload)
 {
-	if(CurrentAmmo < 1 && !GetCanUse())
+	if(CurrentAmmo < 1)
 	{
 		AmmoActor = CannonBallReload;
 		CannonBallReload->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
