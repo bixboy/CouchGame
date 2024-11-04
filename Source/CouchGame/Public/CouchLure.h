@@ -16,10 +16,8 @@ class COUCHGAME_API ACouchLure : public AActor
 
 public:
 	ACouchLure();
-	virtual void Tick(float DeltaTime) override;
 
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchProjectile* CouchProjectile;
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereComponent;
@@ -27,11 +25,6 @@ public:
 	UStaticMeshComponent* LureMesh;
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* TopMesh;
-
-
-protected:
-	virtual void BeginPlay() override;
-
 
 private:
 	UFUNCTION()
