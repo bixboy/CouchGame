@@ -19,7 +19,6 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity)
 void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Position actuelle de l'acteur : %s"), *GetOwner()->GetActorLocation().ToString()));
 
 	if (CanMove)
 	{

@@ -24,11 +24,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 {
 	if (CouchProjectile->CanMove)
 	{
-		LastLocation = GetActorLocation();
-		SphereComponent->SetSimulatePhysics(false);
 		CouchProjectile->CanMove = false;
-		
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACouchLure::SetPhysics, 0.5f, false);
 	}
 	
 	if (OtherActor->Implements<UCouchInteractable>())
@@ -37,10 +33,5 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-void ACouchLure::SetPhysics()
-{
-	SphereComponent->SetSimulatePhysics(true);
-	SetActorLocation(LastLocation);
-}
 
 

@@ -48,24 +48,24 @@ void ACouchFishingRod::SpawnLure()
 {
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
    FVector SuggestedVelocity;
+  
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-       this,
-       SuggestedVelocity,
-       StartLocation,
-       ChargePower->TargetLocation,
-       0,
-       0.5
+      this,
+      SuggestedVelocity,
+      StartLocation,
+      ChargePower->TargetLocation,
+      0,
+      0.5
    );
-
-   FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), StartLocation);
+  
+   FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
    LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform);
-   if (LureRef)
-   {
-      LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-      LureRef->CouchProjectile->Initialize(SuggestedVelocity);
-   }
+   LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
 
    InitializeCableAndConstraint();
+  
+   LureRef->CouchProjectile->Initialize(SuggestedVelocity);
 }
 
 
