@@ -7,26 +7,30 @@
 #include "GameFramework/Actor.h"
 #include "CouchLure.generated.h"
 
-
 UCLASS()
 class COUCHGAME_API ACouchLure : public AActor
 {
 	GENERATED_BODY()
 
-
 public:
 	ACouchLure();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchProjectile* CouchProjectile;
+	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereComponent;
+	TObjectPtr<USphereComponent> SphereComponent;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* LureMesh;
+	TObjectPtr<UStaticMeshComponent> LureMesh;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* TopMesh;
+	TObjectPtr<UStaticMeshComponent> TopMesh;
 
 private:
 	UFUNCTION()
 	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void SetPhysics();
+
+	FTimerHandle TimerHandle;
+	FVector LastLocation;
 };

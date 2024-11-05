@@ -12,11 +12,11 @@ class COUCHGAME_API UCouchProjectile : public UActorComponent
 
 public:
 	UCouchProjectile();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void Initialize(const FVector& LaunchVelocity);
 	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool CanMove = false;
 

@@ -13,15 +13,16 @@ void ACouchInteractableWeapons::Setup()
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
 	MovementComponent = CreateDefaultSubobject<UCouchMovement>(TEXT("MovementComponent"));
 
-	BoxInteract = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxInteract"));
-	RootComponent = BoxInteract;
-	
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	SkeletalMesh->SetupAttachment(RootComponent);
+	BoxInteract = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxInteract"));
+	BoxInteract->SetupAttachment(SkeletalMesh);
 	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
-	WidgetPose->SetupAttachment(RootComponent);
+	WidgetPose->SetupAttachment(SkeletalMesh);
 	PlayerPose = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerPose"));
-	PlayerPose->SetupAttachment(RootComponent);
+	PlayerPose->SetupAttachment(SkeletalMesh);
 
 	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);

@@ -10,9 +10,9 @@ UCouchProjectile::UCouchProjectile()
 
 void UCouchProjectile::Initialize(const FVector& LaunchVelocity)
 {
-	Velocity = LaunchVelocity;  // Définir la vélocité initiale
-	Location = GetOwner()->GetActorLocation(); // Obtenir la position initiale
-	TimeElapsed = 0.0f; // Réinitialiser le temps écoulé
+	Velocity = LaunchVelocity;
+	Location = GetOwner()->GetActorLocation();
+	TimeElapsed = 0.0f;
 	CanMove = true;
 }
 
