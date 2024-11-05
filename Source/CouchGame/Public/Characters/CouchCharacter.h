@@ -138,6 +138,8 @@ public:
 
 	bool IsInInteractingRange;
 	bool IsInteracting;
+	UPROPERTY(EditAnywhere)
+	USceneComponent* PickUpItemPosition;
 private :
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
@@ -146,8 +148,13 @@ private :
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
-	
-
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
+#pragma endregion
+#pragma region Hold Item
+
+public:
+	bool GetIsHoldingItem() const;
+private:
+	bool IsHoldingItem;
 #pragma endregion
 };
