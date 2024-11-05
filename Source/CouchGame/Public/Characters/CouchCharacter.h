@@ -130,14 +130,15 @@ public:
 	UFUNCTION()
 	void OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UPROPERTY()
-	AActor* InteractingActor;
+	
 	UPROPERTY()
 	TArray<AActor*> InteractingActors;
-
+	UPROPERTY()
+	TObjectPtr<AActor> InteractingActor;
+	TObjectPtr<AActor> FindNearestInteractingActor() const;
 	bool IsInInteractingRange;
 	bool IsInteracting;
+	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
 private :

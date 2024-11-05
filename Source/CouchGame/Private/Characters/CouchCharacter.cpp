@@ -232,20 +232,16 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		if (!IsInInteractingRange && !InteractingActor)
+		InteractingActors.Add(OtherActor);
+		if (!IsInInteractingRange)
 		{
 			IsInInteractingRange = true;
-			InteractingActor = OtherActor;
-			// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
-		}
-		else if (InteractingActor && GetDistanceTo(OtherActor) < GetDistanceTo(InteractingActor))
-		{
-			InteractingActors.Add(InteractingActor);
-			InteractingActor = OtherActor;
-		}
-		else if (InteractingActor && GetDistanceTo(OtherActor) >= GetDistanceTo(InteractingActor))
-		{
-			InteractingActors.Add(OtherActor);
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				3.0f,
+				FColor::Red,
+				"Enter InteractingActor Zone"
+			);
 		}
 
 	}
@@ -257,27 +253,38 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		if (OtherActor == InteractingActor && !IsInteracting)
+		if (InteractingActors.Contains(OtherActor))
 		{
-			IsInInteractingRange = false;
-			InteractingActor = nullptr;
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
-			if (InteractingActors.Num() > 0)
+			InteractingActors.Remove(OtherActor);
+			if (InteractingActors.Num() == 0 && !IsInteracting)
 			{
-				IsInInteractingRange = true;
-				InteractingActor = InteractingActors.Top();
-				InteractingActors.Remove(InteractingActor);
+				IsInInteractingRange = false;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					3.0f,
+					FColor::Red,
+					"Exit InteractingActor Zone"
+				);
 			}
 		}
-		else if (OtherActor != InteractingActor && InteractingActors.Contains(OtherActor))
+	}
+}
+
+TObjectPtr<AActor> ACouchCharacter::FindNearestInteractingActor() const
+{
+	float minDistanceFromPlayer = 10000;
+	TObjectPtr<AActor> nearestInteractingActor = nullptr;
+	for (TObjectPtr<AActor> InteractActor : InteractingActors)
+	{
+		if (!InteractActor) continue;
+		float DistanceToPlayer = GetDistanceTo(InteractActor);
+		if(DistanceToPlayer < minDistanceFromPlayer)
 		{
-			InteractingActors.Remove(OtherActor);
-		}
-		else if (InteractingActors.Contains(OtherActor))
-		{
-			InteractingActors.Remove(OtherActor);
+			nearestInteractingActor = InteractActor;
+			minDistanceFromPlayer = DistanceToPlayer;
 		}
 	}
+	return nearestInteractingActor;
 }
 
 void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -324,37 +331,54 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (!InteractingActor || !InteractingActor->Implements<UCouchInteractable>()) return;
-
+	if (InteractingActors.IsEmpty())
+	{
+		return;
+	}
+	
+	if (!InteractingActor)
+	{
+		InteractingActor = FindNearestInteractingActor();
+		if (!InteractingActor)
+		{
+			return;
+		}
+	}
 	float ActionValue = InputActionValue.Get<float>();
-
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
 	
-	// Début de l'interaction
-	if (!IsInteracting && InteractingActor && ActionValue > 0.1f && !bAlreadyUsed)
+	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
 	{
-		if (InteractingActor->Implements<UCouchPickable>())
+		IsInteracting = true;
+		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		if (!IsHoldingItem) StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-		IsInteracting = true;
+		else if (!IsHoldingItem)
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
+		}
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
 	}
-	// Fin de l'interaction
 	else if (IsInteracting && ActionValue < 0.1f)
 	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-		IsInteracting = false;
+
 		if (IsHoldingItem)
 		{
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 			IsHoldingItem = false;
 		}
+		else
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		}
+		IsInteracting = false;
+		InteractingActor = nullptr;
+
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
 	}
-	else if (bAlreadyUsed)
+	else if (ActionValue > 0.1f && bAlreadyUsed)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
 	}
@@ -363,6 +387,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
 	}
 }
+
 
 
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
