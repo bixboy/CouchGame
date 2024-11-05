@@ -27,13 +27,13 @@ bool ACouchFishingRod::IsUsedByPlayer_Implementation()
    return ICouchInteractable::IsUsedByPlayer_Implementation();
 }
 
+#pragma region ChargingPower
 
 void ACouchFishingRod::StartChargeActor_Implementation()
 {
    ICouchInteractable::StartChargeActor_Implementation();
    ChargePower->StartCharging(SkeletalMesh);
 }
-
 
 void ACouchFishingRod::StopChargeActor_Implementation()
 {
@@ -42,6 +42,7 @@ void ACouchFishingRod::StopChargeActor_Implementation()
    SpawnLure();
 }
 
+#pragma endregion 
 
 void ACouchFishingRod::SpawnLure()
 {
@@ -77,28 +78,20 @@ void ACouchFishingRod::InitializeCableAndConstraint()
       Cable->SetupAttachment(RootComponent);
       Cable->RegisterComponent();
       Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
-
-
-      // Définit le matériau du câble
       if (CableMaterial)
       {
          Cable->SetMaterial(0, CableMaterial);
       }
-
-
       Cable->CableLength = 10.f;
 
-
-      // Attache l'extrémité du câble
+      // Attache le cable
       Cable->SetAttachEndToComponent(LureRef->SphereComponent);
           //Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
           //Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
 
-
       Cable->EndLocation = FVector(0.0f, 0.0f, 2.0f);
       Cable->SetVisibility(true, true); 
    }
-
 
    // Ajoute le composant PhysicsConstraint
    PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
@@ -107,8 +100,6 @@ void ACouchFishingRod::InitializeCableAndConstraint()
        PhysicsConstraint->SetupAttachment(RootComponent);
        PhysicsConstraint->RegisterComponent();
 
-
-       // Configure les composants contraints
        PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), LureRef->SphereComponent, FName(TEXT("None")));  
    }
 }

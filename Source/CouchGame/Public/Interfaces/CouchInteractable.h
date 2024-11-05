@@ -1,11 +1,9 @@
 #pragma once
 
-
 #include "CoreMinimal.h"
 #include "Characters/CouchCharacter.h"
 #include "UObject/Interface.h"
 #include "CouchInteractable.generated.h"
-
 
 // This class does not need to be modified.
 UINTERFACE()
