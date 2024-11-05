@@ -16,16 +16,9 @@ ACouchFishingRod::ACouchFishingRod()
    RootComponent = SkeletalMesh;
 }
 
+bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
-void ACouchFishingRod::Tick(float DeltaTime)
-{
-   Super::Tick(DeltaTime);
-}
-
-bool ACouchFishingRod::IsUsedByPlayer_Implementation()
-{
-   return ICouchInteractable::IsUsedByPlayer_Implementation();
-}
+void ACouchFishingRod::BeakCableConstraint() const {PhysicsConstraint->BreakConstraint();}
 
 #pragma region ChargingPower
 
@@ -59,15 +52,13 @@ void ACouchFishingRod::SpawnLure()
    );
   
    FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
-   LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform);
-   LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-
-
-   InitializeCableAndConstraint();
-  
-   LureRef->CouchProjectile->Initialize(SuggestedVelocity);
+   if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
+   {
+      LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+      InitializeCableAndConstraint();
+      LureRef->Initialize(SuggestedVelocity, this);  
+   }
 }
-
 
 void ACouchFishingRod::InitializeCableAndConstraint()
 {
@@ -99,11 +90,9 @@ void ACouchFishingRod::InitializeCableAndConstraint()
    {
        PhysicsConstraint->SetupAttachment(RootComponent);
        PhysicsConstraint->RegisterComponent();
-
-       PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), LureRef->SphereComponent, FName(TEXT("None")));  
+       PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), LureRef->SphereComponent, FName(TEXT("None")));
    }
 }
-
 
 void ACouchFishingRod::RewindCable(float JoystickInput)
 {
