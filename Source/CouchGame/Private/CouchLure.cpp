@@ -35,6 +35,10 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			CouchProjectile->SetCanMove(false);
 			SphereComponent->SetSimulatePhysics(true);
 			CouchFishingRod->BeakCableConstraint();
+
+			FVector Vel = FVector::ZeroVector;
+			SphereComponent->SetPhysicsLinearVelocity(Vel);
+			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 		}	
 	}
 	

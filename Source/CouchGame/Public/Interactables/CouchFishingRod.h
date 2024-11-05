@@ -71,6 +71,8 @@ private:
 	void SpawnLure();
 	UFUNCTION()
 	void InitializeCableAndConstraint();
-	UFUNCTION()
-	void RewindCable(float JoystickInput);
+	UFUNCTION(BlueprintCallable)
+	void RewindCable(float DeltaTime, float JoystickX, float JoystickY);
+
+	float PreviousAngle;
 };

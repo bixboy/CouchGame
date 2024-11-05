@@ -68,38 +68,65 @@ void ACouchFishingRod::InitializeCableAndConstraint()
    {
       Cable->SetupAttachment(RootComponent);
       Cable->RegisterComponent();
+
+      // Setup Cable
       Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
-      if (CableMaterial)
-      {
-         Cable->SetMaterial(0, CableMaterial);
-      }
-      Cable->CableLength = 10.f;
+      Cable->SetMaterial(0, CableMaterial);
+      Cable->NumSegments = 17.f;
+      float Distance = FVector::Dist(SkeletalMesh->GetSocketLocation(FName("barrel")), ChargePower->TargetLocation);
+      Cable->CableLength = Distance;
 
       // Attache le cable
       Cable->SetAttachEndToComponent(LureRef->SphereComponent);
-          //Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
-          //Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
+      Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
+      Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
 
-      Cable->EndLocation = FVector(0.0f, 0.0f, 2.0f);
+      Cable->EndLocation = FVector(0.0f, 0.0f, 30.0f);
       Cable->SetVisibility(true, true); 
    }
 
    // Ajoute le composant PhysicsConstraint
-   PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint"));
-   if (PhysicsConstraint)
+   if (PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint")))
    {
        PhysicsConstraint->SetupAttachment(RootComponent);
        PhysicsConstraint->RegisterComponent();
-       PhysicsConstraint->SetConstrainedComponents(SkeletalMesh, FName(TEXT("None")), LureRef->SphereComponent, FName(TEXT("None")));
+      PhysicsConstraint->SetWorldLocation(SkeletalMesh->GetSocketLocation(FName("barrel")));
    }
 }
 
-void ACouchFishingRod::RewindCable(float JoystickInput)
+void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float JoystickY)
 {
-   if (JoystickInput > Threshold)
+   if (Cable)
    {
-      float NewCableLength = FMath::Clamp(Cable->CableLength - RewindSpeed * JoystickInput, MinCableLength, MaxCableLength);
-      Cable->CableLength = NewCableLength;
+      float CircularMotion = FMath::Sqrt(FMath::Square(JoystickX) + FMath::Square(JoystickY));
+
+      if (CircularMotion > Threshold)
+      {
+         float CurrentAngle = FMath::Atan2(JoystickY, JoystickX);
+         
+         if (PreviousAngle == -999.0f) {PreviousAngle = CurrentAngle;}
+         
+         float AngleDelta = FMath::Abs(CurrentAngle - PreviousAngle);
+
+         // Normalisation
+         if (AngleDelta > PI)
+         {
+            AngleDelta = 2 * PI - AngleDelta;
+         }
+         
+         if (AngleDelta > 0.5f)
+         {
+            float NewCableLength = FMath::Clamp(Cable->CableLength - (RewindSpeed * CircularMotion * DeltaTime), MinCableLength, MaxCableLength);
+            Cable->CableLength = NewCableLength;
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Angle Delta: %f, Cable Length: %f"), AngleDelta, Cable->CableLength));
+            
+            if (LureRef)
+            {
+               //LureRef->SetActorLocation(NewPosition);
+            }
+         }
+         PreviousAngle = CurrentAngle;
+      }
    }
 }
 
