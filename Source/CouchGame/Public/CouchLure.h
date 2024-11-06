@@ -1,11 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
+
 
 #include "CoreMinimal.h"
 #include "Components/CouchProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Interactables/CouchFishingRod.h"
 #include "CouchLure.generated.h"
 
 UCLASS()
@@ -15,21 +16,25 @@ class COUCHGAME_API ACouchLure : public AActor
 
 public:
 	ACouchLure();
-	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere)
-	UCouchProjectile* CouchProjectile;
+	TObjectPtr<USphereComponent> SphereComponent;
 	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereComponent;
+	TObjectPtr<UStaticMeshComponent> LureMesh;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* LureMesh;
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* TopMesh;
+	TObjectPtr<UStaticMeshComponent> TopMesh;
 
-protected:
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
 
 private:
 	UFUNCTION()
 	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<ACouchFishingRod> CouchFishingRod;
+	
+	FTimerHandle TimerHandle;
 };

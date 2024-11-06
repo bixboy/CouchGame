@@ -18,9 +18,4 @@ ACouchPickableCannonBall::ACouchPickableCannonBall()
 	Down->SetupAttachment(RootComponent);
 }
 
-void ACouchPickableCannonBall::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
 

@@ -10,17 +10,25 @@ UCouchProjectile::UCouchProjectile()
 
 void UCouchProjectile::Initialize(const FVector& LaunchVelocity)
 {
-	Velocity = LaunchVelocity;  // Définir la vélocité initiale
-	Location = GetOwner()->GetActorLocation(); // Obtenir la position initiale
-	TimeElapsed = 0.0f; // Réinitialiser le temps écoulé
+	Velocity = LaunchVelocity;
+	Location = GetOwner()->GetActorLocation();
+	TimeElapsed = 0.0f;
+	CanMove = true;
 }
+
+bool UCouchProjectile::GetCanMove() {return CanMove;}
+
+void UCouchProjectile::SetCanMove(bool Value) {CanMove = Value;}
 
 void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	TimeElapsed += DeltaTime;
-	FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
-	SetWorldLocation(NewLocation);
+	if (CanMove)
+	{
+		TimeElapsed += DeltaTime;
+		FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
+		GetOwner()->SetActorLocation(NewLocation);
+	}
 }
 

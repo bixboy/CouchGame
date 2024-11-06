@@ -12,15 +12,16 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CoucheCannon.h"
 #include "Interfaces/CouchInteractable.h"
+#include "Interfaces/CouchPickable.h"
 
-
-// Sets default values
+#pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	InteractionZone = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionZone"));
-	InteractionZone->SetupAttachment(RootComponent);
+	InteractionZone->SetupAttachment(GetMesh());
+	PickUpItemPosition = CreateDefaultSubobject<USceneComponent>(TEXT("PickUpItemPosition"));
+	PickUpItemPosition->SetupAttachment(InteractionZone);
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
@@ -28,7 +29,6 @@ ACouchCharacter::ACouchCharacter()
 }
 
 
-// Called when the game starts or when spawned
 void ACouchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -38,12 +38,11 @@ void ACouchCharacter::BeginPlay()
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
 
-// Called every frame
 void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	TickStateMachine(DeltaTime);
-	if (!IsInteracting) RotateMeshUsingOrient(DeltaTime);
+	if (!IsInteracting || IsHoldingItem) RotateMeshUsingOrient(DeltaTime);
 	if (!CanDashAgain)
 	{
 		DashTimer += DeltaTime;
@@ -69,6 +68,8 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputInteractAndActions(EnhancedInputComponent);
 }
 
+#pragma endregion Unreal Default
+#pragma region Move And Orient
 FVector2D ACouchCharacter::GetOrient() const
 {
 	return Orient;
@@ -96,6 +97,8 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 		GetMesh()->SetRelativeRotation(NewRotation);
 	}
 }
+#pragma endregion
+#pragma region State Machine
 void ACouchCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<UCouchCharacterStateMachine>(this);
@@ -112,7 +115,8 @@ void ACouchCharacter::TickStateMachine(float DeltaTime) const
 	if (!StateMachine) return;
 	StateMachine->Tick(DeltaTime);
 }
-
+#pragma endregion
+#pragma region InputData / MappingContext
 void ACouchCharacter::SetupMappingContextIntoController() const
 {
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -126,134 +130,11 @@ void ACouchCharacter::SetupMappingContextIntoController() const
 
 	InputSystem->AddMappingContext(InputMappingContext, 0);
 }
-
+#pragma endregion
+#pragma region InputMove
 FVector2D ACouchCharacter::GetInputMove() const
 {
 	return InputMove;
-}
-
-bool ACouchCharacter::GetCanDash() const
-{
-	return CanDash;
-}
-
-
-void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
-{
-	if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
-	{
-		CanDashAgain = false;
-		InputDashEvent.Broadcast(InputMove);
-	}
-	
-}
-
-void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->Implements<UCouchInteractable>())
-	{
-		IsInInteractingRange = true;
-		InteractingActor = OtherActor;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
-	}
-	
-}
-
-void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->Implements<UCouchInteractable>())
-	{
-		IsInInteractingRange = false;
-		InteractingActor = nullptr;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Exit InteractingActor Zone");
-		if (IsInteracting)
-		{
-			IsInteracting = false;
-			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-		}
-	}
-}
-
-void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent)
-{
-	if (!InputData) return;
-	if (InputData->InputActionInteract)
-	{
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionInteract,
-			ETriggerEvent::Started,
-			this,
-			&ACouchCharacter::OnInputInteract
-		);
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionInteract,
-			ETriggerEvent::Completed,
-			this,
-			&ACouchCharacter::OnInputInteract
-		);
-	}
-	if (InputData->InputActionFire)
-	{
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionFire,
-			ETriggerEvent::Started,
-			this,
-			&ACouchCharacter::OnInputFire
-		);
-		// EnhancedInputComponent->BindAction(
-		// 	InputData->InputActionFire,
-		// 	ETriggerEvent::Triggered,
-		// 	this,
-		// 	&ACouchCharacter::OnInputFire
-		// );
-		
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionFire,
-			ETriggerEvent::Completed,
-			this,
-			&ACouchCharacter::OnInputFire
-		);
-	}
-}
-
-void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
-{
-	if (IsInInteractingRange && !IsInteracting)
-	{
-		StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-		IsInteracting = true;
-	}
-	else if (IsInInteractingRange && IsInteracting)
-	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
-		IsInteracting = false;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to Interract");
-	}
-}
-
-void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
-{
-	if (IsInteracting)
-	{
-		if (ACoucheCannon* Cannon = Cast<ACoucheCannon>(InteractingActor); Cannon)
-		{
-			if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
-			{
-				Cannon->StartCharging();
-				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
-			}
-			else
-			{
-				Cannon->StopCharging();
-				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
-			}
-		}
-	}
 }
 
 
@@ -326,6 +207,211 @@ void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 		InputMove = FVector2D::Zero();
 	}
 }
+#pragma endregion
+#pragma region Dash
+bool ACouchCharacter::GetCanDash() const
+{
+	return CanDash;
+}
+
+
+void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
+{
+	if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+	{
+		CanDashAgain = false;
+		InputDashEvent.Broadcast(InputMove);
+	}
+	
+}
+
+#pragma endregion
+#pragma region Interraction
+void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->Implements<UCouchInteractable>())
+	{
+		InteractingActors.Add(OtherActor);
+		if (!IsInInteractingRange)
+		{
+			IsInInteractingRange = true;
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				3.0f,
+				FColor::Red,
+				"Enter InteractingActor Zone"
+			);
+		}
+
+	}
+	
+}
+
+void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->Implements<UCouchInteractable>())
+	{
+		if (InteractingActors.Contains(OtherActor))
+		{
+			InteractingActors.Remove(OtherActor);
+			if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
+			{
+				IsInInteractingRange = false;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					3.0f,
+					FColor::Red,
+					"Exit InteractingActor Zone"
+				);
+			}
+		}
+	}
+}
+
+TObjectPtr<AActor> ACouchCharacter::FindNearestInteractingActor() const
+{
+	float minDistanceFromPlayer = 10000;
+	TObjectPtr<AActor> nearestInteractingActor = nullptr;
+	for (TObjectPtr<AActor> InteractActor : InteractingActors)
+	{
+		if (!InteractActor) continue;
+		float DistanceToPlayer = GetDistanceTo(InteractActor);
+		if(DistanceToPlayer < minDistanceFromPlayer)
+		{
+			nearestInteractingActor = InteractActor;
+			minDistanceFromPlayer = DistanceToPlayer;
+		}
+	}
+	return nearestInteractingActor;
+}
+
+void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	if (!InputData) return;
+	if (InputData->InputActionInteract)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionInteract,
+			ETriggerEvent::Started,
+			this,
+			&ACouchCharacter::OnInputInteract
+		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionInteract,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputInteract
+		);
+	}
+	if (InputData->InputActionFire)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionFire,
+			ETriggerEvent::Started,
+			this,
+			&ACouchCharacter::OnInputFire
+		);
+		// EnhancedInputComponent->BindAction(
+		// 	InputData->InputActionFire,
+		// 	ETriggerEvent::Triggered,
+		// 	this,
+		// 	&ACouchCharacter::OnInputFire
+		// );
+		
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionFire,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputFire
+		);
+	}
+}
+
+void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
+{
+	if (InteractingActors.IsEmpty() && !IsInteracting)
+	{
+		return;
+	}
+	
+	if (!InteractingActor)
+	{
+		InteractingActor = FindNearestInteractingActor();
+		if (!InteractingActor)
+		{
+			return;
+		}
+	}
+	float ActionValue = InputActionValue.Get<float>();
+	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
+	
+	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
+	{
+		IsInteracting = true;
+		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
+		{
+			IsHoldingItem = true;
+			ICouchInteractable::Execute_Interact(InteractingActor, this);
+		}
+		else if (!IsHoldingItem)
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
+	}
+	else if (IsInteracting && ActionValue < 0.1f)
+	{
+		if (IsHoldingItem)
+		{
+			ICouchInteractable::Execute_Interact(InteractingActor, this);
+			IsHoldingItem = false;
+		}
+		else
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		}
+		IsInteracting = false;
+		InteractingActor = nullptr;
+		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
+
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
+	}
+	else if (ActionValue > 0.1f && bAlreadyUsed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
+	}
+}
+
+
+
+void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
+{
+	if (IsInteracting)
+	{
+		if (!InteractingActor->Implements<UCouchInteractable>()) return;
+		{
+			if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
+			{
+				ICouchInteractable::Execute_StartChargeActor(InteractingActor);
+				//Cannon->StartCharging();
+				//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
+			}
+			else
+			{
+				ICouchInteractable::Execute_StopChargeActor(InteractingActor);
+				//Cannon->StopCharging();
+				// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Undetected");
+			}
+		}
+	}
+}
+
 
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
 {
@@ -333,11 +419,16 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	{
 		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
 		{
-			if (InputMove != FVector2D::Zero()) CouchMovement->StartMovement(-InputActionValue.Get<FVector2D>().X);
+			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f) CouchMovement->StartMovement(-InputMove.Y);
 			else CouchMovement->StopMovement();	
 		}
 	}
 }
 
-
-
+#pragma endregion 
+#pragma region Hold Item
+bool ACouchCharacter::GetIsHoldingItem() const
+{
+	return IsHoldingItem;
+}
+#pragma endregion

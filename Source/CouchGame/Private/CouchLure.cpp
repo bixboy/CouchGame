@@ -1,16 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CouchLure.h"
 
 #include "Components/CouchProjectile.h"
 #include "Interfaces/CouchInteractable.h"
 
+
 ACouchLure::ACouchLure()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
-	
+  
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	RootComponent = SphereComponent;
 	LureMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LureMesh"));
@@ -21,23 +19,34 @@ ACouchLure::ACouchLure()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
 
-void ACouchLure::BeginPlay()
+void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
-	Super::BeginPlay();
-}
-
-
-void ACouchLure::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	CouchProjectile->Initialize(LaunchVelocity);
+	CouchFishingRod = FishingRod;
 }
 
 void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (CouchProjectile)
+	{
+		if (CouchProjectile->GetCanMove())
+		{
+			CouchProjectile->SetCanMove(false);
+			SphereComponent->SetSimulatePhysics(true);
+			CouchFishingRod->BeakCableConstraint();
+
+			FVector Vel = FVector::ZeroVector;
+			SphereComponent->SetPhysicsLinearVelocity(Vel);
+			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
+		}	
+	}
+	
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
 }
+
+
 

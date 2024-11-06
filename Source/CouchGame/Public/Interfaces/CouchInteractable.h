@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,14 +12,32 @@ class UCouchInteractable : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class COUCHGAME_API ICouchInteractable
 {
 	GENERATED_BODY()
 
+
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(ACouchCharacter* Player);
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartMoveActor(int InputDirection);
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopMoveActor();
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartChargeActor();
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopChargeActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsUsedByPlayer();
 };
+

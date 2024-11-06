@@ -3,25 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchPickableMaster.h"
 #include "GameFramework/Actor.h"
 #include "CouchPickableCannonBall.generated.h"
 
 UCLASS()
-class COUCHGAME_API ACouchPickableCannonBall : public AActor
+class COUCHGAME_API ACouchPickableCannonBall : public ACouchPickableMaster
 {
 	GENERATED_BODY()
 
 public:
 	ACouchPickableCannonBall();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	UStaticMeshComponent* Base;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	UStaticMeshComponent* Top;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	UStaticMeshComponent* Down;
 
-protected:
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> Base;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> Top;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> Down;
 	
 };
