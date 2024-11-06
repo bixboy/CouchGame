@@ -9,17 +9,16 @@
 ACouchCannonBall::ACouchCannonBall()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	RootComponent = Sphere;
 	
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
-	RootComponent = Base;
-	
-	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
-	Sphere->SetupAttachment(RootComponent);
-	
+	Base->SetupAttachment(RootComponent);
 	Top = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Top"));
-	Top->SetupAttachment(RootComponent);
+	Top->SetupAttachment(Base);
 	Down = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Down"));
-	Down->SetupAttachment(RootComponent);
+	Down->SetupAttachment(Base);
 }
 
 void ACouchCannonBall::BeginPlay()
@@ -39,9 +38,9 @@ void ACouchCannonBall::Initialize(const FVector& LaunchVelocity)
 
 void ACouchCannonBall::InitCanonBall(TObjectPtr<ACouchStaticCanonBall> PickableCannonBall)
 {
+
 	SetActorTransform(PickableCannonBall->GetActorTransform());
 	Base->SetStaticMesh(PickableCannonBall->Base->GetStaticMesh());
-	
 	
 	Top->SetStaticMesh( PickableCannonBall->Top->GetStaticMesh());
 	Top->SetRelativeTransform(PickableCannonBall->Top->GetRelativeTransform());

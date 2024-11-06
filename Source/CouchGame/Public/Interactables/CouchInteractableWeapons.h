@@ -43,8 +43,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchWidgetSpawn* WidgetComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USceneComponent* WidgetPose;
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxInteract;
