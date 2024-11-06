@@ -13,5 +13,4 @@ enum class ECouchCharacterStateID : uint8
 	Dash,
 	Fishing,
 	InteractingObject,
-	HoldingObject,
 };
