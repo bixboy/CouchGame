@@ -47,7 +47,7 @@ float UCouchChargePower::UpdatePower(float Alpha)
 {
 	CurrentPower = Alpha * MaxPower;
 	TargetLocation = LineTrace();
-	if (ChargeWidget)
+	if (ChargeWidget && ChargeWidget->PowerChargeActor)
 	{
 		FOutputDeviceNull ar;
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
