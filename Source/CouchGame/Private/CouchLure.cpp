@@ -19,12 +19,27 @@ ACouchLure::ACouchLure()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
 
-void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
-	if (CouchProjectile->CanMove)
+	CouchProjectile->Initialize(LaunchVelocity);
+	CouchFishingRod = FishingRod;
+}
+
+void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (CouchProjectile)
 	{
-		CouchProjectile->CanMove = false;
+		if (CouchProjectile->GetCanMove())
+		{
+			CouchProjectile->SetCanMove(false);
+			SphereComponent->SetSimulatePhysics(true);
+			CouchFishingRod->BeakCableConstraint();
+
+			FVector Vel = FVector::ZeroVector;
+			SphereComponent->SetPhysicsLinearVelocity(Vel);
+			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
+		}	
 	}
 	
 	if (OtherActor->Implements<UCouchInteractable>())

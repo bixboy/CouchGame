@@ -16,6 +16,10 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity)
 	CanMove = true;
 }
 
+bool UCouchProjectile::GetCanMove() {return CanMove;}
+
+void UCouchProjectile::SetCanMove(bool Value) {CanMove = Value;}
+
 void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

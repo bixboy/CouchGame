@@ -21,42 +21,39 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 
 public:
 	ACouchFishingRod();
-	virtual void Tick(float DeltaTime) override;
 	virtual bool IsUsedByPlayer_Implementation() override;
-
 
 public:
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
-
+	
+	UFUNCTION()
+	void BeakCableConstraint() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USkeletalMeshComponent* SkeletalMesh;
-
+	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 	UPROPERTY(EditAnywhere)
-	UPhysicsConstraintComponent* PhysicsConstraint;
-
+	TObjectPtr<UPhysicsConstraintComponent> PhysicsConstraint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchChargePower* ChargePower;
+	TObjectPtr<UCouchChargePower> ChargePower;
 
 
 private:
 
-
-	UPROPERTY()
-	UCableComponent* Cable;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCableComponent> Cable;
 	UPROPERTY()
 	float CableScale = 1.0f;
 	UPROPERTY()
-	UMaterial* CableMaterial;
+	TObjectPtr<UMaterial> CableMaterial;
 
 
 	UPROPERTY(EditAnywhere)
-	UClass* Lure;
+	TObjectPtr<UClass> Lure;
 	UPROPERTY()
-	ACouchLure* LureRef;
+	TObjectPtr<ACouchLure> LureRef;
 
 
 	UPROPERTY(EditAnywhere)
@@ -74,6 +71,8 @@ private:
 	void SpawnLure();
 	UFUNCTION()
 	void InitializeCableAndConstraint();
-	UFUNCTION()
-	void RewindCable(float JoystickInput);
+	UFUNCTION(BlueprintCallable)
+	void RewindCable(float DeltaTime, float JoystickX, float JoystickY);
+
+	float PreviousAngle;
 };

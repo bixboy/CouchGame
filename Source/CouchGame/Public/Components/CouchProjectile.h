@@ -13,20 +13,21 @@ class COUCHGAME_API UCouchProjectile : public UActorComponent
 public:
 	UCouchProjectile();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void Initialize(const FVector& LaunchVelocity);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool CanMove = false;
+
+	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
+	bool GetCanMove();
+	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
+	void SetCanMove(bool Value);
 
 private:
-	UPROPERTY()
 	FVector Velocity;      // Vélocité du projectile
-	UPROPERTY()
 	FVector Location;      // Position actuelle du projectile
-	UPROPERTY()
 	float TimeElapsed;     // Temps écoulé depuis le lancement
-	
 	const float Gravity = -980.0f;
+	
+	UPROPERTY(EditAnywhere)
+	bool CanMove = false;
 };

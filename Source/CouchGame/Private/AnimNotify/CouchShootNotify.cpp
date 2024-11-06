@@ -3,14 +3,14 @@
 
 #include "AnimNotify/CouchShootNotify.h"
 
-#include "Interactables/CoucheCannon.h"
+#include "Interactables/CouchCatapult.h"
 
 void UCouchShootNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (ACoucheCannon* CoucheCannon = Cast<ACoucheCannon>(MeshComp->GetOwner()))
+	if (ACouchCatapult* Catapult = Cast<ACouchCatapult>(MeshComp->GetOwner()))
 	{
-		CoucheCannon->Fire();
+		Catapult->Fire();
 	}
 }
