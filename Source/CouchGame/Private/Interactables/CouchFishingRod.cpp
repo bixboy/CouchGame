@@ -1,6 +1,7 @@
 #include "Interactables/CouchFishingRod.h"
 #include "CouchLure.h"
 #include "Components/CouchChargePower.h"
+#include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -114,18 +115,23 @@ void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float Joyst
             FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
             FVector LurePosition = LureRef->GetActorLocation();
             
-            FVector NewPositionXY = FMath::VInterpTo(FVector(LurePosition.X, LurePosition.Y, StartPosition.Z), StartPosition, DeltaTime, RewindSpeed);
+            FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
+            FVector NewPositionXY = FMath::VInterpTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
             LureRef->SetActorLocation(NewPositionXY);
             
-            if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= 20.f)
+            if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= 10.f)
             {
-               FVector NewPositionZ = FMath::VInterpTo(LurePosition, StartPosition, DeltaTime, RewindSpeed);
+               FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
+               FVector NewPositionZ = FMath::VInterpTo(NewPositionXY, TargetPositionZ, DeltaTime, RewindSpeed);
                LureRef->SetActorLocation(NewPositionZ);
+               
                LureRef->SphereComponent->SetSimulatePhysics(false);
+               GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Distance")));
             }
             
             if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
             {
+               //GetWorld()->SpawnActor(ACouchPickableCannonBall)
                LureRef->DestroyLure();
                LureRef = nullptr;
                Cable->DestroyComponent();
