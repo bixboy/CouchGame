@@ -60,9 +60,9 @@ public:
 #pragma region Movement
 private:	
 	UFUNCTION()
-	void StartMovement(int InputDirection);
+	virtual void StartMoveActor_Implementation(int InputDirection) override;
 	UFUNCTION()
-	void StopMovement();
+	virtual void StopMoveActor_Implementation() override;
 	
 #pragma endregion
 

@@ -10,7 +10,7 @@
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "Interactables/CoucheCannon.h"
+#include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Interfaces/CouchPickable.h"
 
@@ -232,17 +232,21 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		InteractingActors.Add(OtherActor);
-		if (!IsInInteractingRange)
+		if (TObjectPtr<ACouchInteractableMaster> Actor = Cast<ACouchInteractableMaster>(OtherActor); Actor)
 		{
-			IsInInteractingRange = true;
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				3.0f,
-				FColor::Red,
-				"Enter InteractingActor Zone"
-			);
+			InteractingActors.Add(Actor);
+			if (!IsInInteractingRange)
+			{
+				IsInInteractingRange = true;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					3.0f,
+					FColor::Red,
+					"Enter InteractingActor Zone"
+				);
+			}
 		}
+
 
 	}
 	
@@ -255,26 +259,29 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 	{
 		if (InteractingActors.Contains(OtherActor))
 		{
-			InteractingActors.Remove(OtherActor);
-			if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
+			if (TObjectPtr<ACouchInteractableMaster> Actor = Cast<ACouchInteractableMaster>(OtherActor); Actor)
 			{
-				IsInInteractingRange = false;
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					3.0f,
-					FColor::Red,
-					"Exit InteractingActor Zone"
-				);
+				InteractingActors.Remove(Actor);
+				if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
+				{
+					IsInInteractingRange = false;
+					GEngine->AddOnScreenDebugMessage(
+						-1,
+						3.0f,
+						FColor::Red,
+						"Exit InteractingActor Zone"
+					);
+				}
 			}
 		}
 	}
 }
 
-TObjectPtr<AActor> ACouchCharacter::FindNearestInteractingActor() const
+TObjectPtr<ACouchInteractableMaster> ACouchCharacter::FindNearestInteractingActor() const
 {
 	float minDistanceFromPlayer = 10000;
-	TObjectPtr<AActor> nearestInteractingActor = nullptr;
-	for (TObjectPtr<AActor> InteractActor : InteractingActors)
+	TObjectPtr<ACouchInteractableMaster> nearestInteractingActor = nullptr;
+	for (auto InteractActor : InteractingActors)
 	{
 		if (!InteractActor) continue;
 		float DistanceToPlayer = GetDistanceTo(InteractActor);
@@ -365,6 +372,15 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	{
 		if (IsHoldingItem)
 		{
+			if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
+			{
+				TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
+					PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
+				if (ItemToInteractWith)
+				{
+					ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
+				}
+			}
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 			IsHoldingItem = false;
 		}
@@ -415,13 +431,11 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
 {
-	if (IsInInteractingRange && IsInteracting)
+	if (IsInInteractingRange && IsInteracting && InteractingActor)
 	{
-		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
-		{
-			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f) CouchMovement->StartMovement(-InputMove.Y);
-			else CouchMovement->StopMovement();	
-		}
+			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f)
+				ICouchInteractable::Execute_StartMoveActor(InteractingActor,-InputMove.Y);
+			else ICouchInteractable::Execute_StopMoveActor(InteractingActor);	
 	}
 }
 

@@ -58,4 +58,31 @@ void ACouchPickableMaster::Drop_Implementation()
 	PhysicsCollider->SetSimulatePhysics(true);
 }
 
+void ACouchPickableMaster::InteractWithObject_Implementation(ACouchInteractableMaster* interactable)
+{
+	ICouchPickable::InteractWithObject_Implementation(interactable);
+}
+
+bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const
+{
+	if (ClassesPickableItemCanInteractWith.Contains(Interactable.GetClass())) return true;
+	return false;
+}
+
+TObjectPtr<ACouchInteractableMaster> ACouchPickableMaster::PlayerCanUsePickableItemToInteract(
+	TObjectPtr<ACouchInteractableMaster>  PickableItem,
+	TArray<TObjectPtr<ACouchInteractableMaster>> InteractableActors
+	)
+{
+	InteractableActors.Remove(PickableItem);
+	for (auto Interactable : InteractableActors)
+	{
+		if (CanInteractWith(Interactable))
+		{
+			return Interactable;
+		}
+	}
+	return nullptr;
+}
+
 

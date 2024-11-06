@@ -33,3 +33,4 @@ void ACouchInteractableMaster::RemoveCurrentPlayer() {CurrentPlayer = nullptr;}
 
 void ACouchInteractableMaster::SetPlayerIsIn(bool IsIn) {PlayerIsIn = IsIn;}
 
+

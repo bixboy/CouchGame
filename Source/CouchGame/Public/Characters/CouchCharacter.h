@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class ACouchInteractableMaster;
 class USphereComponent;
 class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
@@ -132,10 +133,10 @@ public:
 		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY()
-	TArray<AActor*> InteractingActors;
+	TArray<TObjectPtr<ACouchInteractableMaster>> InteractingActors;
 	UPROPERTY()
-	TObjectPtr<AActor> InteractingActor;
-	TObjectPtr<AActor> FindNearestInteractingActor() const;
+	TObjectPtr<ACouchInteractableMaster> InteractingActor;
+	TObjectPtr<ACouchInteractableMaster> FindNearestInteractingActor() const;
 	bool IsInInteractingRange;
 	bool IsInteracting;
 	

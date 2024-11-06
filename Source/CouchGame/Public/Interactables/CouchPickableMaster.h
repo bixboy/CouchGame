@@ -7,6 +7,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+
 UCLASS()
 class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, public ICouchPickable
 {
@@ -38,9 +39,24 @@ public:
 
 	virtual void Drop_Implementation() override;
 
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> PhysicsCollider;
+#pragma endregion
+#pragma region Interact with other Class
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<ACouchInteractableMaster>> ClassesPickableItemCanInteractWith;
+
+	TObjectPtr<ACouchInteractableMaster> PlayerCanUsePickableItemToInteract(
+		TObjectPtr<ACouchInteractableMaster>  PickableItem, 
+		TArray<TObjectPtr<ACouchInteractableMaster>> InteractableActors
+	);
+
+private:
+	bool CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const;
 #pragma endregion
 	
 };

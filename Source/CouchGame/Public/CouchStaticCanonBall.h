@@ -3,17 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CouchPickableMaster.h"
 #include "GameFramework/Actor.h"
-#include "CouchPickableCannonBall.generated.h"
-
+#include "CouchStaticCanonBall.generated.h"
+class UStaticMeshComponent;
+class ACouchPickableCannonBall;
 UCLASS()
-class COUCHGAME_API ACouchPickableCannonBall : public ACouchPickableMaster
+class COUCHGAME_API ACouchStaticCanonBall : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	ACouchPickableCannonBall();
+	// Sets default values for this actor's properties
+	ACouchStaticCanonBall();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Base;
@@ -24,5 +25,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Down;
 
-	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+	void InitCanonBall(TObjectPtr<ACouchPickableCannonBall> PickableCannonBall);
 };
+
