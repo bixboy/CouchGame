@@ -256,7 +256,7 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 		if (InteractingActors.Contains(OtherActor))
 		{
 			InteractingActors.Remove(OtherActor);
-			if (InteractingActors.Num() == 0 && !IsInteracting)
+			if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
 			{
 				IsInInteractingRange = false;
 				GEngine->AddOnScreenDebugMessage(
@@ -331,7 +331,7 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (InteractingActors.IsEmpty())
+	if (InteractingActors.IsEmpty() && !IsInteracting)
 	{
 		return;
 	}
@@ -363,7 +363,6 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 	else if (IsInteracting && ActionValue < 0.1f)
 	{
-
 		if (IsHoldingItem)
 		{
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
@@ -375,6 +374,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 		}
 		IsInteracting = false;
 		InteractingActor = nullptr;
+		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
 	}
