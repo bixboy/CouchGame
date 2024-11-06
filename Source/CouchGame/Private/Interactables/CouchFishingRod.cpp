@@ -1,5 +1,4 @@
 #include "Interactables/CouchFishingRod.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CouchLure.h"
 #include "Components/CouchChargePower.h"
 #include "Interfaces/CouchInteractable.h"
@@ -18,8 +17,6 @@ ACouchFishingRod::ACouchFishingRod()
 
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
-void ACouchFishingRod::BeakCableConstraint() const {PhysicsConstraint->BreakConstraint();}
-
 #pragma region ChargingPower
 
 void ACouchFishingRod::StartChargeActor_Implementation()
@@ -36,6 +33,8 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 }
 
 #pragma endregion 
+
+#pragma region Spawn & Init
 
 void ACouchFishingRod::SpawnLure()
 {
@@ -84,19 +83,15 @@ void ACouchFishingRod::InitializeCableAndConstraint()
       Cable->EndLocation = FVector(0.0f, 0.0f, 30.0f);
       Cable->SetVisibility(true, true); 
    }
-
-   // Ajoute le composant PhysicsConstraint
-   if (PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this, TEXT("PhysicsConstraint")))
-   {
-       PhysicsConstraint->SetupAttachment(RootComponent);
-       PhysicsConstraint->RegisterComponent();
-      PhysicsConstraint->SetWorldLocation(SkeletalMesh->GetSocketLocation(FName("barrel")));
-   }
 }
+
+#pragma endregion
+
+#pragma region Rewind
 
 void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float JoystickY)
 {
-   if (Cable)
+   if (Cable && LureRef)
    {
       float CircularMotion = FMath::Sqrt(FMath::Square(JoystickX) + FMath::Square(JoystickY));
 
@@ -116,18 +111,37 @@ void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float Joyst
          
          if (AngleDelta > 0.5f)
          {
-            float NewCableLength = FMath::Clamp(Cable->CableLength - (RewindSpeed * CircularMotion * DeltaTime), MinCableLength, MaxCableLength);
-            Cable->CableLength = NewCableLength;
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Angle Delta: %f, Cable Length: %f"), AngleDelta, Cable->CableLength));
+            FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
+            FVector LurePosition = LureRef->GetActorLocation();
             
-            if (LureRef)
+            FVector NewPositionXY = FMath::VInterpTo(FVector(LurePosition.X, LurePosition.Y, StartPosition.Z), StartPosition, DeltaTime, RewindSpeed);
+            LureRef->SetActorLocation(NewPositionXY);
+            
+            if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= 20.f)
             {
-               //LureRef->SetActorLocation(NewPosition);
+               FVector NewPositionZ = FMath::VInterpTo(LurePosition, StartPosition, DeltaTime, RewindSpeed);
+               LureRef->SetActorLocation(NewPositionZ);
+               LureRef->SphereComponent->SetSimulatePhysics(false);
+            }
+            
+            if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
+            {
+               LureRef->DestroyLure();
+               LureRef = nullptr;
+               Cable->DestroyComponent();
+               Cable = nullptr;
             }
          }
          PreviousAngle = CurrentAngle;
       }
    }
 }
+
+void ACouchFishingRod::StopRewindCable()
+{
+   LureRef->SphereComponent->SetSimulatePhysics(true);
+}
+
+#pragma endregion
 
 

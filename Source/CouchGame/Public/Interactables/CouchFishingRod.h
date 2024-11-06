@@ -26,19 +26,12 @@ public:
 public:
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
-	
-	UFUNCTION()
-	void BeakCableConstraint() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UPhysicsConstraintComponent> PhysicsConstraint;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
-
 
 private:
 
@@ -60,6 +53,8 @@ private:
 	float Threshold;
 	UPROPERTY(EditAnywhere)
 	float RewindSpeed;
+	UPROPERTY(EditAnywhere)
+	float StopRewindDistance = 100.f;
 
 
 	UPROPERTY(EditAnywhere)
@@ -73,6 +68,8 @@ private:
 	void InitializeCableAndConstraint();
 	UFUNCTION(BlueprintCallable)
 	void RewindCable(float DeltaTime, float JoystickX, float JoystickY);
+	UFUNCTION(blueprintCallable)
+	void StopRewindCable();
 
 	float PreviousAngle;
 };

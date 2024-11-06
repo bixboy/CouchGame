@@ -7,11 +7,7 @@
 UCouchWidgetSpawn::UCouchWidgetSpawn()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-void UCouchWidgetSpawn::BeginPlay()
-{
-	Super::BeginPlay();
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
 }
 
 AActor* UCouchWidgetSpawn::GetCurrentWidget()
@@ -21,20 +17,30 @@ AActor* UCouchWidgetSpawn::GetCurrentWidget()
 
 void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent)
 {
-	if (CurrentWidget == nullptr && AttachParent != nullptr)
+	if (CurrentWidget == nullptr)
 	{
-		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+		if (AttachParent)
+			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+		else
+			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());
 	}
 	else if (CurrentWidget != nullptr)
 	{
 		CurrentWidget->Destroy();
-		CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+		
+		if (AttachParent)
+			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+		else
+			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());
 	}
 
 	// Vérification de CurrentWidget avant l’attachement
 	if (CurrentWidget != nullptr)
 	{
-		CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
+		if (AttachParent)
+			CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
+		else
+			CurrentWidget->AttachToComponent(WidgetPose, FAttachmentTransformRules::KeepWorldTransform);
 
 		if (CurrentWidget->IsA<ACouchWidget3D>())
 		{
@@ -55,10 +61,5 @@ void UCouchWidgetSpawn::DestroyWidget()
 		CurrentWidget->Destroy();
 		CurrentWidget = nullptr;
 	}
-}
-
-void UCouchWidgetSpawn::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 

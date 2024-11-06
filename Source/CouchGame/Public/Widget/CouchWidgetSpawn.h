@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "CouchWidgetSpawn.generated.h"
 
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class COUCHGAME_API UCouchWidgetSpawn : public UActorComponent
 {
@@ -14,20 +13,20 @@ class COUCHGAME_API UCouchWidgetSpawn : public UActorComponent
 
 public:
 	UCouchWidgetSpawn();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
 	UPROPERTY()
-	AActor* PowerChargeActor;
+	TObjectPtr<AActor> PowerChargeActor;
+	
 	UFUNCTION(BlueprintCallable)
 	AActor* GetCurrentWidget();
 	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
+	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent = nullptr);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 
-protected:
-	virtual void BeginPlay() override;
-
 private:
 	UPROPERTY()
-	AActor* CurrentWidget = nullptr;
+	TObjectPtr<AActor> CurrentWidget = nullptr;
 };

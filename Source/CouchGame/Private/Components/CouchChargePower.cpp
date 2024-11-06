@@ -1,17 +1,13 @@
 #include "Components//CouchChargePower.h"
 
-
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-
+#include "Misc/OutputDeviceNull.h"
 
 UCouchChargePower::UCouchChargePower()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
-
-
-
 
 void UCouchChargePower::BeginPlay()
 {
@@ -33,10 +29,11 @@ void UCouchChargePower::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 }
 
 
-void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp)
+void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner)
 {
 	PowerTimeline.PlayFromStart();
 	Mesh = MeshComp;
+	ChargeWidget = WidgetSpawner;
 }
 
 
@@ -50,6 +47,12 @@ float UCouchChargePower::UpdatePower(float Alpha)
 {
 	CurrentPower = Alpha * MaxPower;
 	TargetLocation = LineTrace();
+	if (ChargeWidget)
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
+		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);	
+	}
 	return CurrentPower;
 }
 
@@ -68,7 +71,7 @@ FVector UCouchChargePower::LineTrace()
 	ActorsToIgnore.Add(GetOwner());
 	FHitResult HitResult;
     
-	// Line Trace
+	// Line Trace*
 	UKismetSystemLibrary::LineTraceSingle(
 	   GetWorld(),
 	   Start,
