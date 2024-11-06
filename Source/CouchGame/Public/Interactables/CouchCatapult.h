@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchChargePower* PowerChargeComponent;
+
+	UFUNCTION()
+	void Fire() {SpawnBullet();}
 	
 private:
 	UFUNCTION()
