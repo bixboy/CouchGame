@@ -1,7 +1,7 @@
 #include "CouchLure.h"
 
 #include "Components/CouchProjectile.h"
-#include "Interfaces/CouchInteractable.h"
+#include "Interfaces/CouchPickable.h"
 
 
 ACouchLure::ACouchLure()
@@ -34,18 +34,31 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			CouchProjectile->SetCanMove(false);
 			SphereComponent->SetSimulatePhysics(true);
-			CouchFishingRod->BeakCableConstraint();
 
-			FVector Vel = FVector::ZeroVector;
+			const FVector Vel = FVector::ZeroVector;
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 		}	
 	}
 	
-	if (OtherActor->Implements<UCouchInteractable>())
+	if (OtherActor->Implements<UCouchPickable>())
 	{
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		FishingObject = Cast<ACouchFishingObject>(OtherActor);
+		if (FishingObject)
+		{
+			FishingObject->Mesh->SetSimulatePhysics(false);
+			FishingObject->Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);	
+		}
 	}
+}
+
+void ACouchLure::DestroyLure()
+{
+	if (FishingObject)
+		FishingObject->Destroy();
+
+	Destroy();
 }
 
 

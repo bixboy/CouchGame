@@ -2,6 +2,7 @@
 
 
 #include "CoreMinimal.h"
+#include "CouchFishingObject.h"
 #include "Components/CouchProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
@@ -28,13 +29,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
+	UFUNCTION()
+	void DestroyLure();
 
 private:
 	UFUNCTION()
 	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	TObjectPtr<ACouchFishingRod> CouchFishingRod;
 	
 	FTimerHandle TimerHandle;
+	
+	UPROPERTY()
+	TObjectPtr<ACouchFishingObject> FishingObject;
+	
 };
