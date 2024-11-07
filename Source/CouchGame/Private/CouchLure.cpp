@@ -3,10 +3,16 @@
 #include "Components/CouchProjectile.h"
 #include "Interfaces/CouchPickable.h"
 
-
 ACouchLure::ACouchLure()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetupLure();
+}
+
+#pragma region Setup Lure
+
+void ACouchLure::SetupLure()
+{
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
   
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
@@ -21,12 +27,16 @@ ACouchLure::ACouchLure()
 
 void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
-	CouchProjectile->Initialize(LaunchVelocity);
+	TArray<TObjectPtr<AActor>> ActorToIgnore;
+	ActorToIgnore.Add(this);
+	ActorToIgnore.Add(GetOwner());
+	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore);
 	CouchFishingRod = FishingRod;
 }
 
-void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+#pragma endregion
+
+void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (CouchProjectile)
 	{

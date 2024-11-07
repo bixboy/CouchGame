@@ -17,7 +17,9 @@ class COUCHGAME_API ACouchLure : public AActor
 
 public:
 	ACouchLure();
-
+	
+#pragma region Components
+public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere)
@@ -26,6 +28,7 @@ public:
 	TObjectPtr<UStaticMeshComponent> LureMesh;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> TopMesh;
+#pragma endregion	
 
 	UFUNCTION(BlueprintCallable)
 	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
@@ -36,11 +39,12 @@ private:
 	UFUNCTION()
 	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void SetupLure();
+
 	UPROPERTY()
 	TObjectPtr<ACouchFishingRod> CouchFishingRod;
-	
-	FTimerHandle TimerHandle;
-	
+
 	UPROPERTY()
 	TObjectPtr<ACouchFishingObject> FishingObject;
 	
