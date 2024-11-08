@@ -7,6 +7,7 @@
 #include "Interfaces/CouchInteractable.h"
 #include "CouchFishingRod.generated.h"
 
+class ACouchWidget3D;
 class ACouchCharacter;
 class ACouchLure;
 class ACouchPickableMaster;
@@ -96,6 +97,23 @@ private:
 	
 	FVector GetRandomPos(float MinDistance, float MaxDistance, float Width);
 
+#pragma endregion
+
+#pragma region QTE Rewind
+
+public:
+	UFUNCTION()
+	void StartQte();
+
+private:
+	bool InQte = false;
+	
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	TSubclassOf<ACouchWidget3D> WidgetQte;
+
+	UFUNCTION()
+	void RewindQte();
+	
 #pragma endregion	
 	
 };

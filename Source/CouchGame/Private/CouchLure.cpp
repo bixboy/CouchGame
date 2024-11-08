@@ -16,6 +16,7 @@ ACouchLure::ACouchLure()
 void ACouchLure::SetupLure()
 {
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
+	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
   
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	RootComponent = SphereComponent;
@@ -74,7 +75,7 @@ void ACouchLure::DestroyLure()
 	Destroy();
 }
 
-TSubclassOf<ACouchPickableMaster>  ACouchLure::GetFishingObject()
+TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
 {
 	if (FishingObject)
 	{
