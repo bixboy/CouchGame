@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class AItemSpawnerManager;
 class ACouchFishingRod;
 class ACouchInteractableMaster;
 class USphereComponent;
@@ -155,11 +156,6 @@ private :
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
 
 	void OnInputFishing(const FInputActionValue& InputActionValue);
-
-	UPROPERTY()
-	TObjectPtr<ACouchFishingRod> FishingRod;
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 #pragma endregion
 #pragma region Hold Item
 
@@ -170,6 +166,14 @@ private:
 #pragma endregion
 #pragma region Fishing
 
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> FishingRod;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 	bool isFishing = false;
 #pragma endregion
+#pragma Item Spawner
+	public:
+	UPROPERTY()
+	TObjectPtr<AItemSpawnerManager> SpawnerManager;
 };

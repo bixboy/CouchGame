@@ -14,6 +14,8 @@
 #include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Interfaces/CouchPickable.h"
+#include "ItemSpawnerManager/ItemSpawnerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -26,7 +28,13 @@ ACouchCharacter::ACouchCharacter()
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
-	
+
+	//Récupère le SpawnerManager et le mets dans un TObjectPtr
+	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
+	if (!SpawnerManagerActor) return;
+	AItemSpawnerManager* SpawnerManagerPtr = Cast<AItemSpawnerManager>(SpawnerManagerActor);
+	if (!SpawnerManagerPtr) return;
+	SpawnerManager = TObjectPtr<AItemSpawnerManager>(SpawnerManagerPtr);
 }
 
 

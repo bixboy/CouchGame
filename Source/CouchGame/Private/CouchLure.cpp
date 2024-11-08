@@ -60,7 +60,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
 			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);	
+			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			
 		}
 	}
 }
