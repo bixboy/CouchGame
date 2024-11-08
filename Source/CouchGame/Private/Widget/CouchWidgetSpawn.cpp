@@ -7,7 +7,6 @@
 UCouchWidgetSpawn::UCouchWidgetSpawn()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
 }
 
 AActor* UCouchWidgetSpawn::GetCurrentWidget()
@@ -21,8 +20,6 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 	{
 		if (AttachParent)
 			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
-		else
-			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());
 	}
 	else if (CurrentWidget != nullptr)
 	{
@@ -30,8 +27,6 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 		
 		if (AttachParent)
 			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
-		else
-			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, WidgetPose->GetComponentTransform());
 	}
 
 	// Vérification de CurrentWidget avant l’attachement
@@ -39,8 +34,6 @@ void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* Atta
 	{
 		if (AttachParent)
 			CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
-		else
-			CurrentWidget->AttachToComponent(WidgetPose, FAttachmentTransformRules::KeepWorldTransform);
 
 		if (CurrentWidget->IsA<ACouchWidget3D>())
 		{

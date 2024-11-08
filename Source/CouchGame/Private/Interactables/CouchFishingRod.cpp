@@ -1,10 +1,10 @@
 #include "Interactables/CouchFishingRod.h"
+#include "Characters/CouchCharacter.h"
 #include "CouchLure.h"
 #include "Components/CouchChargePower.h"
-#include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Interactables/CouchPickableMaster.h"
 
 ACouchFishingRod::ACouchFishingRod()
 {

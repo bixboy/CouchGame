@@ -30,8 +30,9 @@ void ACouchCatapult::StartChargeActor_Implementation()
 		}
 		else
 		{
-			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetComponent->WidgetPose);
-			ICouchInteractable::Execute_StartChargeActor(this);
+			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			IsInCharge = true;
 		}
 	}
 }

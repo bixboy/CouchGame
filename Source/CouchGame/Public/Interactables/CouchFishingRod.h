@@ -3,13 +3,13 @@
 #include "CoreMinimal.h"
 #include "Components/CouchChargePower.h"
 #include "CableComponent.h"
-#include "CouchPickableMaster.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CouchFishingRod.generated.h"
 
+class ACouchCharacter;
 class ACouchLure;
+class ACouchPickableMaster;
 
 UCLASS()
 class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable

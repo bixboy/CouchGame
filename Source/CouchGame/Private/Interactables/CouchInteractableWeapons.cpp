@@ -21,6 +21,8 @@ void ACouchInteractableWeapons::Setup()
 	BoxInteract->SetupAttachment(SkeletalMesh);
 	PlayerPose = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerPose"));
 	PlayerPose->SetupAttachment(SkeletalMesh);
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
+	WidgetPose->SetupAttachment(SkeletalMesh);
 
 	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);
@@ -48,7 +50,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		}
 		else
 		{
-			WidgetComponent->SpawnWidget(InteractWidget, WidgetComponent->WidgetPose);
+			WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
 
 			RemoveCurrentPlayer();
 			CanUse = false;
@@ -93,7 +95,7 @@ void ACouchInteractableWeapons::OnCharacterBeginOverlap(UPrimitiveComponent* Ove
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
 	if (!Execute_IsUsedByPlayer(this))
-		WidgetComponent->SpawnWidget(InteractWidget, WidgetComponent->WidgetPose);
+		WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
 }
 
 void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

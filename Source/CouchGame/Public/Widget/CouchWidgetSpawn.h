@@ -13,7 +13,7 @@ class COUCHGAME_API UCouchWidgetSpawn : public UActorComponent
 
 public:
 	UCouchWidgetSpawn();
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> WidgetPose;
 	UPROPERTY()
@@ -22,7 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AActor* GetCurrentWidget();
 	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent = nullptr);
+	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 

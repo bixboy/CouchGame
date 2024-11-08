@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class ACouchFishingRod;
 class ACouchInteractableMaster;
 class USphereComponent;
 class UCouchCharacterInputData;
@@ -14,6 +15,7 @@ class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
 class UCouchCharacterSettings;
+
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -151,6 +153,13 @@ private :
 	float InputFireValue = 0.f;
 
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
+
+	void OnInputFishing(const FInputActionValue& InputActionValue);
+
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> FishingRod;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 #pragma endregion
 #pragma region Hold Item
 

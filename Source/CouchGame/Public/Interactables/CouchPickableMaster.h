@@ -8,6 +8,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+class UCouchInteractableMaster;
 
 UCLASS()
 class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, public ICouchPickable

@@ -34,18 +34,21 @@ private:
 #pragma region Setup
 public:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	USkeletalMeshComponent* SkeletalMesh;
+	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchMovement* MovementComponent;
+	TObjectPtr<UCouchMovement> MovementComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USceneComponent* PlayerPose;
+	TObjectPtr<USceneComponent> PlayerPose;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchWidgetSpawn* WidgetComponent;
+	TObjectPtr<UCouchWidgetSpawn> WidgetComponent;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* BoxInteract;
+	TObjectPtr<UBoxComponent> BoxInteract;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
 	
 	UFUNCTION()
 	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

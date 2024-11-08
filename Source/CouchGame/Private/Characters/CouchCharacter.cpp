@@ -10,6 +10,7 @@
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Interactables/CouchFishingRod.h"
 #include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Interfaces/CouchPickable.h"
@@ -334,8 +335,25 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 			&ACouchCharacter::OnInputFire
 		);
 	}
+	if (InputData->InputFishingRod)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputFishingRod,
+			ETriggerEvent::Started,
+			this,
+			&ACouchCharacter::OnInputFishing
+		);
+		
+		EnhancedInputComponent->BindAction(
+			InputData->InputFishingRod,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputFishing
+		);
+	}
 }
 
+// Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
 	if (InteractingActors.IsEmpty() && !IsInteracting)
@@ -404,8 +422,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 }
 
-
-
+// Fire
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {
 	if (IsInteracting)
@@ -428,7 +445,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 	}
 }
 
-
+// Interacting
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
 {
 	if (IsInInteractingRange && IsInteracting && InteractingActor)
@@ -439,7 +456,25 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	}
 }
 
-#pragma endregion 
+// Fishing Rod
+void ACouchCharacter::OnInputFishing(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
+	if (!FishingRod)
+	{
+		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
+		FishingRod->SetOwner(this);
+	}
+	else
+	{
+		FishingRod->Destroy();
+		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
+		FishingRod->SetOwner(this);
+	}
+}
+
+#pragma endregion
+
 #pragma region Hold Item
 bool ACouchCharacter::GetIsHoldingItem() const
 {
