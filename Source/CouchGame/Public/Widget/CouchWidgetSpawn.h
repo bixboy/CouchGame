@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "CouchWidgetSpawn.generated.h"
 
+class ACouchWidget3D;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class COUCHGAME_API UCouchWidgetSpawn : public UActorComponent
 {
@@ -20,13 +22,13 @@ public:
 	TObjectPtr<AActor> PowerChargeActor;
 	
 	UFUNCTION(BlueprintCallable)
-	AActor* GetCurrentWidget();
+	ACouchWidget3D* GetCurrentWidget();
 	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent);
+	void SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent);
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 
 private:
 	UPROPERTY()
-	TObjectPtr<AActor> CurrentWidget = nullptr;
+	TObjectPtr<ACouchWidget3D> CurrentWidget = nullptr;
 };

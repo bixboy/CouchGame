@@ -15,13 +15,26 @@ class COUCHGAME_API ACouchLure : public AActor
 
 public:
 	ACouchLure();
+
+#pragma region Defaults
+public:	
+	UFUNCTION(BlueprintCallable)
+	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
+
+private:	
+	UFUNCTION()
+	void SetupLure();
+	UFUNCTION()
+	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> CouchFishingRod;
+#pragma endregion	
 	
 #pragma region Components
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USphereComponent> SphereComponent;
 	UPROPERTY(EditAnywhere)
@@ -30,25 +43,23 @@ public:
 	TObjectPtr<UStaticMeshComponent> TopMesh;
 #pragma endregion	
 
-	UFUNCTION(BlueprintCallable)
-	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
-	UFUNCTION()
-	void DestroyLure();
-
+#pragma region Fishing Object
+public:	
 	UFUNCTION()
 	TSubclassOf<ACouchPickableMaster> GetFishingObject();
+	UFUNCTION()
+	ACouchPickableMaster* GetFishingObjectActor();
 
 private:
-	UFUNCTION()
-	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void SetupLure();
-
-	UPROPERTY()
-	TObjectPtr<ACouchFishingRod> CouchFishingRod;
-
 	UPROPERTY()
 	TObjectPtr<ACouchPickableMaster> FishingObject;
+
+#pragma endregion
+
+public:
+	UFUNCTION()
+	void DestroyLure();
+	UFUNCTION()
+	void DetachObject();
 	
 };

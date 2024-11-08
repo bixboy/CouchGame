@@ -5,6 +5,7 @@
 #include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interactables/CouchPickableMaster.h"
+#include "Widget/CouchWidget3D.h"
 
 ACouchFishingRod::ACouchFishingRod()
 {
@@ -15,7 +16,7 @@ ACouchFishingRod::ACouchFishingRod()
    RootComponent = SkeletalMesh;
 }
 
-void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
+void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player)
 {
    CurrentPlayer = Player;
    if (CurrentPlayer)
@@ -25,8 +26,6 @@ void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
       //AddActorLocalOffset(SocketLocation);
    }
 }
-
-
 
 #pragma region ChargingPower
 
@@ -225,16 +224,26 @@ void ACouchFishingRod::StartQte()
    if (!InQte)
    {
       InQte = true;
-      //LureRef->NewObject<>()
-      //LureRefLureRef->WidgetSpawner->SpawnWidget(WidgetQte, );
+      TObjectPtr<USceneComponent> WidgetPose = NewObject<USceneComponent>(LureRef->GetFishingObjectActor(), FName("WidgetPose"));
+      WidgetPose->RegisterComponent();
+      
+      FVector WidgetLocation = FVector(LureRef->GetFishingObjectActor()->GetActorLocation());
+      WidgetPose->SetWorldLocation(FVector(WidgetLocation.X, WidgetLocation.Y, WidgetLocation.Z + 50.f));
+      LureRef->GetFishingObjectActor()->WidgetSpawner->SpawnWidget(WidgetQte, WidgetPose);
    }
 }
 
 void ACouchFishingRod::RewindQte()
 {
-   
+   if(CurrentTeam == 1)
+   {
+      LureRef->GetFishingObjectActor()->UpdatePercent(-0.1f);  
+   }
+   else if(CurrentTeam == 2)
+   {
+      LureRef->GetFishingObjectActor()->UpdatePercent(0.1f);
+   }
 }
-
 
 #pragma endregion
 
@@ -252,6 +261,22 @@ void ACouchFishingRod::DestroyLureAndCable()
       Cable->DestroyComponent();
       Cable = nullptr;
    }
+}
+
+void ACouchFishingRod::DestroyFishingRod()
+{
+   if (LureRef)
+   {
+      LureRef->DetachObject();
+      LureRef->Destroy();
+      LureRef = nullptr;
+   }
+   if (Cable)
+   {
+      Cable->DestroyComponent();
+      Cable = nullptr;
+   }
+   Destroy();
 }
 
 TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter()

@@ -8,6 +8,8 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+class ACouchLure;
+class UCouchWidgetSpawn;
 class UCouchInteractableMaster;
 
 UCLASS()
@@ -21,6 +23,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,5 +60,23 @@ public:
 private:
 	bool CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const;
 #pragma endregion
+
+#pragma region Fishing
+public:
+	bool AttachLure(TObjectPtr<ACouchLure> LureRef);
+	void Detachlure(TObjectPtr<ACouchLure> LureRef);
+	void UpdatePercent(float Value);
+
+	UFUNCTION(BlueprintCallable)
+	float GetQtePercent() const;
+
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<ACouchLure>> CurrentLuresAttached;
+
+	UPROPERTY()
+	float CurrentPercentQte = 0.f;
+	
+#pragma endregion	
 	
 };

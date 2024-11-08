@@ -2,11 +2,16 @@
 
 #include "Interactables/CouchPickableMaster.h"
 
+#include "Misc/OutputDeviceNull.h"
+#include "Widget/CouchWidgetSpawn.h"
+#include "Widget/CouchWidget3D.h"
+
 #pragma region Unreal Default
 ACouchPickableMaster::ACouchPickableMaster()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
+	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
 }
 
 void ACouchPickableMaster::BeginPlay()
@@ -61,6 +66,54 @@ bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> 
 	if (ClassesPickableItemCanInteractWith.Contains(Interactable.GetClass())) return true;
 	return false;
 }
+
+#pragma region Qte Rewind
+
+bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
+{
+	if (CurrentLuresAttached.Num() < 2)
+	{
+		CurrentLuresAttached.Add(LureRef);
+		return false;
+	}
+	else if (CurrentLuresAttached.Num() == 2)
+	{
+		if (WidgetSpawner->GetCurrentWidget())
+		{
+			FOutputDeviceNull ar;
+			FString CmdAndParams = FString::Printf(TEXT("Init"));
+			WidgetSpawner->GetCurrentWidget()->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);	
+		}
+		
+		CurrentPercentQte = 0.f;
+		return true;
+	}
+	return false;
+}
+
+void ACouchPickableMaster::Detachlure(TObjectPtr<ACouchLure> LureRef)
+{
+	if (CurrentLuresAttached.Find(LureRef))
+	{
+		CurrentLuresAttached.Remove(LureRef);
+		if (CurrentLuresAttached.Num() == 0)
+		{
+			PhysicsCollider->SetSimulatePhysics(true);
+		}
+	}
+}
+
+void ACouchPickableMaster::UpdatePercent(float Value)
+{
+	CurrentPercentQte += Value;
+}
+
+float ACouchPickableMaster::GetQtePercent() const
+{
+	return CurrentPercentQte;
+}
+
+#pragma endregion
 
 TObjectPtr<ACouchInteractableMaster> ACouchPickableMaster::PlayerCanUsePickableItemToInteract(
 	TObjectPtr<ACouchInteractableMaster>  PickableItem,
