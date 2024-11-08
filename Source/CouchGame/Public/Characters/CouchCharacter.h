@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class UBoxComponent;
+class AItemSpawnerManager;
 class ACouchFishingRod;
 class ACouchInteractableMaster;
 class USphereComponent;
@@ -155,11 +157,6 @@ private :
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
 
 	void OnInputFishing(const FInputActionValue& InputActionValue);
-
-	UPROPERTY()
-	TObjectPtr<ACouchFishingRod> FishingRod;
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 #pragma endregion
 #pragma region Hold Item
 
@@ -169,7 +166,30 @@ private:
 	bool IsHoldingItem;
 #pragma endregion
 #pragma region Fishing
-
+private:
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> FishingRod;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 	bool isFishing = false;
+	bool CanFish = false;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> FishingZoneDetectionBox;
+
+	UFUNCTION()
+	void OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+											const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	void DestroyFishingRod();
+#pragma endregion
+#pragma region Item Spawner
+	public:
+	UPROPERTY()
+	TObjectPtr<AItemSpawnerManager> SpawnerManager;
+
 #pragma endregion
 };

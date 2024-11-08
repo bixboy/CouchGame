@@ -4,6 +4,7 @@
 #include "Interactables/CouchInteractableMaster.h"
 #include "Interactables/CouchPickableMaster.h"
 #include "Interfaces/CouchPickable.h"
+#include "ItemSpawnerManager/ItemSpawnerManager.h"
 
 ACouchLure::ACouchLure()
 {
@@ -61,7 +62,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
 			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);	
+			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
 		}
 	}
 }

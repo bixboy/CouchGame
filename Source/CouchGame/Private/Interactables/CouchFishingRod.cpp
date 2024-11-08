@@ -26,6 +26,8 @@ void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
    }
 }
 
+
+
 #pragma region ChargingPower
 
 void ACouchFishingRod::StartChargeActor_Implementation()
@@ -188,6 +190,7 @@ void ACouchFishingRod::SpawnPickableObject()
    ActorToIgnore.Add(LureRef);
    ActorToIgnore.Add(CurrentPlayer);
    PickableActor->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
+   CurrentPlayer->DestroyFishingRod();
 }
 
 FVector ACouchFishingRod::GetRandomPos(const float MinDistance, const float MaxDistance, const float Width)
@@ -249,4 +252,9 @@ void ACouchFishingRod::DestroyLureAndCable()
       Cable->DestroyComponent();
       Cable = nullptr;
    }
+}
+
+TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter()
+{
+   return CurrentPlayer;
 }
