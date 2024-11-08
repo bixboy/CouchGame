@@ -70,6 +70,7 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 }
 
 #pragma endregion Unreal Default
+
 #pragma region Move And Orient
 FVector2D ACouchCharacter::GetOrient() const
 {
@@ -99,7 +100,9 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 	}
 }
 #pragma endregion
+
 #pragma region State Machine
+
 void ACouchCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<UCouchCharacterStateMachine>(this);
@@ -117,6 +120,7 @@ void ACouchCharacter::TickStateMachine(float DeltaTime) const
 	StateMachine->Tick(DeltaTime);
 }
 #pragma endregion
+
 #pragma region InputData / MappingContext
 void ACouchCharacter::SetupMappingContextIntoController() const
 {
@@ -132,6 +136,7 @@ void ACouchCharacter::SetupMappingContextIntoController() const
 	InputSystem->AddMappingContext(InputMappingContext, 0);
 }
 #pragma endregion
+
 #pragma region InputMove
 FVector2D ACouchCharacter::GetInputMove() const
 {
@@ -209,6 +214,7 @@ void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 	}
 }
 #pragma endregion
+
 #pragma region Dash
 bool ACouchCharacter::GetCanDash() const
 {
@@ -227,6 +233,7 @@ void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 }
 
 #pragma endregion
+
 #pragma region Interraction
 void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -448,7 +455,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 // Interacting
 void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
 {
-	if (IsInInteractingRange && IsInteracting && InteractingActor)
+	if (IsInInteractingRange && IsInteracting && InteractingActor && !FishingRod)
 	{
 			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f)
 				ICouchInteractable::Execute_StartMoveActor(InteractingActor,-InputMove.Y);
@@ -459,17 +466,15 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 // Fishing Rod
 void ACouchCharacter::OnInputFishing(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Input Fire Detected");
 	if (!FishingRod)
 	{
 		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
-		FishingRod->SetOwner(this);
+		FishingRod->SetupFishingRod(this);
 	}
-	else
+	else if (FishingRod)
 	{
 		FishingRod->Destroy();
-		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
-		FishingRod->SetOwner(this);
+		FishingRod = nullptr;
 	}
 }
 

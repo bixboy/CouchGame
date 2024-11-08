@@ -71,5 +71,14 @@ void ACouchLure::DestroyLure()
 	Destroy();
 }
 
+ACouchFishingObject* ACouchLure::GetFishingObject()
+{
+	if (FishingObject)
+	{
+		return FishingObject;	
+	}
+	return nullptr;
+}
+
 
 
