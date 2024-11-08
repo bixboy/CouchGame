@@ -363,7 +363,7 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 // Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (InteractingActors.IsEmpty() && !IsInteracting)
+	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
 		return;
 	}
@@ -450,6 +450,18 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			}
 		}
 	}
+	else if (isFishing)
+	{
+		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
+		{
+			ICouchInteractable::Execute_StartChargeActor(FishingRod);
+		}
+		else
+		{
+			ICouchInteractable::Execute_StopChargeActor(FishingRod);
+
+		}
+	}
 }
 
 // Interacting
@@ -466,15 +478,18 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 // Fishing Rod
 void ACouchCharacter::OnInputFishing(const FInputActionValue& InputActionValue)
 {
+	if (IsInteracting) return;
 	if (!FishingRod)
 	{
 		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 		FishingRod->SetupFishingRod(this);
+		isFishing = true;
 	}
-	else if (FishingRod)
+	else
 	{
 		FishingRod->Destroy();
 		FishingRod = nullptr;
+		isFishing = false;
 	}
 }
 

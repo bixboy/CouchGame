@@ -168,4 +168,8 @@ public:
 private:
 	bool IsHoldingItem;
 #pragma endregion
+#pragma region Fishing
+
+	bool isFishing = false;
+#pragma endregion
 };

@@ -39,8 +39,7 @@ public:
 	virtual void Drop_Implementation() override;
 
 	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
-
-private:
+	
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> PhysicsCollider;
 #pragma endregion
