@@ -15,7 +15,6 @@ ACouchFishingRod::ACouchFishingRod()
    RootComponent = SkeletalMesh;
 }
 
-
 void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
 {
    CurrentPlayer = Player;
@@ -216,6 +215,26 @@ FVector ACouchFishingRod::GetRandomPos(const float MinDistance, const float MaxD
 
 #pragma endregion
 
+#pragma region QTE Rewind
+
+void ACouchFishingRod::StartQte()
+{
+   if (!InQte)
+   {
+      InQte = true;
+      //LureRef->NewObject<>()
+      //LureRefLureRef->WidgetSpawner->SpawnWidget(WidgetQte, );
+   }
+}
+
+void ACouchFishingRod::RewindQte()
+{
+   
+}
+
+
+#pragma endregion
+
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
 void ACouchFishingRod::DestroyLureAndCable()
@@ -231,5 +250,3 @@ void ACouchFishingRod::DestroyLureAndCable()
       Cable = nullptr;
    }
 }
-
-
