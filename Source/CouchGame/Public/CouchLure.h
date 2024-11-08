@@ -20,6 +20,8 @@ public:
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USphereComponent> SphereComponent;
 	UPROPERTY(EditAnywhere)
