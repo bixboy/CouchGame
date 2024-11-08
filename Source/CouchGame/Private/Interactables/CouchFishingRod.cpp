@@ -4,19 +4,28 @@
 #include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Kismet/KismetMathLibrary.h"
 
 ACouchFishingRod::ACouchFishingRod()
 {
    PrimaryActorTick.bCanEverTick = false;
    ChargePower = CreateDefaultSubobject<UCouchChargePower>(TEXT("ChargePower"));
 
-
    SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
    RootComponent = SkeletalMesh;
 }
 
-bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
+void ACouchFishingRod::BeginPlay()
+{
+   Super::BeginPlay();
+   CurrentPlayer = Cast<ACouchCharacter>(GetOwner());
+   if (CurrentPlayer)
+   {
+      AttachToComponent(CurrentPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripAttach"));
+      //FVector SocketLocation = FVector(SkeletalMesh->GetSocketTransform(FName("GripPoint"), RTS_Component).GetLocation());
+      //AddActorLocalOffset(SocketLocation);
+   }
+}
 
 #pragma region ChargingPower
 
@@ -35,7 +44,7 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 
 #pragma endregion 
 
-#pragma region Spawn & Init
+#pragma region SpawnLure & InitLure
 
 void ACouchFishingRod::SpawnLure()
 {
@@ -50,7 +59,12 @@ void ACouchFishingRod::SpawnLure()
       0,
       0.5
    );
-  
+
+   if (LureRef)
+   {
+      DestroyLureAndCable();
+   }
+      
    FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
    if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
    {
@@ -92,62 +106,119 @@ void ACouchFishingRod::InitializeCableAndConstraint()
 
 void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float JoystickY)
 {
-   if (Cable && LureRef)
+   if (LureRef)
    {
-      float CircularMotion = FMath::Sqrt(FMath::Square(JoystickX) + FMath::Square(JoystickY));
+       float CircularMotion = FMath::Sqrt(FMath::Square(JoystickX) + FMath::Square(JoystickY));
 
-      if (CircularMotion > Threshold)
-      {
-         float CurrentAngle = FMath::Atan2(JoystickY, JoystickX);
-         
-         if (PreviousAngle == -999.0f) {PreviousAngle = CurrentAngle;}
-         
-         float AngleDelta = FMath::Abs(CurrentAngle - PreviousAngle);
-
-         // Normalisation
-         if (AngleDelta > PI)
-         {
-            AngleDelta = 2 * PI - AngleDelta;
-         }
-         
-         if (AngleDelta > 0.5f)
-         {
-            FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
-            FVector LurePosition = LureRef->GetActorLocation();
-            
-            FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
-            FVector NewPositionXY = FMath::VInterpTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
-            LureRef->SetActorLocation(NewPositionXY);
-            
-            if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= 10.f)
-            {
-               FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
-               FVector NewPositionZ = FMath::VInterpTo(NewPositionXY, TargetPositionZ, DeltaTime, RewindSpeed);
-               LureRef->SetActorLocation(NewPositionZ);
+       if (CircularMotion > Threshold)
+       {
+           // Compare l'angle actuel a previous Angle
+           float CurrentAngle = FMath::Atan2(JoystickY, JoystickX);
+           if (PreviousAngle == -999.0f) { PreviousAngle = CurrentAngle; }
+           
+           float AngleDelta = FMath::Abs(CurrentAngle - PreviousAngle);
+           AngleDelta = (AngleDelta > PI) ? 2 * PI - AngleDelta : AngleDelta;
+          
+           if (AngleDelta > 0.5f)
+           {
+               FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
+               FVector LurePosition = LureRef->GetActorLocation();
                
-               LureRef->SphereComponent->SetSimulatePhysics(false);
-               GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Distance")));
-            }
-            
-            if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
-            {
-               //GetWorld()->SpawnActor(ACouchPickableCannonBall)
-               LureRef->DestroyLure();
-               LureRef = nullptr;
-               Cable->DestroyComponent();
-               Cable = nullptr;
-            }
-         }
-         PreviousAngle = CurrentAngle;
-      }
+               FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
+               FVector NewPositionXY = FMath::VInterpTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
+               LureRef->SetActorLocation(NewPositionXY);
+
+               // Si la position est proche de start position, monter
+               if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= 5.f)
+               {
+                   FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
+                   FVector NewPositionZ = FMath::VInterpTo(NewPositionXY, TargetPositionZ, DeltaTime, RewindSpeed);
+                   LureRef->SetActorLocation(NewPositionZ);
+                   
+                   LureRef->SphereComponent->SetSimulatePhysics(false); 
+               }
+              
+              if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
+               {
+                   SpawnPickableObject();
+                   DestroyLureAndCable();
+               }
+           }
+          PreviousAngle = CurrentAngle;
+       }
    }
 }
 
-void ACouchFishingRod::StopRewindCable()
+void ACouchFishingRod::StopRewindCable() {LureRef->SphereComponent->SetSimulatePhysics(true);}
+
+#pragma endregion
+
+#pragma region SpawnPickableObject
+
+void ACouchFishingRod::SpawnPickableObject()
 {
-   LureRef->SphereComponent->SetSimulatePhysics(true);
+   FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
+   FVector TargetLocation = GetRandomPos(200.f, 500.f, 100.f);
+   FVector SuggestedVelocity;
+   
+   UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+    this,
+    SuggestedVelocity,
+    StartLocation,
+    TargetLocation,
+    0.f,
+    0.5f
+ ); 
+   
+   FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
+   TObjectPtr<ACouchPickableMaster> PickableActor = GetWorld()->SpawnActor<ACouchPickableMaster>(PickableObject, Transform);
+
+   TArray<TObjectPtr<AActor>> ActorToIgnore;
+   ActorToIgnore.Add(this);
+   ActorToIgnore.Add(LureRef);
+   ActorToIgnore.Add(CurrentPlayer);
+   PickableActor->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
+}
+
+FVector ACouchFishingRod::GetRandomPos(const float MinDistance, const float MaxDistance, const float Width)
+{
+   if (!CurrentPlayer)
+   {
+      return FVector::ZeroVector;
+   }
+   
+   FRotator BackwardRotation = CurrentPlayer->GetMesh()->GetComponentRotation();
+   BackwardRotation.Yaw += 90.0f;
+   
+   FVector BackwardDirection = -FRotationMatrix(BackwardRotation).GetUnitAxis(EAxis::X);
+   FVector PlayerLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
+
+   float DistanceBehind = FMath::FRandRange(MinDistance, MaxDistance);
+   FVector CenterPosition = PlayerLocation + (BackwardDirection * DistanceBehind);
+
+   float OffsetX = FMath::FRandRange(-Width / 2.0f, Width / 2.0f);
+   float OffsetY = FMath::FRandRange(-Width / 2.0f, Width / 2.0f);
+   FVector RandomPosition = CenterPosition + FVector(OffsetX, OffsetY, 0.0f);
+
+   return RandomPosition;
 }
 
 #pragma endregion
+
+bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
+
+void ACouchFishingRod::DestroyLureAndCable()
+{
+   if (LureRef)
+   {
+      LureRef->Destroy();
+      LureRef = nullptr;
+   }
+   if (Cable)
+   {
+      Cable->DestroyComponent();
+      Cable = nullptr;
+   }
+}
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CouchInteractableMaster.h"
+#include "Components/CouchProjectile.h"
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
@@ -15,17 +16,14 @@ class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, publ
 
 #pragma region Unreal Default
 public:
-	// Sets default values for this actor's properties
 	ACouchPickableMaster();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchProjectile> CouchProjectile;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+protected:
+	virtual void BeginPlay() override;
+
 #pragma endregion
 
 #pragma region Interactables

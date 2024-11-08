@@ -1,31 +1,36 @@
 #pragma once
 
-
 #include "CoreMinimal.h"
 #include "Components/CouchChargePower.h"
 #include "CableComponent.h"
+#include "CouchPickableMaster.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CouchFishingRod.generated.h"
 
-
 class ACouchLure;
-
 
 UCLASS()
 class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	ACouchFishingRod();
+	
+	UFUNCTION()
 	virtual bool IsUsedByPlayer_Implementation() override;
-
-public:
+	UFUNCTION()
 	virtual void StartChargeActor_Implementation() override;
+	UFUNCTION()
 	virtual void StopChargeActor_Implementation() override;
+
+	UFUNCTION()
+	void DestroyLureAndCable();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
@@ -33,43 +38,65 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
+	TSubclassOf<ACouchPickableMaster> PickableObject;
+
 private:
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCableComponent> Cable;
 	UPROPERTY()
-	float CableScale = 1.0f;
-	UPROPERTY()
-	TObjectPtr<UMaterial> CableMaterial;
+	TObjectPtr<ACouchCharacter> CurrentPlayer;
 
-
-	UPROPERTY(EditAnywhere)
+#pragma region Lure Actor
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TObjectPtr<UClass> Lure;
 	UPROPERTY()
 	TObjectPtr<ACouchLure> LureRef;
-
-
-	UPROPERTY(EditAnywhere)
-	float Threshold;
-	UPROPERTY(EditAnywhere)
-	float RewindSpeed;
-	UPROPERTY(EditAnywhere)
-	float StopRewindDistance = 100.f;
-
-
-	UPROPERTY(EditAnywhere)
-	float MaxCableLength;
-	UPROPERTY(EditAnywhere)
-	float MinCableLength;
-  
+	
 	UFUNCTION()
-	void SpawnLure();
+	void SpawnLure();	
+	
+#pragma endregion	
+	
+#pragma region Cable Components
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
+	TObjectPtr<UCableComponent> Cable;
+	UPROPERTY()
+	float CableScale = 1.0f;
+	
+	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
+	float MaxCableLength;
+	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
+	float MinCableLength;
+	
+	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
+	TObjectPtr<UMaterial> CableMaterial;
+
 	UFUNCTION()
 	void InitializeCableAndConstraint();
+
+#pragma endregion
+
+#pragma region Rewind	
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float Threshold;
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float RewindSpeed;
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float StopRewindDistance = 100.f;
+	
+	float PreviousAngle;
+
 	UFUNCTION(BlueprintCallable)
 	void RewindCable(float DeltaTime, float JoystickX, float JoystickY);
 	UFUNCTION(blueprintCallable)
 	void StopRewindCable();
+	UFUNCTION(BlueprintCallable)
+	void SpawnPickableObject();
+	
+	FVector GetRandomPos(float MinDistance, float MaxDistance, float Width);
 
-	float PreviousAngle;
+#pragma endregion	
+	
 };
