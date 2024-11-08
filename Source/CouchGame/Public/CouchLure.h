@@ -34,7 +34,7 @@ public:
 	void DestroyLure();
 
 	UFUNCTION()
-	ACouchFishingObject* GetFishingObject();
+	TSubclassOf<ACouchPickableMaster> GetFishingObject();
 
 private:
 	UFUNCTION()
@@ -47,6 +47,6 @@ private:
 	TObjectPtr<ACouchFishingRod> CouchFishingRod;
 
 	UPROPERTY()
-	TObjectPtr<ACouchFishingObject> FishingObject;
+	TObjectPtr<ACouchPickableMaster> FishingObject;
 	
 };
