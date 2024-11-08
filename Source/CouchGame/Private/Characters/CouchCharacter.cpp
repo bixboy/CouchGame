@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CouchFishingRod.h"
@@ -25,9 +26,14 @@ ACouchCharacter::ACouchCharacter()
 	InteractionZone->SetupAttachment(GetMesh());
 	PickUpItemPosition = CreateDefaultSubobject<USceneComponent>(TEXT("PickUpItemPosition"));
 	PickUpItemPosition->SetupAttachment(InteractionZone);
+	FishingZoneDetectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("FishingZoneDetectionBox"));
+	FishingZoneDetectionBox->SetupAttachment(GetMesh());
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
+
+	FishingZoneDetectionBox->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlapFishingZone);
+	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
 
 	//Récupère le SpawnerManager et le mets dans un TObjectPtr
 	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
@@ -350,22 +356,6 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 			&ACouchCharacter::OnInputFire
 		);
 	}
-	if (InputData->InputFishingRod)
-	{
-		EnhancedInputComponent->BindAction(
-			InputData->InputFishingRod,
-			ETriggerEvent::Started,
-			this,
-			&ACouchCharacter::OnInputFishing
-		);
-		
-		EnhancedInputComponent->BindAction(
-			InputData->InputFishingRod,
-			ETriggerEvent::Completed,
-			this,
-			&ACouchCharacter::OnInputFishing
-		);
-	}
 }
 
 // Interact
@@ -458,16 +448,26 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			}
 		}
 	}
-	else if (isFishing)
+	else if (CanFish)
 	{
 		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
-			ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			if (!FishingRod)
+			{
+				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
+				FishingRod->SetupFishingRod(this);
+				isFishing = true;
+				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			}
+			
 		}
 		else
 		{
-			ICouchInteractable::Execute_StopChargeActor(FishingRod);
-
+			if (FishingRod)
+			{
+				ICouchInteractable::Execute_StopChargeActor(FishingRod);
+			}
+			
 		}
 	}
 }
@@ -483,29 +483,43 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 	}
 }
 
-// Fishing Rod
-void ACouchCharacter::OnInputFishing(const FInputActionValue& InputActionValue)
-{
-	if (IsInteracting) return;
-	if (!FishingRod)
-	{
-		FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
-		FishingRod->SetupFishingRod(this);
-		isFishing = true;
-	}
-	else
-	{
-		FishingRod->Destroy();
-		FishingRod = nullptr;
-		isFishing = false;
-	}
-}
-
 #pragma endregion
 
 #pragma region Hold Item
 bool ACouchCharacter::GetIsHoldingItem() const
 {
 	return IsHoldingItem;
+}
+#pragma endregion
+#pragma region Fishing
+
+void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	CanFish = true;
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
+}
+
+void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	CanFish = false;
+	if (FishingRod)
+	{
+		FishingRod->Destroy();
+		FishingRod = nullptr;
+		isFishing = false;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
+}
+
+void ACouchCharacter::DestroyFishingRod()
+{
+	if (FishingRod)
+	{
+		FishingRod->Destroy();
+		FishingRod = nullptr;
+		isFishing = false;
+	}
 }
 #pragma endregion

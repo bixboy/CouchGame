@@ -39,6 +39,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
 
+	TObjectPtr<ACouchCharacter> GetCharacter();
+
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> CurrentPlayer;
