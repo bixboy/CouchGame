@@ -17,7 +17,6 @@ ACouchLure::ACouchLure()
 void ACouchLure::SetupLure()
 {
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
-	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
   
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	RootComponent = SphereComponent;
@@ -55,7 +54,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		}	
 	}
 	
-	if (OtherActor->Implements<UCouchPickable>())
+	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
 		if (FishingObject)
@@ -64,7 +63,21 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
+
+			if (FishingObject->AttachLure(this))
+			{
+				CouchFishingRod->StartQte();
+			}
 		}
+	}
+}
+
+void ACouchLure::DetachObject()
+{
+	if (FishingObject)
+	{
+		FishingObject->Detachlure(this);
+		FishingObject = nullptr;
 	}
 }
 
@@ -81,6 +94,15 @@ TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
 	if (FishingObject)
 	{
 		return FishingObject.GetClass();	
+	}
+	return nullptr;
+}
+
+ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
+{
+	if (FishingObject)
+	{
+		return FishingObject;
 	}
 	return nullptr;
 }

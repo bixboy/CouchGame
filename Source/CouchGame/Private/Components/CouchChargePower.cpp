@@ -51,7 +51,7 @@ float UCouchChargePower::UpdatePower(float Alpha)
 	{
 		FOutputDeviceNull ar;
 		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
-		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);	
+		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
 	}
 	return CurrentPower;
 }

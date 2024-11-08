@@ -19,33 +19,36 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 
 public:
 	ACouchFishingRod();
+	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player);
 	
-	UFUNCTION()
 	virtual bool IsUsedByPlayer_Implementation() override;
-	UFUNCTION()
 	virtual void StartChargeActor_Implementation() override;
-	UFUNCTION()
 	virtual void StopChargeActor_Implementation() override;
 
-	UFUNCTION()
 	void DestroyLureAndCable();
+	void DestroyFishingRod();
+	
+	TObjectPtr<ACouchCharacter> GetCharacter();
 
-	UFUNCTION()
-	void SetupFishingRod(ACouchCharacter* Player);
-
+#pragma region Default Values
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
-
-	TObjectPtr<ACouchCharacter> GetCharacter();
-
+	
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> CurrentPlayer;
-
+	
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"))
+	int CurrentTeam = 1;
+	
 	bool IsInCharge = false;
+
+	
+#pragma endregion	
 
 #pragma region Lure Actor
 private:

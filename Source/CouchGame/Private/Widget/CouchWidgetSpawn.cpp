@@ -9,24 +9,24 @@ UCouchWidgetSpawn::UCouchWidgetSpawn()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-AActor* UCouchWidgetSpawn::GetCurrentWidget()
+ACouchWidget3D* UCouchWidgetSpawn::GetCurrentWidget()
 {
 	return CurrentWidget;
 }
 
-void UCouchWidgetSpawn::SpawnWidget(UClass* WidgetToSpawn, USceneComponent* AttachParent)
+void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent)
 {
 	if (CurrentWidget == nullptr)
 	{
 		if (AttachParent)
-			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+			CurrentWidget = GetWorld()->SpawnActor<ACouchWidget3D>(WidgetToSpawn, AttachParent->GetComponentTransform());
 	}
 	else if (CurrentWidget != nullptr)
 	{
 		CurrentWidget->Destroy();
 		
 		if (AttachParent)
-			CurrentWidget = GetWorld()->SpawnActor<AActor>(WidgetToSpawn, AttachParent->GetComponentTransform());
+			CurrentWidget = GetWorld()->SpawnActor<ACouchWidget3D>(WidgetToSpawn, AttachParent->GetComponentTransform());
 	}
 
 	// Vérification de CurrentWidget avant l’attachement

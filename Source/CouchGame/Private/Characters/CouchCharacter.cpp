@@ -491,8 +491,10 @@ bool ACouchCharacter::GetIsHoldingItem() const
 	return IsHoldingItem;
 }
 #pragma endregion
+
 #pragma region Fishing
 
+// Fishing
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -517,6 +519,7 @@ void ACouchCharacter::DestroyFishingRod()
 {
 	if (FishingRod)
 	{
+		FishingRod->DestroyFishingRod();
 		FishingRod->Destroy();
 		FishingRod = nullptr;
 		isFishing = false;
