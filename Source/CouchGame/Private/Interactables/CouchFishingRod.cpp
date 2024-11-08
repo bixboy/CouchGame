@@ -32,14 +32,22 @@ void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
 void ACouchFishingRod::StartChargeActor_Implementation()
 {
    ICouchInteractable::StartChargeActor_Implementation();
-   ChargePower->StartCharging(SkeletalMesh);
+   if(!IsInCharge)
+   {
+      ChargePower->StartCharging(SkeletalMesh);
+      IsInCharge = true;
+   }
 }
 
 void ACouchFishingRod::StopChargeActor_Implementation()
 {
    ICouchInteractable::StopChargeActor_Implementation();
-   ChargePower->StopCharging();
-   SpawnLure();
+   if (IsInCharge)
+   {
+      ChargePower->StopCharging();
+      SpawnLure();
+      IsInCharge = false;
+   }
 }
 
 #pragma endregion 
@@ -174,7 +182,7 @@ void ACouchFishingRod::SpawnPickableObject()
  ); 
    
    FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
-   TObjectPtr<ACouchPickableMaster> PickableActor = GetWorld()->SpawnActor<ACouchPickableMaster>(PickableObject, Transform);
+   TObjectPtr<ACouchPickableMaster> PickableActor = GetWorld()->SpawnActor<ACouchPickableMaster>(LureRef->GetFishingObject(), Transform);
 
    TArray<TObjectPtr<AActor>> ActorToIgnore;
    ActorToIgnore.Add(this);
@@ -214,7 +222,7 @@ void ACouchFishingRod::DestroyLureAndCable()
 {
    if (LureRef)
    {
-      LureRef->Destroy();
+      LureRef->DestroyLure();
       LureRef = nullptr;
    }
    if (Cable)

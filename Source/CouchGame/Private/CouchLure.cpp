@@ -1,6 +1,8 @@
 #include "CouchLure.h"
 
 #include "Components/CouchProjectile.h"
+#include "Interactables/CouchInteractableMaster.h"
+#include "Interactables/CouchPickableMaster.h"
 #include "Interfaces/CouchPickable.h"
 
 ACouchLure::ACouchLure()
@@ -53,11 +55,11 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	
 	if (OtherActor->Implements<UCouchPickable>())
 	{
-		FishingObject = Cast<ACouchFishingObject>(OtherActor);
+		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
 		if (FishingObject)
 		{
-			FishingObject->Mesh->SetSimulatePhysics(false);
-			FishingObject->Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
+			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);	
 		}
 	}
@@ -71,11 +73,11 @@ void ACouchLure::DestroyLure()
 	Destroy();
 }
 
-ACouchFishingObject* ACouchLure::GetFishingObject()
+TSubclassOf<ACouchPickableMaster>  ACouchLure::GetFishingObject()
 {
 	if (FishingObject)
 	{
-		return FishingObject;	
+		return FishingObject.GetClass();	
 	}
 	return nullptr;
 }

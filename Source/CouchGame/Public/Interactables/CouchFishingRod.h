@@ -38,12 +38,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	TSubclassOf<ACouchPickableMaster> PickableObject;
-
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> CurrentPlayer;
+
+	bool IsInCharge = false;
 
 #pragma region Lure Actor
 private:
