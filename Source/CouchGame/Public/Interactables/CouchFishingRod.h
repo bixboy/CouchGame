@@ -16,9 +16,6 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void BeginPlay() override;
-
 public:
 	ACouchFishingRod();
 	
@@ -31,6 +28,9 @@ public:
 
 	UFUNCTION()
 	void DestroyLureAndCable();
+
+	UFUNCTION()
+	void SetupFishingRod(ACouchCharacter* Player);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;

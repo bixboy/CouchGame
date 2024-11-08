@@ -15,10 +15,10 @@ ACouchFishingRod::ACouchFishingRod()
    RootComponent = SkeletalMesh;
 }
 
-void ACouchFishingRod::BeginPlay()
+
+void ACouchFishingRod::SetupFishingRod(ACouchCharacter* Player)
 {
-   Super::BeginPlay();
-   CurrentPlayer = Cast<ACouchCharacter>(GetOwner());
+   CurrentPlayer = Player;
    if (CurrentPlayer)
    {
       AttachToComponent(CurrentPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripAttach"));
@@ -140,7 +140,10 @@ void ACouchFishingRod::RewindCable(float DeltaTime, float JoystickX, float Joyst
               
               if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
                {
-                   SpawnPickableObject();
+                  if (LureRef->GetFishingObject())
+                  {
+                     SpawnPickableObject();  
+                  }
                    DestroyLureAndCable();
                }
            }
