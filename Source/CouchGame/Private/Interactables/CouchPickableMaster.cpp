@@ -74,6 +74,7 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 	if (CurrentLuresAttached.Num() < 2)
 	{
 		CurrentLuresAttached.Add(LureRef);
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Lure Ref");
 		return false;
 	}
 	else if (CurrentLuresAttached.Num() == 2)

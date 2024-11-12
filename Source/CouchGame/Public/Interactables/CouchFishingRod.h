@@ -28,7 +28,7 @@ public:
 	void DestroyLureAndCable();
 	void DestroyFishingRod();
 	
-	TObjectPtr<ACouchCharacter> GetCharacter();
+	TObjectPtr<ACouchCharacter> GetCharacter() const;
 
 #pragma region Default Values
 public:
@@ -112,6 +112,9 @@ public:
 
 private:
 	bool InQte = false;
+
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float QtePercent = 0.1f;
 	
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
 	TSubclassOf<ACouchWidget3D> WidgetQte;

@@ -5,7 +5,8 @@
 #include "Interfaces/CouchInteractable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interactables/CouchPickableMaster.h"
-#include "Widget/CouchWidget3D.h"
+
+#pragma region Setup
 
 ACouchFishingRod::ACouchFishingRod()
 {
@@ -26,6 +27,8 @@ void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player)
       //AddActorLocalOffset(SocketLocation);
    }
 }
+
+#pragma endregion
 
 #pragma region ChargingPower
 
@@ -237,17 +240,19 @@ void ACouchFishingRod::RewindQte()
 {
    if(CurrentTeam == 1)
    {
-      LureRef->GetFishingObjectActor()->UpdatePercent(-0.1f);  
+      LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);  
    }
    else if(CurrentTeam == 2)
    {
-      LureRef->GetFishingObjectActor()->UpdatePercent(0.1f);
+      LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
    }
 }
 
 #pragma endregion
 
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
+
+TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
 void ACouchFishingRod::DestroyLureAndCable()
 {
@@ -276,10 +281,4 @@ void ACouchFishingRod::DestroyFishingRod()
       Cable->DestroyComponent();
       Cable = nullptr;
    }
-   Destroy();
-}
-
-TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter()
-{
-   return CurrentPlayer;
 }

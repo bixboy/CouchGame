@@ -452,8 +452,10 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 	{
 		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Fishing Rod is supposed to b here");
 			if (!FishingRod)
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing Rod is supposed to b here");
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this);
 				isFishing = true;
@@ -506,12 +508,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	CanFish = false;
-	if (FishingRod)
-	{
-		FishingRod->Destroy();
-		FishingRod = nullptr;
-		isFishing = false;
-	}
+	DestroyFishingRod();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
@@ -522,7 +519,7 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod->DestroyFishingRod();
 		FishingRod->Destroy();
 		FishingRod = nullptr;
-		isFishing = false;
 	}
+	isFishing = false;
 }
 #pragma endregion
