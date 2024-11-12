@@ -53,6 +53,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float CharacterRotationSpeed = 20.0f;
 	void RotateMeshUsingOrient(float DeltaTime) const;
+	bool CanMove = true;
 
 #pragma endregion
 #pragma region State Machine

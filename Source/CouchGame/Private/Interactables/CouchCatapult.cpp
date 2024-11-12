@@ -45,15 +45,6 @@ void ACouchCatapult::StopChargeActor_Implementation()
 		PowerChargeComponent->StopCharging();
 		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
 		
-		if (WidgetComponent && WidgetComponent->PowerChargeActor)
-		{
-			FOutputDeviceNull ar;
-			FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
-			
-			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
-			WidgetComponent->DestroyWidget();
-		}
-		
 		SetCanUse(false);
 		IsInCharge = false;
 	}
