@@ -281,5 +281,4 @@ void ACouchFishingRod::DestroyFishingRod()
       Cable->DestroyComponent();
       Cable = nullptr;
    }
-   Destroy();
 }
