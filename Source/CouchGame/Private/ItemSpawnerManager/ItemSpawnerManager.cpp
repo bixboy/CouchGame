@@ -51,7 +51,7 @@ void AItemSpawnerManager::Tick(float DeltaTime)
 void AItemSpawnerManager::OnItemBeginOverlapDestoryBox(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Item Spawner Destroyed");
+	// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Item Spawner Destroyed");
 	if (OtherActor->IsA(ACouchPickableMaster::StaticClass()))
 	{
 		ACouchPickableMaster* Item = Cast<ACouchPickableMaster>(OtherActor);

@@ -1,10 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Interactables/CouchInteractableMaster.h"
 #include "CouchCraftingTable.generated.h"
+
+
+struct FCraftRecipe;
+class ACouchPickableMaster;
 
 UCLASS()
 class COUCHGAME_API ACouchCraftingTable : public ACouchInteractableMaster
@@ -15,13 +17,12 @@ class COUCHGAME_API ACouchCraftingTable : public ACouchInteractableMaster
 public:
 	// Sets default values for this actor's properties
 	ACouchCraftingTable();
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
-	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -33,15 +34,17 @@ private:
 	TObjectPtr<UStaticMeshComponent> Table;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USceneComponent> Plate1Position;
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> Plate1Box;
+	TObjectPtr<UBoxComponent> TableInteractiveZone;
 
+	UPROPERTY()
+	TObjectPtr<ACouchPickableMaster> Plate1;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USceneComponent> Plate1Position;
 	
+	UPROPERTY()
+	TObjectPtr<ACouchPickableMaster> Plate2;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> Plate2Position;
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> Plate2Box;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> FillBarPosition;
@@ -52,7 +55,23 @@ private:
 #pragma endregion
 
 #pragma region Crafting
+public:
+	const FCraftRecipe* IsCraftingPossible(const TArray<TSubclassOf<ACouchPickableMaster>>& Ingredients);
+private:
+	UPROPERTY(EditAnywhere, Category = Crafting)
+	TArray<FCraftRecipe> CraftRecipes;
 
-	
+	bool AreArraysEqualIgnoringOrder(const TArray<TSubclassOf<ACouchPickableMaster>>& Array1,
+	const TArray<TSubclassOf<ACouchPickableMaster>>& Array2) const;
+	void PlaceActor(ACouchPickableMaster* Ingredient, USceneComponent* Position);
+
+public:
+	void AddIngredient(ACouchPickableMaster* Ingredient);
+
+	void RemoveIngredient(ACouchPickableMaster* Ingredient);
+
+	bool IsCraftingTableFull() const;
 #pragma endregion
 };
+
+

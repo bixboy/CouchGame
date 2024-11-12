@@ -8,6 +8,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+class ACouchCraftingTable;
 class ACouchLure;
 class UCouchWidgetSpawn;
 class UCouchInteractableMaster;
@@ -78,5 +79,9 @@ private:
 	float CurrentPercentQte = 0.f;
 	
 #pragma endregion	
+
+#pragma region Crafting
+	TObjectPtr<ACouchCraftingTable> CraftingTable;
 	
+#pragma endregion
 };

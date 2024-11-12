@@ -25,7 +25,7 @@ void ACouchPickableCannonBall::InteractWithObject_Implementation(ACouchInteracta
 	if (interactable->IsA(ACouchCatapult::StaticClass()))
 	{
 		ACouchCatapult* catapult = Cast<ACouchCatapult>(interactable);
-		if (!catapult)return;
+		if (!catapult) return;
 		catapult->Reload(this);
 	}
 }
