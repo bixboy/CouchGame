@@ -74,7 +74,6 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 	if (CurrentLuresAttached.Num() < 2)
 	{
 		CurrentLuresAttached.Add(LureRef);
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Lure Ref");
 		return false;
 	}
 	else if (CurrentLuresAttached.Num() == 2)
@@ -94,13 +93,10 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 
 void ACouchPickableMaster::Detachlure(TObjectPtr<ACouchLure> LureRef)
 {
-	if (CurrentLuresAttached.Find(LureRef))
+	CurrentLuresAttached.Remove(LureRef);
+	if (CurrentLuresAttached.Num() == 0)
 	{
-		CurrentLuresAttached.Remove(LureRef);
-		if (CurrentLuresAttached.Num() == 0)
-		{
-			PhysicsCollider->SetSimulatePhysics(true);
-		}
+		PhysicsCollider->SetSimulatePhysics(true);
 	}
 }
 
