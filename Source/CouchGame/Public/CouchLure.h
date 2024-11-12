@@ -46,9 +46,9 @@ public:
 #pragma region Fishing Object
 public:	
 	UFUNCTION()
-	TSubclassOf<ACouchPickableMaster> GetFishingObject();
+	TSubclassOf<ACouchPickableMaster> GetFishingObject() const;
 	UFUNCTION()
-	ACouchPickableMaster* GetFishingObjectActor();
+	ACouchPickableMaster* GetFishingObjectActor() const;
 
 private:
 	UPROPERTY()
@@ -60,6 +60,6 @@ public:
 	UFUNCTION()
 	void DestroyLure();
 	UFUNCTION()
-	void DetachObject();
+	void DetachAttachedObject();
 	
 };

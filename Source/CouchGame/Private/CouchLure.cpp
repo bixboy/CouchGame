@@ -41,6 +41,7 @@ void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* Fis
 
 void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Stop Movement
 	if (CouchProjectile)
 	{
 		if (CouchProjectile->GetCanMove())
@@ -53,7 +54,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 		}	
 	}
-	
+
+	// Attach Lure
 	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
@@ -63,8 +65,6 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			{
 				FishingObject->PhysicsCollider->SetSimulatePhysics(false);
 				FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-				FishingObject->AttachLure(this);
-			
 				CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);	
 			}
 			else
@@ -75,7 +75,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-void ACouchLure::DetachObject()
+void ACouchLure::DetachAttachedObject()
 {
 	if (FishingObject)
 	{
@@ -92,7 +92,9 @@ void ACouchLure::DestroyLure()
 	Destroy();
 }
 
-TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
+#pragma region Getter
+
+TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 {
 	if (FishingObject)
 	{
@@ -101,7 +103,7 @@ TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
 	return nullptr;
 }
 
-ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
+ACouchPickableMaster* ACouchLure::GetFishingObjectActor() const
 {
 	if (FishingObject)
 	{
@@ -109,6 +111,8 @@ ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
 	}
 	return nullptr;
 }
+
+#pragma endregion
 
 
 

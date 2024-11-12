@@ -28,8 +28,9 @@ public:
 
 	void DestroyLureAndCable();
 	void DestroyFishingRod();
-	
+
 	TObjectPtr<ACouchCharacter> GetCharacter() const;
+	int GetTeam() const;
 
 #pragma region Default Values
 public:
@@ -124,6 +125,8 @@ public:
 public:
 	UFUNCTION()
 	void StartQte();
+	UFUNCTION()
+	void StopQte();
 
 private:
 	bool InQte = false;

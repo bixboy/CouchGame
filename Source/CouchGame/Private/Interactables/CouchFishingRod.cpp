@@ -240,13 +240,21 @@ void ACouchFishingRod::StartQte()
    }
 }
 
+void ACouchFishingRod::StopQte()
+{
+   if (InQte)
+   {
+      InQte = false;
+   }
+}
+
 void ACouchFishingRod::RewindQte()
 {
    if (LureRef->GetFishingObjectActor()->GetQtePercent() <= 1 || LureRef->GetFishingObjectActor()->GetQtePercent() >= 0 )
    {
       if(CurrentTeam == 1 && LureRef)
       {
-         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);  
+         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
       }
       else if(CurrentTeam == 2 && LureRef)
       {
@@ -260,6 +268,11 @@ void ACouchFishingRod::RewindQte()
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
 TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
+
+int ACouchFishingRod::GetTeam() const
+{
+   return CurrentTeam;
+}
 
 void ACouchFishingRod::DestroyLureAndCable()
 {
@@ -279,7 +292,7 @@ void ACouchFishingRod::DestroyFishingRod()
 {
    if (LureRef)
    {
-      LureRef->DetachObject();
+      LureRef->DetachAttachedObject();
       LureRef->Destroy();
       LureRef = nullptr;
    }

@@ -67,11 +67,15 @@ public:
 	bool AttachLure(TObjectPtr<ACouchLure> LureRef);
 	void Detachlure(TObjectPtr<ACouchLure> LureRef);
 	void UpdatePercent(float Value);
+	void StopQte();
 
 	UFUNCTION(BlueprintCallable)
 	float GetQtePercent() const;
 
 private:
+	UPROPERTY()
+	TObjectPtr<USceneComponent> QteWidgetPose;
+	
 	void InitQte();
 	
 	UPROPERTY()
