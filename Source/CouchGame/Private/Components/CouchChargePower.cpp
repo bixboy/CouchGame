@@ -40,6 +40,14 @@ void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWi
 void UCouchChargePower::StopCharging()
 {
 	PowerTimeline.Stop();
+	if (ChargeWidget && ChargeWidget->PowerChargeActor)
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
+			
+		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+		ChargeWidget->DestroyWidget();
+	}
 }
 
 

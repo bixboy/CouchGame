@@ -217,14 +217,17 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 
 void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	FVector2D Input = InputActionValue.Get<FVector2D>();
-	if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+	if (CanMove)
 	{
-		InputMove = Input;
-	}
-	else
-	{
-		InputMove = FVector2D::Zero();
+		FVector2D Input = InputActionValue.Get<FVector2D>();
+		if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+		{
+			InputMove = Input;
+		}
+		else
+		{
+			InputMove = FVector2D::Zero();
+		}	
 	}
 }
 #pragma endregion
@@ -361,6 +364,21 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 // Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
+	float ActionValue = InputActionValue.Get<float>();
+	if (isFishing && FishingRod)
+	{
+		if (ActionValue > 0)
+		{
+			FishingRod->isPlayerFishing = true;
+		}
+		else
+		{
+			FishingRod->isPlayerFishing = false;
+			FishingRod->StopRewindCable();
+		}
+		return;
+	}
+	
 	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
 		return;
@@ -374,7 +392,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			return;
 		}
 	}
-	float ActionValue = InputActionValue.Get<float>();
+	
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
 	
 	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
@@ -452,21 +470,26 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 	{
 		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Fishing Rod is supposed to b here");
 			if (!FishingRod)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing Rod is supposed to b here");
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this);
 				isFishing = true;
+				CanMove = false;
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
-			
+			else
+			{
+				isFishing = true;
+				CanMove = false;
+				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			}
 		}
 		else
 		{
 			if (FishingRod)
 			{
+				CanMove = true;
 				ICouchInteractable::Execute_StopChargeActor(FishingRod);
 			}
 			
