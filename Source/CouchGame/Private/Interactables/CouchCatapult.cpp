@@ -3,6 +3,8 @@
 #include "Interactables/CouchCatapult.h"
 
 #include "CouchCannonBall.h"
+#include "CouchStaticCanonBall.h"
+#include "INodeAndChannelMappings.h"
 #include "Components/CouchChargePower.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/OutputDeviceNull.h"
@@ -23,13 +25,14 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
-			PowerChargeComponent->StartCharging(SkeletalMesh);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
 			IsInCharge = true;
 		}
 		else
 		{
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
-			ICouchInteractable::Execute_StartChargeActor(this);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			IsInCharge = true;
 		}
 	}
 }
@@ -78,9 +81,11 @@ void ACouchCatapult::SpawnBullet()
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
 	if (Projectile)
 	{
+		Projectile->InitCanonBall(AmmoActor);
 		Projectile->Initialize(SuggestedVelocity);
 		if (AmmoActor)
 		{
+			
 			CurrentAmmo --;
 			AmmoActor->Destroy();
 			AmmoActor = nullptr;
@@ -92,8 +97,15 @@ void ACouchCatapult::Reload(ACouchPickableCannonBall* CannonBallReload)
 {
 	if(CurrentAmmo < 1)
 	{
-		AmmoActor = CannonBallReload;
-		CannonBallReload->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
+		FTransform Transform = FTransform(FRotator::ZeroRotator,
+			SkeletalMesh->GetSocketLocation(FName("barrel")),
+			CannonBallReload->GetActorScale());
+		ACouchStaticCanonBall* StaticBall = GetWorld()->SpawnActor<ACouchStaticCanonBall>(StaticBullet,Transform);
+		CannonBallReload->Destroy();
+		StaticBall->InitCanonBall(CannonBallReload);
+		StaticBall->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
+
+		AmmoActor = StaticBall;
 		CurrentAmmo = 1;
 		SetCanUse(true);		
 	}

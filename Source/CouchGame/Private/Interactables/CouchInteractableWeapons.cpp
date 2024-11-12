@@ -19,10 +19,10 @@ void ACouchInteractableWeapons::Setup()
 	SkeletalMesh->SetupAttachment(RootComponent);
 	BoxInteract = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxInteract"));
 	BoxInteract->SetupAttachment(SkeletalMesh);
-	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
-	WidgetPose->SetupAttachment(SkeletalMesh);
 	PlayerPose = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerPose"));
 	PlayerPose->SetupAttachment(SkeletalMesh);
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
+	WidgetPose->SetupAttachment(SkeletalMesh);
 
 	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);
@@ -56,7 +56,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 			CanUse = false;
 			SetPlayerIsIn(false);
 			
-			StopMovement();
+			Execute_StopMoveActor(this);
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
 	}
@@ -64,8 +64,9 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 
 #pragma region MovementComponent
 
-void ACouchInteractableWeapons::StartMovement(int InputDirection)
+void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection)
 {
+	Super::StartMoveActor_Implementation(InputDirection);
 	if (Execute_IsUsedByPlayer(this))
 	{
 		CanUse = false;
@@ -73,8 +74,9 @@ void ACouchInteractableWeapons::StartMovement(int InputDirection)
 	}
 }
 
-void ACouchInteractableWeapons::StopMovement()
+void ACouchInteractableWeapons::StopMoveActor_Implementation()
 {
+	Super::StopMoveActor_Implementation();
 	if (Execute_IsUsedByPlayer(this))
 	{
 		CanUse = true;
@@ -102,4 +104,10 @@ void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* Overl
 	if (!Execute_IsUsedByPlayer(this))
 		WidgetComponent->DestroyWidget();
 }
+
+
+
+
+
+
 

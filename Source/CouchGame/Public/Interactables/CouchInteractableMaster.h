@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
 #include "CouchInteractableMaster.generated.h"
@@ -28,6 +27,7 @@ public:
 
 	UFUNCTION()
 	void SetPlayerIsIn(bool IsIn);
+
 
 private:
 	UPROPERTY()

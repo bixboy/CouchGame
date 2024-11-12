@@ -23,5 +23,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Down;
-	
+
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
 };

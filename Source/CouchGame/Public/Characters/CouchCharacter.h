@@ -7,12 +7,17 @@
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
 
+class UBoxComponent;
+class AItemSpawnerManager;
+class ACouchFishingRod;
+class ACouchInteractableMaster;
 class USphereComponent;
 class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
 class UCouchCharacterSettings;
+
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
 {
@@ -132,10 +137,10 @@ public:
 		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY()
-	TArray<AActor*> InteractingActors;
+	TArray<TObjectPtr<ACouchInteractableMaster>> InteractingActors;
 	UPROPERTY()
-	TObjectPtr<AActor> InteractingActor;
-	TObjectPtr<AActor> FindNearestInteractingActor() const;
+	TObjectPtr<ACouchInteractableMaster> InteractingActor;
+	TObjectPtr<ACouchInteractableMaster> FindNearestInteractingActor() const;
 	bool IsInInteractingRange;
 	bool IsInteracting;
 	
@@ -150,6 +155,8 @@ private :
 	float InputFireValue = 0.f;
 
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
+
+	void OnInputFishing(const FInputActionValue& InputActionValue);
 #pragma endregion
 #pragma region Hold Item
 
@@ -157,5 +164,32 @@ public:
 	bool GetIsHoldingItem() const;
 private:
 	bool IsHoldingItem;
+#pragma endregion
+#pragma region Fishing
+private:
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> FishingRod;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
+	bool isFishing = false;
+	bool CanFish = false;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> FishingZoneDetectionBox;
+
+	UFUNCTION()
+	void OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+											const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	void DestroyFishingRod();
+#pragma endregion
+#pragma region Item Spawner
+	public:
+	UPROPERTY()
+	TObjectPtr<AItemSpawnerManager> SpawnerManager;
+
 #pragma endregion
 };

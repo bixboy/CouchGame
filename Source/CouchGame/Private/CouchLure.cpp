@@ -1,12 +1,21 @@
 #include "CouchLure.h"
 
 #include "Components/CouchProjectile.h"
-#include "Interfaces/CouchInteractable.h"
-
+#include "Interactables/CouchInteractableMaster.h"
+#include "Interactables/CouchPickableMaster.h"
+#include "Interfaces/CouchPickable.h"
+#include "ItemSpawnerManager/ItemSpawnerManager.h"
 
 ACouchLure::ACouchLure()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetupLure();
+}
+
+#pragma region Setup Lure
+
+void ACouchLure::SetupLure()
+{
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
   
 	SphereComponent =  CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
@@ -21,12 +30,16 @@ ACouchLure::ACouchLure()
 
 void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
-	CouchProjectile->Initialize(LaunchVelocity);
+	TArray<TObjectPtr<AActor>> ActorToIgnore;
+	ActorToIgnore.Add(this);
+	ActorToIgnore.Add(GetOwner());
+	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore);
 	CouchFishingRod = FishingRod;
 }
 
-void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+#pragma endregion
+
+void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (CouchProjectile)
 	{
@@ -34,18 +47,64 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			CouchProjectile->SetCanMove(false);
 			SphereComponent->SetSimulatePhysics(true);
-			CouchFishingRod->BeakCableConstraint();
 
-			FVector Vel = FVector::ZeroVector;
+			const FVector Vel = FVector::ZeroVector;
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 		}	
 	}
 	
-	if (OtherActor->Implements<UCouchInteractable>())
+	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
+		if (FishingObject)
+		{
+			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
+			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
+
+			if (FishingObject->AttachLure(this))
+			{
+				CouchFishingRod->StartQte();
+			}
+		}
 	}
+}
+
+void ACouchLure::DetachObject()
+{
+	if (FishingObject)
+	{
+		FishingObject->Detachlure(this);
+		FishingObject = nullptr;
+	}
+}
+
+void ACouchLure::DestroyLure()
+{
+	if (FishingObject)
+		FishingObject->Destroy();
+
+	Destroy();
+}
+
+TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
+{
+	if (FishingObject)
+	{
+		return FishingObject.GetClass();	
+	}
+	return nullptr;
+}
+
+ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
+{
+	if (FishingObject)
+	{
+		return FishingObject;
+	}
+	return nullptr;
 }
 
 

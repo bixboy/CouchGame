@@ -91,7 +91,7 @@ void ACouchPlank::Tick(float DeltaTime)
 		{
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-			APlayer->IsInteracting = false;
+			// APlayer->IsInteracting = false;
 			Destroy();
 		}
 	}

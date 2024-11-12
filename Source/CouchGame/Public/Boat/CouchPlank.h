@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Widget/CouchWidgetSpawn.h"
-#include "GameFramework/Actor.h"
+#include "Interactables/CouchInteractableMaster.h"
 #include "Interfaces/CouchInteractable.h"
 #include "CouchPlank.generated.h"
 
@@ -18,7 +18,7 @@ class USceneComponent;
 class UNiagaraComponent;
 
 UCLASS()
-class COUCHGAME_API ACouchPlank : public AActor, public ICouchInteractable
+class COUCHGAME_API ACouchPlank : public ACouchInteractableMaster
 {
 	GENERATED_BODY()
 
