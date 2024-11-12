@@ -508,9 +508,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	CanFish = false;
 	if (FishingRod)
 	{
-		FishingRod->Destroy();
-		FishingRod = nullptr;
-		isFishing = false;
+		FishingRod->DestroyFishingRod();
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }

@@ -62,6 +62,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
 			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			FishingObject->AttachLure(this);
+			
 			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
 
 			if (FishingObject->AttachLure(this))
