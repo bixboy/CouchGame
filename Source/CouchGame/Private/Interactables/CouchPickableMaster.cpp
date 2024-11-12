@@ -2,6 +2,7 @@
 
 #include "Interactables/CouchPickableMaster.h"
 
+#include "CouchLure.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Widget/CouchWidget3D.h"
@@ -78,17 +79,33 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 	}
 	else if (CurrentLuresAttached.Num() == 2)
 	{
-		if (WidgetSpawner->GetCurrentWidget())
-		{
-			FOutputDeviceNull ar;
-			FString CmdAndParams = FString::Printf(TEXT("Init"));
-			WidgetSpawner->GetCurrentWidget()->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);	
-		}
-		
-		CurrentPercentQte = 0.f;
+		CurrentPercentQte = 0.5f;
+		InitQte();
 		return true;
 	}
 	return false;
+}
+
+void ACouchPickableMaster::InitQte()
+{
+	TObjectPtr<USceneComponent> QteWidgetPose = NewObject<USceneComponent>(this, FName("QteWidgetPose"));
+	QteWidgetPose->RegisterComponent();
+      
+	FVector WidgetLocation = FVector(GetActorLocation());
+	QteWidgetPose->SetWorldLocation(FVector(WidgetLocation.X, WidgetLocation.Y, WidgetLocation.Z + 50.f));
+	
+	WidgetSpawner->SpawnWidget(WidgetQte, QteWidgetPose);
+	if (WidgetSpawner->GetCurrentWidget())
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("Init %s"), *this->GetName());
+		WidgetSpawner->GetCurrentWidget()->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+	}
+
+	for (TObjectPtr<ACouchLure> LuresAttached : CurrentLuresAttached)
+	{
+		LuresAttached->CouchFishingRod->StartQte();
+	}
 }
 
 void ACouchPickableMaster::Detachlure(TObjectPtr<ACouchLure> LureRef)

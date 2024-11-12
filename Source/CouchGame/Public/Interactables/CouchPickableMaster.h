@@ -8,6 +8,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+class ACouchWidget3D;
 class ACouchLure;
 class UCouchWidgetSpawn;
 class UCouchInteractableMaster;
@@ -71,11 +72,16 @@ public:
 	float GetQtePercent() const;
 
 private:
+	void InitQte();
+	
 	UPROPERTY()
 	TArray<TObjectPtr<ACouchLure>> CurrentLuresAttached;
 
+	UPROPERTY(EditAnywhere, Category = DefaultsValue)
+	TSubclassOf<ACouchWidget3D> WidgetQte;
+
 	UPROPERTY()
-	float CurrentPercentQte = 0.f;
+	float CurrentPercentQte = 0.5f;
 	
 #pragma endregion	
 	

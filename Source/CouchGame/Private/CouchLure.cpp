@@ -59,15 +59,17 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
 		if (FishingObject)
 		{
-			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
-			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			FishingObject->AttachLure(this);
-			
-			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
-
-			if (FishingObject->AttachLure(this))
+			if (!FishingObject->AttachLure(this))
 			{
-				CouchFishingRod->StartQte();
+				FishingObject->PhysicsCollider->SetSimulatePhysics(false);
+				FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				FishingObject->AttachLure(this);
+			
+				CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);	
+			}
+			else
+			{
+				SphereComponent->SetSimulatePhysics(false);
 			}
 		}
 	}

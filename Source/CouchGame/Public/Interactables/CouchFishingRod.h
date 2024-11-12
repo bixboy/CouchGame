@@ -130,9 +130,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
 	float QtePercent = 0.1f;
-	
-	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
-	TSubclassOf<ACouchWidget3D> WidgetQte;
 
 	UFUNCTION()
 	void RewindQte();

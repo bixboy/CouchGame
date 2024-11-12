@@ -476,12 +476,16 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				FishingRod->SetupFishingRod(this);
 				isFishing = true;
 				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 			else
 			{
 				isFishing = true;
 				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 		}
@@ -489,10 +493,9 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 		{
 			if (FishingRod)
 			{
-				CanMove = true;
 				ICouchInteractable::Execute_StopChargeActor(FishingRod);
 			}
-			
+			CanMove = true;
 		}
 	}
 }

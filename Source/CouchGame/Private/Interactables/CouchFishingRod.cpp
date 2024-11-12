@@ -131,7 +131,7 @@ void ACouchFishingRod::InitializeCableAndConstraint()
 
 void ACouchFishingRod::RewindCable(float DeltaTime)
 {
-   if (LureRef)
+   if (LureRef && !InQte)
    {
       FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
       FVector LurePosition = LureRef->GetActorLocation();
@@ -163,9 +163,13 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
 
 void ACouchFishingRod::StopRewindCable()
 {
-   if (LureRef && LureRef->SphereComponent)
+   if (LureRef && LureRef->SphereComponent && !InQte)
    {
       LureRef->SphereComponent->SetSimulatePhysics(true);
+   }
+   else if (InQte)
+   {
+      RewindQte();
    }
 }
 
@@ -233,24 +237,21 @@ void ACouchFishingRod::StartQte()
    if (!InQte)
    {
       InQte = true;
-      TObjectPtr<USceneComponent> QteWidgetPose = NewObject<USceneComponent>(LureRef->GetFishingObjectActor(), FName("QteWidgetPose"));
-      QteWidgetPose->RegisterComponent();
-      
-      FVector WidgetLocation = FVector(LureRef->GetFishingObjectActor()->GetActorLocation());
-      QteWidgetPose->SetWorldLocation(FVector(WidgetLocation.X, WidgetLocation.Y, WidgetLocation.Z + 50.f));
-      LureRef->GetFishingObjectActor()->WidgetSpawner->SpawnWidget(WidgetQte, QteWidgetPose);
    }
 }
 
 void ACouchFishingRod::RewindQte()
 {
-   if(CurrentTeam == 1)
+   if (LureRef->GetFishingObjectActor()->GetQtePercent() <= 1 || LureRef->GetFishingObjectActor()->GetQtePercent() >= 0 )
    {
-      LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);  
-   }
-   else if(CurrentTeam == 2)
-   {
-      LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
+      if(CurrentTeam == 1 && LureRef)
+      {
+         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);  
+      }
+      else if(CurrentTeam == 2 && LureRef)
+      {
+         LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
+      }  
    }
 }
 
