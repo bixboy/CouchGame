@@ -2,10 +2,10 @@
 
 
 #include "Characters/States/CouchCharacterStateInteract.h"
-
 #include "Characters/CouchCharacter.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Characters/CouchCharacterStateMachine.h"
+#include "Interactables/CouchInteractableMaster.h"
 #include "Interfaces/CouchInteractable.h"
 
 

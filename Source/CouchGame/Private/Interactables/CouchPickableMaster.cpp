@@ -2,6 +2,8 @@
 
 #include "Interactables/CouchPickableMaster.h"
 
+#include "Components/BoxComponent.h"
+#include "Crafting/CouchCraftingTable.h"
 #include "CouchLure.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Widget/CouchWidgetSpawn.h"
@@ -13,6 +15,11 @@ ACouchPickableMaster::ACouchPickableMaster()
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
 	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	PhysicsCollider = Mesh;
+	RootComponent = Mesh;
+	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
+	InteractionBox->SetupAttachment(Mesh);
 	QteWidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("QteWidgetPose"));
 
 }
@@ -20,7 +27,7 @@ ACouchPickableMaster::ACouchPickableMaster()
 void ACouchPickableMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
+	// PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
 }
 
 #pragma endregion
@@ -48,6 +55,11 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 	AttachToComponent(player->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	FVector ItemLocation = player->PickUpItemPosition->GetComponentLocation();
 	SetActorLocation(ItemLocation);
+	if (CraftingTable)
+	{
+		CraftingTable->RemoveIngredient(this);
+		CraftingTable = nullptr;
+	}
 
 }
 
@@ -56,12 +68,22 @@ void ACouchPickableMaster::Drop_Implementation()
 	if (!PhysicsCollider) return;
 	ICouchPickable::Drop_Implementation();
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	PhysicsCollider->SetSimulatePhysics(true);
+	if (!CraftingTable) PhysicsCollider->SetSimulatePhysics(true);
+
 }
 
 void ACouchPickableMaster::InteractWithObject_Implementation(ACouchInteractableMaster* interactable)
 {
 	ICouchPickable::InteractWithObject_Implementation(interactable);
+	
+	if (interactable->IsA(ACouchCraftingTable::StaticClass()))
+	{
+		ACouchCraftingTable* CraftTable = Cast<ACouchCraftingTable>(interactable);
+		if (!CraftTable || CraftTable->IsCraftingTableFull()) return;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with CraftingTable"));
+		CraftTable->AddIngredient(this);
+		CraftingTable = CraftTable;
+	}
 }
 
 bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const

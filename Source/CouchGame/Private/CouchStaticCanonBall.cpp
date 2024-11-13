@@ -23,8 +23,8 @@ ACouchStaticCanonBall::ACouchStaticCanonBall()
 void ACouchStaticCanonBall::InitCanonBall(TObjectPtr<ACouchPickableCannonBall> PickableCannonBall)
 {
 	SetActorTransform(PickableCannonBall->GetActorTransform());
-	Base->SetStaticMesh(PickableCannonBall->Base->GetStaticMesh());
-	Base->SetRelativeTransform(PickableCannonBall->Base->GetRelativeTransform());
+	Base->SetStaticMesh(PickableCannonBall->Mesh->GetStaticMesh());
+	Base->SetRelativeTransform(PickableCannonBall->Mesh->GetRelativeTransform());
 
 	
 	Top->SetStaticMesh( PickableCannonBall->Top->GetStaticMesh());

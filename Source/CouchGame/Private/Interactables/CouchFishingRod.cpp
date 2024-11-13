@@ -39,7 +39,6 @@ void ACouchFishingRod::Tick(float DeltaSeconds)
    if (isPlayerFishing)
    {
       RewindCable(DeltaSeconds);
-      GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "RewindCable le poulet là");
    }
 }
 
