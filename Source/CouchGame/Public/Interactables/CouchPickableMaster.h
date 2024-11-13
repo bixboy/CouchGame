@@ -22,6 +22,10 @@ class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, publ
 public:
 	ACouchPickableMaster();
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Mesh;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> InteractionBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

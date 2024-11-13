@@ -9,7 +9,7 @@ ACouchPickableCannonBall::ACouchPickableCannonBall()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
+	Base = Mesh;
 	RootComponent = Base;
 
 	Top = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Top"));

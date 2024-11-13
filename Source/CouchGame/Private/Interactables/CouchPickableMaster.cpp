@@ -2,6 +2,7 @@
 
 #include "Interactables/CouchPickableMaster.h"
 
+#include "Components/BoxComponent.h"
 #include "Crafting/CouchCraftingTable.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Widget/CouchWidgetSpawn.h"
@@ -13,12 +14,17 @@ ACouchPickableMaster::ACouchPickableMaster()
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
 	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	PhysicsCollider = Mesh;
+	RootComponent = Mesh;
+	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
+	InteractionBox->SetupAttachment(Mesh);
 }
 
 void ACouchPickableMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
+	// PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
 }
 
 #pragma endregion
