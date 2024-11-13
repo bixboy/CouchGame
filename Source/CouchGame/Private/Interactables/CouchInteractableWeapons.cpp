@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactables/CouchInteractableWeapons.h"
+#include "Widget/CouchWidget3D.h"
 
 ACouchInteractableWeapons::ACouchInteractableWeapons()
 {
@@ -26,11 +27,25 @@ void ACouchInteractableWeapons::Setup()
 
 	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);
+
+	CurrentInteractWidget = InteractWidget->StaticClass();
 }
 
 bool ACouchInteractableWeapons::GetCanUse() const {return CanUse;}
 
 void ACouchInteractableWeapons::SetCanUse(bool Value) {CanUse = Value;}
+
+void ACouchInteractableWeapons::SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget)
+{
+	if (InteractingWidget != nullptr)
+	{
+		CurrentInteractWidget = InteractingWidget->StaticClass();	
+	}
+	else if (InteractingWidget == nullptr)
+	{
+		CurrentInteractWidget = InteractWidget;
+	}
+}
 
 void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 {
@@ -41,16 +56,19 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		WidgetComponent->DestroyWidget();
 		if (!Execute_IsUsedByPlayer(this))
 		{
-			CanUse = true;
 			SetPlayerIsIn(true);
-			
-			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
-			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
-			GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+			if (!CanUse)
+			{
+				CanUse = true;
+				FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
+				GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
+				GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);	
+			}
 		}
 		else
 		{
-			WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
+			WidgetComponent->SpawnWidget(CurrentInteractWidget->StaticClass(), WidgetPose);
 
 			RemoveCurrentPlayer();
 			CanUse = false;
@@ -93,9 +111,11 @@ void ACouchInteractableWeapons::StopMoveActor_Implementation()
 void ACouchInteractableWeapons::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
 	if (!Execute_IsUsedByPlayer(this))
-		WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);	
+	}
 }
 
 void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -104,6 +124,7 @@ void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* Overl
 	if (!Execute_IsUsedByPlayer(this))
 		WidgetComponent->DestroyWidget();
 }
+
 
 
 

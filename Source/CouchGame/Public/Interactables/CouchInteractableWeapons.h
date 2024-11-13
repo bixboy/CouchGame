@@ -68,9 +68,16 @@ private:
 #pragma endregion
 
 #pragma region Widgets
+public:
+	UFUNCTION()
+	void SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget = nullptr);
+	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	UClass* InteractWidget;
+	TSubclassOf<ACouchWidget3D> InteractWidget;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
 
 #pragma endregion	
 };
