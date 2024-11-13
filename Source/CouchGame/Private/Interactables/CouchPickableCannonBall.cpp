@@ -8,10 +8,7 @@
 ACouchPickableCannonBall::ACouchPickableCannonBall()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	Base = Mesh;
-	RootComponent = Base;
-
+	
 	Top = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Top"));
 	Top->SetupAttachment(RootComponent);
 
