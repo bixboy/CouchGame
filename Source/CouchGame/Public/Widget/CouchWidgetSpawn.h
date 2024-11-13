@@ -22,7 +22,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<AActor> PowerChargeActor;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ACouchWidget3D* GetCurrentWidget();
 	
 	UFUNCTION(BlueprintCallable)
