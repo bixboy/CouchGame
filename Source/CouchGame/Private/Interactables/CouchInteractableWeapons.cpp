@@ -9,6 +9,14 @@ ACouchInteractableWeapons::ACouchInteractableWeapons()
 	Setup();
 }
 
+#pragma region Setup
+
+void ACouchInteractableWeapons::BeginPlay()
+{
+	Super::BeginPlay();
+	SetInteractWidget();
+}
+
 void ACouchInteractableWeapons::Setup()
 {
 	WidgetComponent = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("SpawnerWidget"));
@@ -27,8 +35,6 @@ void ACouchInteractableWeapons::Setup()
 
 	BoxInteract->OnComponentBeginOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterBeginOverlap);
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchInteractableWeapons::OnCharacterEndOverlap);
-
-	CurrentInteractWidget = InteractWidget->StaticClass();
 }
 
 bool ACouchInteractableWeapons::GetCanUse() const {return CanUse;}
@@ -39,13 +45,15 @@ void ACouchInteractableWeapons::SetInteractWidget(TSubclassOf<ACouchWidget3D> In
 {
 	if (InteractingWidget != nullptr)
 	{
-		CurrentInteractWidget = InteractingWidget->StaticClass();	
+		CurrentInteractWidget = InteractingWidget;	
 	}
 	else if (InteractingWidget == nullptr)
 	{
 		CurrentInteractWidget = InteractWidget;
 	}
 }
+
+#pragma endregion
 
 void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 {
@@ -57,18 +65,14 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		if (!Execute_IsUsedByPlayer(this))
 		{
 			SetPlayerIsIn(true);
-
-			if (!CanUse)
-			{
-				CanUse = true;
-				FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
-				GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
-				GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);	
-			}
+			CanUse = true;
+			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
+			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
+			GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);	
 		}
 		else
 		{
-			WidgetComponent->SpawnWidget(CurrentInteractWidget->StaticClass(), WidgetPose);
+			WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);
 
 			RemoveCurrentPlayer();
 			CanUse = false;

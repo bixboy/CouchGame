@@ -17,6 +17,8 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 public:
 	ACouchInteractableWeapons();
 
+	virtual void BeginPlay() override;
+
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	
 	UFUNCTION()
@@ -76,7 +78,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<ACouchWidget3D> InteractWidget;
 
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	UPROPERTY()
 	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
 
 #pragma endregion	

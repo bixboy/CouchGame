@@ -30,14 +30,15 @@ void ACouchUmbrella::Tick(float DeltaTime)
 
 void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 {
-	ICouchInteractable::Interact_Implementation(Player);
-	
 	// Si un autre joueur utilise déjà la planche, empêcher l'interaction
 	if (IsPlayerRepairing && Player != GetCurrentPlayer())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Already in use by another player");
 		return;
 	}
+	
+	// Execute le parent
+	Super::Interact_Implementation(Player);
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
