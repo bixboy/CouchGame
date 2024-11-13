@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FCraftingRecipe.generated.h"
 
+class ACouchPickableCannonBall;
 class ACouchPickableMaster;
 
 USTRUCT()
@@ -18,10 +19,10 @@ struct FCraftRecipe
 
 	// Le résultat unique du craft (classe de l'objet produit)
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ACouchPickableMaster> ResultObject;
+	TSubclassOf<ACouchPickableCannonBall> ResultObject;
 
 	// Le widget associé au résultat du craft
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> ResultWidget;
+	TSubclassOf<ACouchWidget3D> ResultWidget;
 };
 

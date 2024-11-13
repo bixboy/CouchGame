@@ -2,16 +2,20 @@
 
 
 #include "Crafting/CouchCraftingTable.h"
-
-#include "MovieSceneTracksComponentTypes.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
-#include "Blueprint/UserWidget.h"
+#include "Components/TimelineComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Curves/CurveFloat.h"
 #include "Interactables/CouchPickableMaster.h"
 #include "Crafting/FCraftingRecipe.h"
+#include "Interactables/CouchPickableCannonBall.h"
+#include "Kismet/GameplayStatics.h"
+#include "Widget/CouchWidget3D.h"
+#include "Widget/CouchWidgetSpawn.h"
 
 
 // Sets default values
@@ -43,10 +47,6 @@ ACouchCraftingTable::ACouchCraftingTable()
 	Plate2Position = CreateDefaultSubobject<USceneComponent>(TEXT("Plate2Position"));
 	Plate2Position->SetupAttachment(Table);
 
-	// Initialisation de FillBarPosition
-	FillBarPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FillBarPosition"));
-	FillBarPosition->SetupAttachment(SkeletalMesh);
-
 	// Initialisation de PlateSuggestionPos
 	PlateSuggestionPos = CreateDefaultSubobject<USceneComponent>(TEXT("PlateSuggestionPos"));
 	PlateSuggestionPos->SetupAttachment(SkeletalMesh);
@@ -54,13 +54,11 @@ ACouchCraftingTable::ACouchCraftingTable()
 	// Initialisation de FinalDishSpawnPosition
 	FinalDishSpawnPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishSpawnPosition"));
 	FinalDishSpawnPosition->SetupAttachment(SkeletalMesh);
-}
 
-// Called when the game starts or when spawned
-void ACouchCraftingTable::BeginPlay()
-{
-	Super::BeginPlay();
-	
+	FinalDishTargetPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishTargetPosition"));
+	FinalDishTargetPosition->SetupAttachment(SkeletalMesh);
+
+	WidgetSpawn = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawn"));
 }
 
 const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible(
@@ -76,8 +74,16 @@ const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible(
 	return nullptr;
 }
 
+const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible()
+{
+	TArray<TSubclassOf<ACouchPickableMaster>> Ingredients;
+	if (Plate1) Ingredients.Add(Plate1.GetClass());
+	if (Plate2) Ingredients.Add(Plate2.GetClass());
+	return IsCraftingPossible(Ingredients);
+}
+
 bool ACouchCraftingTable::AreArraysEqualIgnoringOrder(const TArray<TSubclassOf<ACouchPickableMaster>>& Array1,
-	const TArray<TSubclassOf<ACouchPickableMaster>>& Array2) const
+                                                      const TArray<TSubclassOf<ACouchPickableMaster>>& Array2) const
 {
 	if (Array1.Num() != Array2.Num())
 	{
@@ -92,6 +98,34 @@ bool ACouchCraftingTable::AreArraysEqualIgnoringOrder(const TArray<TSubclassOf<A
 
 	// Compare les deux tableaux triés
 	return SortedArray1 == SortedArray2;
+}
+
+void ACouchCraftingTable::SpawnCraft()
+{
+	FVector StartLocation = FinalDishSpawnPosition->GetComponentLocation();
+	FVector TargetLocation = FinalDishTargetPosition->GetComponentLocation();
+	FVector SuggestedVelocity;
+   
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+	 this,
+	 SuggestedVelocity,
+	 StartLocation,
+	 TargetLocation,
+	 0.f,
+	 0.5f
+  ); 
+   
+	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), StartLocation);
+	TObjectPtr<ACouchPickableCannonBall> CraftItem = GetWorld()->SpawnActor<ACouchPickableCannonBall>(ItemToCraft, Transform);
+	ItemToCraft = nullptr;
+
+	TArray<TObjectPtr<AActor>> ActorToIgnore;
+	ActorToIgnore.Add(this);
+	
+	
+	CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Spawn Craft Item");
+
 }
 
 void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
@@ -113,6 +147,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 			PlaceActor(Plate2, Plate2Position);
 		}
 	}
+	UpdateCraftSuggestion();
 }
 
 void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
@@ -123,15 +158,90 @@ void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
 	{
 		Plate1 = nullptr;
 	}
-	else if (Plate2.Get() == Ingredient)
+	else
 	{
 		Plate2 = nullptr;
 	}
+	UpdateCraftSuggestion();
 }
 
 bool ACouchCraftingTable::IsCraftingTableFull() const
 {
 	return Plate1 && Plate2;
+}
+
+void ACouchCraftingTable::CraftItem()
+{
+	if (!ItemToCraft) return;
+	MoveTimeline.PlayFromStart();
+}
+
+// Called when the game starts or when spawned
+void ACouchCraftingTable::BeginPlay()
+{
+	Super::BeginPlay();
+	InitializeMoveTimeline();
+}
+
+void ACouchCraftingTable::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	MoveTimeline.TickTimeline(DeltaTime);
+}
+
+void ACouchCraftingTable::InitializeMoveTimeline()
+{
+	if (MoveCurve)
+	{
+		FOnTimelineFloat ProgressFunction;
+		ProgressFunction.BindUFunction(this, FName("UpdateItemPosition"));
+		MoveTimeline.AddInterpFloat(MoveCurve,ProgressFunction);
+		MoveTimeline.SetLooping(false);
+		
+		FOnTimelineEvent OnTimelineFinishEvent;
+		OnTimelineFinishEvent.BindUFunction(this, FName("OnMoveCompleted"));
+		MoveTimeline.SetTimelineFinishedFunc(OnTimelineFinishEvent);
+	}
+}
+
+void ACouchCraftingTable::UpdateItemPosition(float Alpha)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
+	FVector TargetLocation = FinalDishSpawnPosition->GetComponentLocation();
+	if (Plate1)
+	{
+		FVector StartLocation = Plate1->GetActorLocation();
+		FVector StartScale = Plate1->GetActorScale();
+		FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
+		FVector NewScale = FMath::Lerp(StartScale, FVector::Zero(), Alpha);
+		Plate1->SetActorLocation(NewLocation);
+		Plate1->SetActorScale3D(NewScale);
+	}
+	if (Plate2)
+	{
+		FVector StartLocation = Plate2->GetActorLocation();
+		FVector StartScale = Plate2->GetActorScale();
+		FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
+		FVector NewScale = FMath::Lerp(StartScale, FVector::Zero(), Alpha);
+		Plate2->SetActorLocation(NewLocation);
+		Plate2->SetActorScale3D(NewScale);
+	}
+}
+
+void ACouchCraftingTable::OnMoveCompleted()
+{
+	if (Plate1)
+	{
+		Plate1->Destroy();
+		Plate1 = nullptr;
+	}
+	if (Plate2)
+	{
+		Plate2->Destroy();
+		Plate2 = nullptr;
+	}
+	SpawnCraft();
+	UpdateCraftSuggestion();
 }
 
 void ACouchCraftingTable::PlaceActor(ACouchPickableMaster* Ingredient, USceneComponent* Position)
@@ -143,6 +253,23 @@ void ACouchCraftingTable::PlaceActor(ACouchPickableMaster* Ingredient, USceneCom
 			Ingredient->GetActorScale());
 	Ingredient->SetActorTransform(Transform);
 	Ingredient->AttachToComponent(Position, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+}
+
+void ACouchCraftingTable::UpdateCraftSuggestion()
+{
+	if (const FCraftRecipe* Recipe = IsCraftingPossible())
+	{
+		if (Recipe->ResultWidget)
+		{
+			WidgetSpawn->SpawnWidget(Recipe->ResultWidget, PlateSuggestionPos);
+		}
+		ItemToCraft = Recipe->ResultObject;
+	}
+	else
+	{
+		if (WidgetSpawn->GetCurrentWidget()) WidgetSpawn->DestroyWidget();
+		ItemToCraft = nullptr;
+	}
 }
 
 void ACouchCraftingTable::Interact_Implementation(ACouchCharacter* Player)
