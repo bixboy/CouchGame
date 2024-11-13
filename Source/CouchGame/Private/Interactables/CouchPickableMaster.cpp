@@ -18,6 +18,7 @@ ACouchPickableMaster::ACouchPickableMaster()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	PhysicsCollider = Mesh;
 	RootComponent = Mesh;
+	
 	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
 	InteractionBox->SetupAttachment(Mesh);
 	QteWidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("QteWidgetPose"));
