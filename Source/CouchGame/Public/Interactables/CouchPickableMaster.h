@@ -9,6 +9,7 @@
 #include "CouchPickableMaster.generated.h"
 
 class ACouchWidget3D;
+class ACouchCraftingTable;
 class ACouchLure;
 class UCouchWidgetSpawn;
 class UCouchInteractableMaster;
@@ -22,6 +23,10 @@ class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, publ
 public:
 	ACouchPickableMaster();
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Mesh;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> InteractionBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -88,5 +93,9 @@ private:
 	float CurrentPercentQte = 0.5f;
 	
 #pragma endregion	
+
+#pragma region Crafting
+	TObjectPtr<ACouchCraftingTable> CraftingTable;
 	
+#pragma endregion
 };
