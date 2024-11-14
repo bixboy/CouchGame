@@ -112,6 +112,8 @@ void ACouchInteractableWeapons::StopMoveActor_Implementation()
 
 #pragma endregion
 
+#pragma region Overlap
+
 void ACouchInteractableWeapons::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -129,6 +131,7 @@ void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* Overl
 		WidgetComponent->DestroyWidget();
 }
 
+#pragma endregion
 
 
 
