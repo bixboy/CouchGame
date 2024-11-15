@@ -1,13 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactables/CouchCatapult.h"
-
 #include "CouchCannonBall.h"
 #include "CouchStaticCanonBall.h"
-#include "INodeAndChannelMappings.h"
 #include "Components/CouchChargePower.h"
 #include "Kismet/GameplayStatics.h"
-#include "Misc/OutputDeviceNull.h"
 
 ACouchCatapult::ACouchCatapult()
 {
@@ -50,7 +47,17 @@ void ACouchCatapult::StopChargeActor_Implementation()
 	}
 }
 
+void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
+{
+	if (IsInCharge && Execute_IsUsedByPlayer(this))
+	{
+		IsInCharge = false;
+	}
+	Super::Interact_Implementation(Player);
+}
+
 #pragma endregion
+
 
 #pragma region Shoot / Reload
 
@@ -76,11 +83,11 @@ void ACouchCatapult::SpawnBullet()
 		Projectile->Initialize(SuggestedVelocity);
 		if (AmmoActor)
 		{
-			
 			CurrentAmmo --;
 			AmmoActor->Destroy();
 			AmmoActor = nullptr;
 		}
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(CameraShake, 1.0f);
 	}
 }
 

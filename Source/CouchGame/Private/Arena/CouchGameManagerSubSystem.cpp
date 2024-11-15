@@ -38,6 +38,8 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 void UCouchGameManagerSubSystem::StartNewRound()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	CurrentRound++;
 
 	// Démarre un timer de 3 minutes pour la manche
@@ -54,6 +56,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	{
 		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
 		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 			Widget->ChangeWinnerText(FText::FromString("Team A wins the round!"));
 			Widget->AddToViewport();
 		}
@@ -66,6 +70,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	{
 		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
 		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 			Widget->ChangeWinnerText(FText::FromString("Team B wins the round!"));
 			Widget->AddToViewport();
 		}
@@ -81,6 +87,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 
 		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
 		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 			Widget->ChangeWinnerText(FText::FromString("No Team wins the round!"));
 			Widget->AddToViewport();
 		}
@@ -92,7 +100,11 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Game Finish!"));
 
 		if (UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WinWidget))
+		{
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 			WidgetInstance->AddToViewport();
+		}
 	}
 }
 

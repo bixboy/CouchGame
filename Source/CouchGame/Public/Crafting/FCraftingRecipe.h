@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Widget/CouchWidget3D.h"
 #include "FCraftingRecipe.generated.h"
 
 class ACouchPickableCannonBall;
