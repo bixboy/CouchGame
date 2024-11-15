@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchCharacterAnimationManager.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "CouchCharacter.generated.h"
@@ -17,6 +18,7 @@ class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
 class UCouchCharacterSettings;
+class UAnimationManager;
 
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter
@@ -117,8 +119,7 @@ private:
 
 	UPROPERTY()
 	bool CanDashAgain = true;
-
-	UPROPERTY()
+	
 	float DashTimer;
 	
 	
@@ -191,6 +192,9 @@ public:
 	public:
 	UPROPERTY()
 	TObjectPtr<AItemSpawnerManager> SpawnerManager;
-
+#pragma endregion
+#pragma region Animation Manager
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCouchCharacterAnimationManager* AnimationManager;
 #pragma endregion
 };

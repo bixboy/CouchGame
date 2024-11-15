@@ -7,6 +7,7 @@
 
 class ACouchPickableCannonBall;
 class ACouchPickableMaster;
+class ACouchWidget3D;
 
 USTRUCT()
 struct FCraftRecipe

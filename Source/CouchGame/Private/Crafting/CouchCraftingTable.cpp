@@ -174,6 +174,7 @@ void ACouchCraftingTable::CraftItem()
 {
 	if (!ItemToCraft) return;
 	MoveTimeline.PlayFromStart();
+	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
 }
 
 // Called when the game starts or when spawned

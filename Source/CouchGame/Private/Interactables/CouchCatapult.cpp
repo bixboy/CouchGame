@@ -26,12 +26,14 @@ void ACouchCatapult::StartChargeActor_Implementation()
 		if (WidgetComponent->PowerChargeActor)
 		{
 			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 		}
 		else
 		{
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
 			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 		}
 	}
@@ -43,7 +45,9 @@ void ACouchCatapult::StopChargeActor_Implementation()
 	if (GetCanUse() && CurrentAmmo >= 1 && IsInCharge)
 	{
 		PowerChargeComponent->StopCharging();
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = false;
 		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = true;
 		
 		SetCanUse(false);
 		IsInCharge = false;
@@ -76,10 +80,10 @@ void ACouchCatapult::SpawnBullet()
 		Projectile->Initialize(SuggestedVelocity);
 		if (AmmoActor)
 		{
-			
 			CurrentAmmo --;
 			AmmoActor->Destroy();
 			AmmoActor = nullptr;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
 		}
 	}
 }

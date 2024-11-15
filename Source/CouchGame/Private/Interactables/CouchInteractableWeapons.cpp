@@ -43,7 +43,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		{
 			CanUse = true;
 			SetPlayerIsIn(true);
-			
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = true;
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
 			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
 			GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -51,11 +51,12 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		else
 		{
 			WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
-
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = false;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = false;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;
 			RemoveCurrentPlayer();
 			CanUse = false;
 			SetPlayerIsIn(false);
-			
 			Execute_StopMoveActor(this);
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}	
@@ -71,6 +72,16 @@ void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection
 	{
 		CanUse = false;
 		MovementComponent->StartMovement(InputDirection);
+		if (InputDirection == 1)
+		{
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = true;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;
+		}
+		else
+		{
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = false;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = true;
+		}
 	}
 }
 
@@ -80,11 +91,15 @@ void ACouchInteractableWeapons::StopMoveActor_Implementation()
 	if (Execute_IsUsedByPlayer(this))
 	{
 		CanUse = true;
-		MovementComponent->StopMovement();	
+		MovementComponent->StopMovement();
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = false;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;
 	}
 	else
 	{
 		MovementComponent->StopMovement();
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = false;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;
 	}
 }
 

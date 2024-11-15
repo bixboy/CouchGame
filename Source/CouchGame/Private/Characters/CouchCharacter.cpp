@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/BoxComponent.h"
@@ -28,13 +29,13 @@ ACouchCharacter::ACouchCharacter()
 	PickUpItemPosition->SetupAttachment(InteractionZone);
 	FishingZoneDetectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("FishingZoneDetectionBox"));
 	FishingZoneDetectionBox->SetupAttachment(GetMesh());
-
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
 
 	FishingZoneDetectionBox->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlapFishingZone);
 	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
-
+	
+	
 	//Récupère le SpawnerManager et le mets dans un TObjectPtr
 	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
 	if (!SpawnerManagerActor) return;
@@ -48,7 +49,7 @@ void ACouchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	CreateStateMachine();
-
+	AnimationManager = NewObject<UCouchCharacterAnimationManager>();
 	InitStateMachine();
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
@@ -65,6 +66,7 @@ void ACouchCharacter::Tick(float DeltaTime)
 		{
 			DashTimer = 0;
 			CanDashAgain = true;
+			AnimationManager->IsDashCooldown = false;
 		}
 	}
 }
@@ -212,6 +214,12 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 			this,
 			&ACouchCharacter::OnInputDash
 		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionDash,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputDash
+		);
 	}
 }
 
@@ -241,11 +249,21 @@ bool ACouchCharacter::GetCanDash() const
 
 void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+	if (InputActionValue.Get<float>() > 0.1f)
 	{
-		CanDashAgain = false;
-		InputDashEvent.Broadcast(InputMove);
+		AnimationManager->HasPressedDashInput = true;
+		if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+		{
+			CanDashAgain = false;
+			AnimationManager->IsDashCooldown = true;
+			InputDashEvent.Broadcast(InputMove);
+		}
 	}
+	else
+	{
+		AnimationManager->HasPressedDashInput = false;
+	}
+	
 	
 }
 
@@ -424,6 +442,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			}
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 			IsHoldingItem = false;
+			AnimationManager->IsCarryingItem = false;
 		}
 		else
 		{
@@ -479,6 +498,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+				AnimationManager->IsFishingStart = true;
 			}
 			else
 			{
@@ -487,6 +507,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+				AnimationManager->IsFishingStart = true;
 			}
 		}
 		else
@@ -494,6 +515,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			if (FishingRod)
 			{
 				ICouchInteractable::Execute_StopChargeActor(FishingRod);
+				AnimationManager->IsFishingStart = false;
 			}
 			CanMove = true;
 		}
@@ -547,5 +569,8 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod = nullptr;
 	}
 	isFishing = false;
+	AnimationManager->IsFishingStart = false;
+	AnimationManager->IsFishingRelease = false;
+	AnimationManager->IsFishingPull = false;
 }
 #pragma endregion

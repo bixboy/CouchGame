@@ -39,6 +39,17 @@ void ACouchFishingRod::Tick(float DeltaSeconds)
    if (isPlayerFishing)
    {
       RewindCable(DeltaSeconds);
+      if (!CurrentPlayer->AnimationManager->IsFishingPull)
+      {
+         CurrentPlayer->AnimationManager->IsFishingPull = true;
+      }
+   }
+   else
+   {
+      if (CurrentPlayer->AnimationManager->IsFishingPull)
+      {
+         CurrentPlayer->AnimationManager->IsFishingPull = false;
+      }
    }
 }
 
@@ -61,6 +72,7 @@ void ACouchFishingRod::StopChargeActor_Implementation()
    if (IsInCharge)
    {
       ChargePower->StopCharging();
+      CurrentPlayer->AnimationManager->IsFishingRelease = true;
       SpawnLure();
       IsInCharge = false;
    }
