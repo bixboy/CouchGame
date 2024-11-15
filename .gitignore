@@ -52,7 +52,7 @@ Binaries/Win64/*
 !Binaries/Win64/CouchGameEditor.target
 !Binaries/Win64/UnrealEditor.modules
 !Binaries/Win64/UnrealEditor-CouchGame.dll
-
+!Plugins/LevelSelection/Binaries/Win64/UnrealEditor-LevelSelection.dll
 
 # Builds
 Build/*
@@ -71,7 +71,10 @@ Saved/*
 
 # Compiled source files for the engine to use
 Intermediate/*
-Plugins/*/Intermediate/*
+Plugins/*/Intermediate/*   # Modifier cette ligne pour ne pas ignorer ton plugin
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Si tu veux ignorer les autres plugins, mais garder le tien, tu peux ajouter une exception comme suit :
+# !Plugins/MonPlugin/Intermediate/*    # Exemple pour garder le contenu de ton plugin
