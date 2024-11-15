@@ -51,6 +51,7 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult, float RepairingTime, f
 	if (FloorHit)
 	{
 		FTransform SpawnTransform(GetActorRotation(), HitResult.ImpactPoint);
+		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + PlankLocationOffset);
 		if (SpawnTransform.GetLocation() != FVector::ZeroVector)
 		{
 			ACouchPlank* NewHit =  GetWorld()->SpawnActor<ACouchPlank>(FloorHit, SpawnTransform);

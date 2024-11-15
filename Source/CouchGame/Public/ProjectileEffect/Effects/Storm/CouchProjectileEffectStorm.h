@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
 #include "CouchProjectileEffectStorm.generated.h"
 
@@ -22,10 +23,6 @@ public:
 	
 	virtual void ExecuteEffect() override;
 
-	UFUNCTION()
-	void OnActorOverlapStorm(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AStorm> Storm;
@@ -37,10 +34,11 @@ private:
 	float DelayToExecute = 5.0;
 	float Timer;
 	
-	UPROPERTY(EditAnywhere)
-	float StormStrength;
+	UPROPERTY(EditAnywhere, Category = "Storm")
+	float StormStrength = 1000.0f;
 
-	void StormEffect(AActor* Actor) const;
-
+	UPROPERTY(EditAnywhere, Category = "Storm")
+	float ForceRadius = 500.0f;
+	
 
 };

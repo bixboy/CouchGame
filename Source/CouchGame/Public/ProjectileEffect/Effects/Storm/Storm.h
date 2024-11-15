@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Storm.generated.h"
 
+class URadialForceComponent;
+
 UCLASS()
 class COUCHGAME_API AStorm : public AActor
 {
@@ -14,8 +16,11 @@ class COUCHGAME_API AStorm : public AActor
 public:
 	// Sets default values for this actor's properties
 	AStorm();
+	void Init(float StormStrength, float ForceRadius) const;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	URadialForceComponent* RadialForceComponent;
 	
 	
 
