@@ -23,4 +23,6 @@ class COUCHGAME_API ICouchDamageable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Hit(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetPercentRepair();
 };

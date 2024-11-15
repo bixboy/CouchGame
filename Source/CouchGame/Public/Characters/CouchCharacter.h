@@ -6,6 +6,7 @@
 #include "CouchCharacterAnimationManager.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
 class UBoxComponent;
@@ -21,7 +22,7 @@ class UCouchCharacterSettings;
 class UAnimationManager;
 
 UCLASS()
-class COUCHGAME_API ACouchCharacter : public ACharacter
+class COUCHGAME_API ACouchCharacter : public ACharacter, public ICouchDamageable
 {
 	GENERATED_BODY()
 #pragma region Unreal Default
@@ -42,6 +43,8 @@ public:
 #pragma endregion
 #pragma region Move And Orient
 public:
+	virtual void Hit_Implementation(FHitResult HitResult) override;
+	
 	FVector2D GetOrient() const;
 
 	void SetOrient(FVector2D NewOrient);
@@ -56,6 +59,10 @@ protected:
 	float CharacterRotationSpeed = 20.0f;
 	void RotateMeshUsingOrient(float DeltaTime) const;
 	bool CanMove = true;
+
+	UPROPERTY(EditAnywhere)
+	float StunDelay = 2.f;
+	void OnTimerStunEnd();
 
 #pragma endregion
 #pragma region State Machine

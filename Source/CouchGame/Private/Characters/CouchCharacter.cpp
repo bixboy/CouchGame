@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 #include "EnhancedInputSubsystems.h"
@@ -18,6 +17,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "ItemSpawnerManager/ItemSpawnerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Camera/CameraActor.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -43,7 +43,6 @@ ACouchCharacter::ACouchCharacter()
 	if (!SpawnerManagerPtr) return;
 	SpawnerManager = TObjectPtr<AItemSpawnerManager>(SpawnerManagerPtr);
 }
-
 
 void ACouchCharacter::BeginPlay()
 {
@@ -83,6 +82,20 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	BindInputMoveAndActions(EnhancedInputComponent);
 	BindInputInteractAndActions(EnhancedInputComponent);
+}
+
+void ACouchCharacter::Hit_Implementation(FHitResult HitResult)
+{
+	ICouchDamageable::Hit_Implementation(HitResult);
+	CanMove = false;
+	
+	FTimerHandle RoundTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
+}
+
+void ACouchCharacter::OnTimerStunEnd()
+{
+	CanMove = true;
 }
 
 #pragma endregion Unreal Default

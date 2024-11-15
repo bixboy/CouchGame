@@ -80,7 +80,7 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 
 #pragma endregion 
 
-#pragma region SpawnLure & InitLure
+#pragma region Spawn & Init Lure
 
 void ACouchFishingRod::SpawnLure()
 {
@@ -186,7 +186,7 @@ void ACouchFishingRod::StopRewindCable()
 
 #pragma endregion
 
-#pragma region SpawnPickableObject
+#pragma region Spawn Pickable Object
 
 void ACouchFishingRod::SpawnPickableObject()
 {
@@ -276,6 +276,8 @@ void ACouchFishingRod::RewindQte()
 
 #pragma endregion
 
+#pragma region Getter
+
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
 TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
@@ -284,6 +286,8 @@ int ACouchFishingRod::GetTeam() const
 {
    return CurrentTeam;
 }
+
+#pragma endregion
 
 void ACouchFishingRod::DestroyLureAndCable()
 {

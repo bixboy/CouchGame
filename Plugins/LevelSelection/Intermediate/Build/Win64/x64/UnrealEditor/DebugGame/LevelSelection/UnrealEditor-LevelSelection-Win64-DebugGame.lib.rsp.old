@@ -1,0 +1,12 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-LevelSelection-Win64-DebugGame.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.Cpp20.h.obj"
+"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Module.LevelSelection.cpp.obj"
+"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Default.rc2.res"
+/OUT:"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\UnrealEditor-LevelSelection-Win64-DebugGame.lib"
