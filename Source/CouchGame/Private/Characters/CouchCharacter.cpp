@@ -84,9 +84,9 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputInteractAndActions(EnhancedInputComponent);
 }
 
-void ACouchCharacter::Hit_Implementation(FHitResult HitResult)
+void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
-	ICouchDamageable::Hit_Implementation(HitResult);
+	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	CanMove = false;
 	
 	FTimerHandle RoundTimerHandle;
