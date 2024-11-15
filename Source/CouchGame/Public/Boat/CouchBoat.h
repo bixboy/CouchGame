@@ -51,5 +51,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EBoatTeam Team;
+
+	bool IsDestroyed = false;
 };
 

@@ -21,6 +21,8 @@ public:
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
 
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchChargePower* PowerChargeComponent;
 
@@ -44,6 +46,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	UClass* PowerChargeWidget;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<UCameraShakeBase> CameraShake;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)

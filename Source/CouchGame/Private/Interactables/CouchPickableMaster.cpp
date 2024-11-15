@@ -2,6 +2,9 @@
 
 #include "Interactables/CouchPickableMaster.h"
 
+#include "Components/BoxComponent.h"
+#include "Crafting/CouchCraftingTable.h"
+#include "CouchLure.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Widget/CouchWidget3D.h"
@@ -12,12 +15,20 @@ ACouchPickableMaster::ACouchPickableMaster()
 	PrimaryActorTick.bCanEverTick = true;
 	CouchProjectile = CreateDefaultSubobject<UCouchProjectile>(TEXT("ProjectileComponent"));
 	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	PhysicsCollider = Mesh;
+	RootComponent = Mesh;
+	
+	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionBox"));
+	InteractionBox->SetupAttachment(Mesh);
+	QteWidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("QteWidgetPose"));
+
 }
 
 void ACouchPickableMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
+	// PhysicsCollider = GetComponentByClass<UStaticMeshComponent>();
 }
 
 #pragma endregion
@@ -45,6 +56,11 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 	AttachToComponent(player->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	FVector ItemLocation = player->PickUpItemPosition->GetComponentLocation();
 	SetActorLocation(ItemLocation);
+	if (CraftingTable)
+	{
+		CraftingTable->RemoveIngredient(this);
+		CraftingTable = nullptr;
+	}
 
 }
 
@@ -53,12 +69,22 @@ void ACouchPickableMaster::Drop_Implementation()
 	if (!PhysicsCollider) return;
 	ICouchPickable::Drop_Implementation();
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	PhysicsCollider->SetSimulatePhysics(true);
+	if (!CraftingTable) PhysicsCollider->SetSimulatePhysics(true);
+
 }
 
 void ACouchPickableMaster::InteractWithObject_Implementation(ACouchInteractableMaster* interactable)
 {
 	ICouchPickable::InteractWithObject_Implementation(interactable);
+	
+	if (interactable->IsA(ACouchCraftingTable::StaticClass()))
+	{
+		ACouchCraftingTable* CraftTable = Cast<ACouchCraftingTable>(interactable);
+		if (!CraftTable || CraftTable->IsCraftingTableFull()) return;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with CraftingTable"));
+		CraftTable->AddIngredient(this);
+		CraftingTable = CraftTable;
+	}
 }
 
 bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const
@@ -67,25 +93,25 @@ bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> 
 	return false;
 }
 
-#pragma region Qte Rewind
+#pragma region Attach Lure
 
 bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 {
-	if (CurrentLuresAttached.Num() < 2)
+	if (CurrentLuresAttached.Num() <= 2)
 	{
 		CurrentLuresAttached.Add(LureRef);
+		if (CurrentLuresAttached.Num() == 2)
+		{
+			CurrentPercentQte = 0.5f;
+			InitQte();
+			return true;
+		}
 		return false;
 	}
-	else if (CurrentLuresAttached.Num() == 2)
+	if (CurrentLuresAttached.Num() == 2)
 	{
-		if (WidgetSpawner->GetCurrentWidget())
-		{
-			FOutputDeviceNull ar;
-			FString CmdAndParams = FString::Printf(TEXT("Init"));
-			WidgetSpawner->GetCurrentWidget()->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);	
-		}
-		
-		CurrentPercentQte = 0.f;
+		CurrentPercentQte = 0.5f;
+		InitQte();
 		return true;
 	}
 	return false;
@@ -93,24 +119,74 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 
 void ACouchPickableMaster::Detachlure(TObjectPtr<ACouchLure> LureRef)
 {
-	if (CurrentLuresAttached.Find(LureRef))
+	CurrentLuresAttached.Remove(LureRef);
+	if (CurrentLuresAttached.Num() == 0)
 	{
-		CurrentLuresAttached.Remove(LureRef);
-		if (CurrentLuresAttached.Num() == 0)
-		{
-			PhysicsCollider->SetSimulatePhysics(true);
-		}
+		PhysicsCollider->SetSimulatePhysics(true);
+	}
+}
+
+#pragma endregion
+
+#pragma region Qte Rewind
+
+void ACouchPickableMaster::InitQte()
+{
+	// Position & Spawn Widget
+	QteWidgetPose->SetWorldLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 50.f));
+	WidgetSpawner->SpawnWidget(WidgetQte, QteWidgetPose);
+
+	// Init Widget
+	if (WidgetSpawner->GetCurrentWidget())
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("Init %s"), *this->GetName());
+		WidgetSpawner->GetCurrentWidget()->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+	}
+
+	// Start QTE
+	for (TObjectPtr<ACouchLure> LuresAttached : CurrentLuresAttached)
+	{
+		LuresAttached->CouchFishingRod->StartQte();
 	}
 }
 
 void ACouchPickableMaster::UpdatePercent(float Value)
 {
 	CurrentPercentQte += Value;
+	CurrentPercentQte = FMath::Clamp(CurrentPercentQte, 0.0f, 1.0f);
+	
+	if (CurrentPercentQte >= 1.f || CurrentPercentQte <= 0.f)
+		StopQte();
 }
 
 float ACouchPickableMaster::GetQtePercent() const
 {
 	return CurrentPercentQte;
+}
+
+void ACouchPickableMaster::StopQte()
+{
+	if(WidgetSpawner->GetCurrentWidget())
+	{
+		WidgetSpawner->DestroyWidget();
+		for (TObjectPtr<ACouchLure> LuresAttached : CurrentLuresAttached)
+		{
+			LuresAttached->CouchFishingRod->StopQte();
+
+			// Si Team 1 Gagne
+			if (LuresAttached->CouchFishingRod->GetTeam() == 2 && CurrentPercentQte >= 1)
+			{
+				LuresAttached->CouchFishingRod->DestroyFishingRod();
+			}
+
+			// Si Team 2 Gagne
+			if (LuresAttached->CouchFishingRod->GetTeam() == 1 && CurrentPercentQte <= 0)
+			{
+				LuresAttached->CouchFishingRod->DestroyFishingRod();
+			}
+		}
+	}
 }
 
 #pragma endregion

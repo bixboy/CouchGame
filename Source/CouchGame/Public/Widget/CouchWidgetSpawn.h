@@ -18,13 +18,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> WidgetPose;
+	
 	UPROPERTY()
 	TObjectPtr<AActor> PowerChargeActor;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ACouchWidget3D* GetCurrentWidget();
+	
 	UFUNCTION(BlueprintCallable)
 	void SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent);
+	
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
 

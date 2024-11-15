@@ -8,6 +8,8 @@
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
 
+class ACouchWidget3D;
+class ACouchCraftingTable;
 class ACouchLure;
 class UCouchWidgetSpawn;
 class UCouchInteractableMaster;
@@ -21,6 +23,10 @@ class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, publ
 public:
 	ACouchPickableMaster();
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Mesh;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> InteractionBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchProjectile> CouchProjectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -66,17 +72,30 @@ public:
 	bool AttachLure(TObjectPtr<ACouchLure> LureRef);
 	void Detachlure(TObjectPtr<ACouchLure> LureRef);
 	void UpdatePercent(float Value);
+	void StopQte();
 
 	UFUNCTION(BlueprintCallable)
 	float GetQtePercent() const;
 
 private:
 	UPROPERTY()
+	TObjectPtr<USceneComponent> QteWidgetPose;
+	
+	void InitQte();
+	
+	UPROPERTY()
 	TArray<TObjectPtr<ACouchLure>> CurrentLuresAttached;
 
+	UPROPERTY(EditAnywhere, Category = DefaultsValue)
+	TSubclassOf<ACouchWidget3D> WidgetQte;
+
 	UPROPERTY()
-	float CurrentPercentQte = 0.f;
+	float CurrentPercentQte = 0.5f;
 	
 #pragma endregion	
+
+#pragma region Crafting
+	TObjectPtr<ACouchCraftingTable> CraftingTable;
 	
+#pragma endregion
 };

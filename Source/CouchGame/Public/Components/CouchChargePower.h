@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY()
 	FVector TargetLocation;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	UClass* PowerChargeWidget;
   
 private:   
 	UPROPERTY()
@@ -60,7 +63,6 @@ private:
   
 	UFUNCTION()
 	FVector LineTrace();
-
 
 #pragma endregion
 };

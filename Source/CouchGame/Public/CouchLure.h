@@ -21,14 +21,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod);
 
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> CouchFishingRod;
+
 private:	
 	UFUNCTION()
 	void SetupLure();
 	UFUNCTION()
 	void OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UPROPERTY()
-	TObjectPtr<ACouchFishingRod> CouchFishingRod;
 #pragma endregion	
 	
 #pragma region Components
@@ -46,9 +46,9 @@ public:
 #pragma region Fishing Object
 public:	
 	UFUNCTION()
-	TSubclassOf<ACouchPickableMaster> GetFishingObject();
+	TSubclassOf<ACouchPickableMaster> GetFishingObject() const;
 	UFUNCTION()
-	ACouchPickableMaster* GetFishingObjectActor();
+	ACouchPickableMaster* GetFishingObjectActor() const;
 
 private:
 	UPROPERTY()
@@ -60,6 +60,6 @@ public:
 	UFUNCTION()
 	void DestroyLure();
 	UFUNCTION()
-	void DetachObject();
+	void DetachAttachedObject();
 	
 };

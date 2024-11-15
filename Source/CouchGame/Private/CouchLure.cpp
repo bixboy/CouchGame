@@ -41,6 +41,7 @@ void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* Fis
 
 void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Stop Movement
 	if (CouchProjectile)
 	{
 		if (CouchProjectile->GetCanMove())
@@ -53,26 +54,28 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 		}	
 	}
-	
+
+	// Attach Lure
 	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
 		if (FishingObject)
 		{
-			FishingObject->PhysicsCollider->SetSimulatePhysics(false);
-			FishingObject->PhysicsCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
-
-			if (FishingObject->AttachLure(this))
+			if (!FishingObject->AttachLure(this))
 			{
-				CouchFishingRod->StartQte();
+				FishingObject->PhysicsCollider->SetSimulatePhysics(false);
+				FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);	
+			}
+			else
+			{
+				SphereComponent->SetSimulatePhysics(false);
 			}
 		}
 	}
 }
 
-void ACouchLure::DetachObject()
+void ACouchLure::DetachAttachedObject()
 {
 	if (FishingObject)
 	{
@@ -89,7 +92,9 @@ void ACouchLure::DestroyLure()
 	Destroy();
 }
 
-TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
+#pragma region Getter
+
+TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 {
 	if (FishingObject)
 	{
@@ -98,7 +103,7 @@ TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject()
 	return nullptr;
 }
 
-ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
+ACouchPickableMaster* ACouchLure::GetFishingObjectActor() const
 {
 	if (FishingObject)
 	{
@@ -106,6 +111,8 @@ ACouchPickableMaster* ACouchLure::GetFishingObjectActor()
 	}
 	return nullptr;
 }
+
+#pragma endregion
 
 
 

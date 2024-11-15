@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 #include "EnhancedInputSubsystems.h"
@@ -17,6 +16,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "ItemSpawnerManager/ItemSpawnerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Camera/CameraActor.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -42,7 +42,6 @@ ACouchCharacter::ACouchCharacter()
 	if (!SpawnerManagerPtr) return;
 	SpawnerManager = TObjectPtr<AItemSpawnerManager>(SpawnerManagerPtr);
 }
-
 
 void ACouchCharacter::BeginPlay()
 {
@@ -81,6 +80,20 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	BindInputMoveAndActions(EnhancedInputComponent);
 	BindInputInteractAndActions(EnhancedInputComponent);
+}
+
+void ACouchCharacter::Hit_Implementation(FHitResult HitResult)
+{
+	ICouchDamageable::Hit_Implementation(HitResult);
+	CanMove = false;
+	
+	FTimerHandle RoundTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
+}
+
+void ACouchCharacter::OnTimerStunEnd()
+{
+	CanMove = true;
 }
 
 #pragma endregion Unreal Default
@@ -217,14 +230,17 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 
 void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	FVector2D Input = InputActionValue.Get<FVector2D>();
-	if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+	if (CanMove)
 	{
-		InputMove = Input;
-	}
-	else
-	{
-		InputMove = FVector2D::Zero();
+		FVector2D Input = InputActionValue.Get<FVector2D>();
+		if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+		{
+			InputMove = Input;
+		}
+		else
+		{
+			InputMove = FVector2D::Zero();
+		}	
 	}
 }
 #pragma endregion
@@ -361,6 +377,21 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 // Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
+	float ActionValue = InputActionValue.Get<float>();
+	if (isFishing && FishingRod)
+	{
+		if (ActionValue > 0)
+		{
+			FishingRod->isPlayerFishing = true;
+		}
+		else
+		{
+			FishingRod->isPlayerFishing = false;
+			FishingRod->StopRewindCable();
+		}
+		return;
+	}
+	
 	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
 		return;
@@ -374,7 +405,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			return;
 		}
 	}
-	float ActionValue = InputActionValue.Get<float>();
+	
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
 	
 	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
@@ -457,9 +488,19 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this);
 				isFishing = true;
+				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
-			
+			else
+			{
+				isFishing = true;
+				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			}
 		}
 		else
 		{
@@ -467,7 +508,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			{
 				ICouchInteractable::Execute_StopChargeActor(FishingRod);
 			}
-			
+			CanMove = true;
 		}
 	}
 }
@@ -506,12 +547,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	CanFish = false;
-	if (FishingRod)
-	{
-		FishingRod->Destroy();
-		FishingRod = nullptr;
-		isFishing = false;
-	}
+	DestroyFishingRod();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
@@ -522,7 +558,7 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod->DestroyFishingRod();
 		FishingRod->Destroy();
 		FishingRod = nullptr;
-		isFishing = false;
 	}
+	isFishing = false;
 }
 #pragma endregion

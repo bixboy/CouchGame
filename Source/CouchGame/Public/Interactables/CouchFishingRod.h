@@ -19,6 +19,7 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 
 public:
 	ACouchFishingRod();
+	virtual void Tick(float DeltaSeconds) override;
 	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player);
 	
 	virtual bool IsUsedByPlayer_Implementation() override;
@@ -27,8 +28,9 @@ public:
 
 	void DestroyLureAndCable();
 	void DestroyFishingRod();
-	
-	TObjectPtr<ACouchCharacter> GetCharacter();
+
+	TObjectPtr<ACouchCharacter> GetCharacter() const;
+	int GetTeam() const;
 
 #pragma region Default Values
 public:
@@ -36,11 +38,20 @@ public:
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchChargePower> ChargePower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn>WidgetSpawner;
 	
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> CurrentPlayer;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TObjectPtr<UClass> PowerChargeWidget;
 	
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"))
 	int CurrentTeam = 1;
@@ -93,14 +104,19 @@ private:
 	
 	float PreviousAngle;
 
-	UFUNCTION(BlueprintCallable)
-	void RewindCable(float DeltaTime, float JoystickX, float JoystickY);
-	UFUNCTION(blueprintCallable)
-	void StopRewindCable();
+	void RewindCable(float DeltaTime);
 	UFUNCTION(BlueprintCallable)
 	void SpawnPickableObject();
-	
 	FVector GetRandomPos(float MinDistance, float MaxDistance, float Width);
+	
+	UPROPERTY(EditAnywhere)
+	float StopRewindZ = 2.f;
+
+
+public:
+	void StopRewindCable();
+public:
+	bool isPlayerFishing;
 
 #pragma endregion
 
@@ -109,12 +125,14 @@ private:
 public:
 	UFUNCTION()
 	void StartQte();
+	UFUNCTION()
+	void StopQte();
 
 private:
 	bool InQte = false;
-	
+
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
-	TSubclassOf<ACouchWidget3D> WidgetQte;
+	float QtePercent = 0.1f;
 
 	UFUNCTION()
 	void RewindQte();
