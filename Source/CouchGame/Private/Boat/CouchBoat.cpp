@@ -57,6 +57,8 @@ void ACouchBoat::BoatRepair()
 
 void ACouchBoat::SinkBoatAndGameOver()
 {
+	if (IsDestroyed) return;
+	
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
 	switch (Team)
 	{
@@ -78,6 +80,7 @@ void ACouchBoat::SinkBoatAndGameOver()
 			break;
 		
 	}
+	IsDestroyed = true;
 }
 
 float ACouchBoat::GetBoatLife() const

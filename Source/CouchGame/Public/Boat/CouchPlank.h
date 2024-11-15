@@ -29,62 +29,65 @@ public:
 
 	virtual bool IsUsedByPlayer_Implementation() override;
 
+	// Overlap
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	// Getter
 	UFUNCTION(BlueprintCallable)
 	float GetRepairingPercent() const;
 	UFUNCTION(BlueprintCallable)
-	
-	
 	AActor* GetInteractWidget() const;
 
-protected:
-	virtual void BeginPlay() override;
+#pragma region componenents
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	TObjectPtr<UCouchWidgetSpawn> CouchWidgetSpawn;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraComponent> WaterParticle;
+	
+	UPROPERTY(EditAnywhere, blueprintReadWrite)
+	TObjectPtr<UStaticMeshComponent> HitMesh;
+
+	UPROPERTY(EditAnywhere, blueprintReadWrite)
+	TObjectPtr<UBoxComponent> BlockAll;
+	
+	UPROPERTY(EditAnywhere, blueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPos;
+	
+	UPROPERTY(VisibleAnywhere, blueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> InterractiveBoxRange;
+
+#pragma endregion	
+
+protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-
-	UPROPERTY(EditAnywhere)
-	UBoxComponent* BlockAll;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ACouchWidget3D> InteractWidgetClass;
 	UPROPERTY()
-	AActor* InteractWidgetPtr;
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* HitMesh;
-
-	UStaticMesh* GetRandomStaticMesh();
-	
-	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "AAA_PlankMeshes", meta = (AllowPrivateAccess = "true"))
-	TArray<UStaticMesh*> DamagedPlanckMeshes;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* InterractiveBoxRange;
-	
-	
-	UPROPERTY(EditAnywhere)
-	UNiagaraComponent* WaterParticle;
-
-	UPROPERTY(EditAnywhere)
-	USceneComponent* WidgetPos;
-
-	UPROPERTY(EditAnywhere)
-	UCouchWidgetSpawn* CouchWidgetSpawn;
-
-	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	TObjectPtr<ACouchCharacter> APlayer;
 	bool IsPlayerRepairing;
 
+	// Widget
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
+	TSubclassOf<ACouchWidget3D> InteractWidgetClass;
 	UPROPERTY()
-	ABoatFloor* Floor; 
-	UPROPERTY(EditAnywhere)
+	TObjectPtr<AActor> InteractWidgetPtr;
+
+	// Timer
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
 	float TimeToRepair;
-	
-	float Timer;
 	UPROPERTY()
-	ACouchCharacter* APlayer;
+	ABoatFloor* Floor;
+	float Timer;
+
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+
+	UStaticMesh* GetRandomStaticMesh();
+
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<UStaticMesh>> DamagedPlanckMeshes;
 };
