@@ -75,7 +75,8 @@ void ACouchPlank::Tick(float DeltaTime)
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 			// APlayer->IsInteracting = false;
-			CurrentPlayer->AnimationManager->IsRepairing = false;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsRepairing = false;
+			SetActorTickEnabled(false);
 			Destroy();
 		}
 	}
