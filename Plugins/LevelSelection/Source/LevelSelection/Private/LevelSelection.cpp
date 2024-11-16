@@ -12,10 +12,14 @@
 #include "Engine/ObjectLibrary.h"
 
 static const FName LevelSelectionTabName("LevelSelection");
-
 #define LOCTEXT_NAMESPACE "FLevelSelectionModule"
 DEFINE_LOG_CATEGORY(MyMenuLog)
 
+
+
+#pragma region Setup Plugin
+
+// Start Module
 void FLevelSelectionModule::StartupModule()
 {
 	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
@@ -35,19 +39,20 @@ void FLevelSelectionModule::StartupModule()
 	}	
 }
 
+//Close Module
 void FLevelSelectionModule::ShutdownModule()
 {
-	if (bIsTabRegistered)
-	{
-		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
-		bIsTabRegistered = false;
-	}
+		// if (bIsTabRegistered)
+	// {
+	// 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
+	// 	bIsTabRegistered = false;
+	// }
 
-	UToolMenus::UnRegisterStartupCallback(this);
-	UToolMenus::UnregisterOwner(this);
+	//UToolMenus::UnRegisterStartupCallback(this);
+	//UToolMenus::UnregisterOwner(this);
 
-	FLevelSelectionStyle::Shutdown();
-	FLevelSelectionCommands::Unregister();
+	//FLevelSelectionStyle::Shutdown();
+	//FLevelSelectionCommands::Unregister();
 }
 
 TSharedRef<SDockTab> FLevelSelectionModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
@@ -77,6 +82,11 @@ void FLevelSelectionModule::PluginButtonClicked()
 	FGlobalTabmanager::Get()->TryInvokeTab(LevelSelectionTabName);
 }
 
+#pragma endregion
+
+#pragma region Creat Menu
+
+// Menu
 void FLevelSelectionModule::AddMenuEntry(FMenuBarBuilder& MenuBuilder)
 {
 	MenuBuilder.AddPullDownMenu(
@@ -87,6 +97,7 @@ void FLevelSelectionModule::AddMenuEntry(FMenuBarBuilder& MenuBuilder)
 	  FName(TEXT("LevelSelection")));
 }
 
+// Sub Menu
 void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.AddWidget(
@@ -112,12 +123,14 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 	}
 	else
 	{
+		// Creation du Sub Menu
 		for (const FString& LevelName : Levels)
 		{
+			FSlateIcon LevelIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.GameSettings");
 			MenuBuilder.AddMenuEntry(
 				FText::FromString(FPaths::GetBaseFilename(LevelName)),
 				FText::FromString(FString::Printf(TEXT("Open level %s"), *FPaths::GetBaseFilename(LevelName))),
-				FSlateIcon(),
+				LevelIcon,
 				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
 				{
 					OnOpenLevelClicked(LevelName);
@@ -127,6 +140,11 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 	}
 }
 
+#pragma endregion
+
+#pragma region File Paths & Open Maps
+
+// Find Levels
 TArray<FString> FLevelSelectionModule::GetAllMapNames()
 {
     auto ObjectLibrary = UObjectLibrary::CreateLibrary(UWorld::StaticClass(), false, true);
@@ -149,13 +167,16 @@ TArray<FString> FLevelSelectionModule::GetAllMapNames()
     return Names;
 }
 
+// Open Levels
 void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 {
 	FEditorFileUtils::LoadMap(LevelPath, true);
 }
 
-#undef LOCTEXT_NAMESPACE
-	
-IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
+#pragma endregion
 
+
+
+#undef LOCTEXT_NAMESPACE
+IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
 #endif
