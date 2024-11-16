@@ -26,26 +26,25 @@ public class LevelSelection : ModuleRules
 			new string[]
 			{
 				"Core",
-				// ... add other public dependencies that you statically link with here ...
-			}
-			);
-			
-		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Projects",
-				"InputCore",
-				"EditorFramework",
-				"UnrealEd",
-				"ToolMenus",
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
+				"SlateCore"
 			}
 			);
+		
+		
+		// Dépendances privées pour l'éditeur
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"Projects",
+			"InputCore",
+			"EditorFramework",
+			"UnrealEd",
+			"ToolMenus",
+			"PropertyEditor",
+			"AssetRegistry",
+			"EditorSubsystem"
+		});
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(

@@ -4,7 +4,7 @@
 	"VersionName": "1.0",
 	"FriendlyName": "LevelSelection",
 	"Description": "",
-	"Category": "Other",
+	"Category": "Editor",
 	"CreatedBy": "Bixboy",
 	"CreatedByURL": "",
 	"DocsURL": "",
@@ -20,5 +20,9 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
+	],
+	"EnabledByDefault": true,
+	"TargetAllowList": [
+		"Editor"
 	]
 }

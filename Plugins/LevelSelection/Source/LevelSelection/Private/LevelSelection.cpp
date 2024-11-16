@@ -1,5 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #include "LevelSelection.h"
 #include "FileHelpers.h"
 #include "LevelSelectionStyle.h"
@@ -12,34 +12,47 @@
 #include "Engine/ObjectLibrary.h"
 
 static const FName LevelSelectionTabName("LevelSelection");
-
 #define LOCTEXT_NAMESPACE "FLevelSelectionModule"
 DEFINE_LOG_CATEGORY(MyMenuLog)
 
+
+
+#pragma region Setup Plugin
+
+// Start Module
 void FLevelSelectionModule::StartupModule()
 {
-    FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
+	{
+		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
     
-    TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
+		TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
     
-    MenuExtender->AddMenuBarExtension(
-        "Help", // Positionner après le menu "Help"
-        EExtensionHook::After, // Définir la position après le menu "Help"
-        nullptr, // Aucune commande supplémentaire
-        FMenuBarExtensionDelegate::CreateRaw(this, &FLevelSelectionModule::AddMenuEntry)
-    );
-    
-    LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
+		MenuExtender->AddMenuBarExtension(
+			"Help", // Positionner après le menu "Help"
+			EExtensionHook::After, // Définir la position après le menu "Help"
+			nullptr, // Aucune commande supplémentaire
+			FMenuBarExtensionDelegate::CreateRaw(this, &FLevelSelectionModule::AddMenuEntry)
+		);
+		bIsTabRegistered = true;
+		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
+	}	
 }
 
+//Close Module
 void FLevelSelectionModule::ShutdownModule()
 {
-	UToolMenus::UnRegisterStartupCallback(this);
-	UToolMenus::UnregisterOwner(this);
+		// if (bIsTabRegistered)
+	// {
+	// 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
+	// 	bIsTabRegistered = false;
+	// }
 
-	FLevelSelectionStyle::Shutdown();
-	FLevelSelectionCommands::Unregister();
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
+	//UToolMenus::UnRegisterStartupCallback(this);
+	//UToolMenus::UnregisterOwner(this);
+
+	//FLevelSelectionStyle::Shutdown();
+	//FLevelSelectionCommands::Unregister();
 }
 
 TSharedRef<SDockTab> FLevelSelectionModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
@@ -69,6 +82,11 @@ void FLevelSelectionModule::PluginButtonClicked()
 	FGlobalTabmanager::Get()->TryInvokeTab(LevelSelectionTabName);
 }
 
+#pragma endregion
+
+#pragma region Creat Menu
+
+// Menu
 void FLevelSelectionModule::AddMenuEntry(FMenuBarBuilder& MenuBuilder)
 {
 	MenuBuilder.AddPullDownMenu(
@@ -79,6 +97,7 @@ void FLevelSelectionModule::AddMenuEntry(FMenuBarBuilder& MenuBuilder)
 	  FName(TEXT("LevelSelection")));
 }
 
+// Sub Menu
 void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.AddWidget(
@@ -104,12 +123,14 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 	}
 	else
 	{
+		// Creation du Sub Menu
 		for (const FString& LevelName : Levels)
 		{
+			FSlateIcon LevelIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.GameSettings");
 			MenuBuilder.AddMenuEntry(
 				FText::FromString(FPaths::GetBaseFilename(LevelName)),
 				FText::FromString(FString::Printf(TEXT("Open level %s"), *FPaths::GetBaseFilename(LevelName))),
-				FSlateIcon(),
+				LevelIcon,
 				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
 				{
 					OnOpenLevelClicked(LevelName);
@@ -119,10 +140,16 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 	}
 }
 
+#pragma endregion
+
+#pragma region File Paths & Open Maps
+
+// Find Levels
 TArray<FString> FLevelSelectionModule::GetAllMapNames()
 {
     auto ObjectLibrary = UObjectLibrary::CreateLibrary(UWorld::StaticClass(), false, true);
-    ObjectLibrary->LoadAssetDataFromPath(TEXT("/Game"));
+	ObjectLibrary->LoadAssetDataFromPath(TEXT("/Game"));
+	
     TArray<FAssetData> AssetDatas;
     ObjectLibrary->GetAssetDataList(AssetDatas);
     UE_LOG(LogTemp, Warning, TEXT("Found maps: %d"), AssetDatas.Num());
@@ -140,12 +167,16 @@ TArray<FString> FLevelSelectionModule::GetAllMapNames()
     return Names;
 }
 
+// Open Levels
 void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 {
-	// Ouvrir le niveau spécifié
 	FEditorFileUtils::LoadMap(LevelPath, true);
 }
 
+#pragma endregion
+
+
+
 #undef LOCTEXT_NAMESPACE
-	
 IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
+#endif
