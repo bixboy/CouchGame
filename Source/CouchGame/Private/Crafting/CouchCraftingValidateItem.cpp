@@ -25,6 +25,7 @@ void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player
 	Super::Interact_Implementation(Player);
 	if (!CraftingTable) return;
 	CraftingTable->CraftItem();
+	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = !CurrentPlayer->AnimationManager->IsCheckingChef;
 }
 
 void ACouchCraftingValidateItem::BeginPlay()

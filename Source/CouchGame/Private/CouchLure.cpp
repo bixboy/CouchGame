@@ -52,6 +52,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			const FVector Vel = FVector::ZeroVector;
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
+			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishingRelease = false;
 		}	
 	}
 

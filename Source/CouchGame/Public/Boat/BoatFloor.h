@@ -23,7 +23,7 @@ public:
 
 	void Init(ACouchBoat* Boat);
 
-	virtual void Hit_Implementation(FHitResult HitResult) override;
+	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 
 	void RemoveHitFromArray(ACouchPlank* Plank);
 protected:
@@ -48,5 +48,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DamageFrequency = 1;
 	float Timer;
+
+	UPROPERTY(EditAnywhere)
+	FVector PlankLocationOffset;
 	
 };

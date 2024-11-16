@@ -25,7 +25,7 @@ class COUCHGAME_API ACouchPlank : public ACouchInteractableMaster
 public:
 	ACouchPlank();
 
-	void Init(ABoatFloor* floor);
+	void Init(ABoatFloor* floor, float RepairingTime = 0.f, float Scale = 0.f);
 
 	virtual bool IsUsedByPlayer_Implementation() override;
 

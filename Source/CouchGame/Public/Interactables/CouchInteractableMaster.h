@@ -29,7 +29,7 @@ public:
 	void SetPlayerIsIn(bool IsIn);
 
 
-private:
+protected:
 	UPROPERTY()
 	ACouchCharacter* CurrentPlayer;
 	UPROPERTY()
