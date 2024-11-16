@@ -18,7 +18,7 @@ public:
 	virtual void NativeConstruct() override;
 
 protected:
-	bool Initialize() override;
+	virtual bool Initialize() override;
 
 #pragma region Text
 public:
