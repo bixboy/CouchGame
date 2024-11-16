@@ -1,5 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #include "LevelSelection.h"
 #include "FileHelpers.h"
 #include "LevelSelectionStyle.h"
@@ -18,28 +18,36 @@ DEFINE_LOG_CATEGORY(MyMenuLog)
 
 void FLevelSelectionModule::StartupModule()
 {
-    FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
+	{
+		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
     
-    TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
+		TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
     
-    MenuExtender->AddMenuBarExtension(
-        "Help", // Positionner après le menu "Help"
-        EExtensionHook::After, // Définir la position après le menu "Help"
-        nullptr, // Aucune commande supplémentaire
-        FMenuBarExtensionDelegate::CreateRaw(this, &FLevelSelectionModule::AddMenuEntry)
-    );
-    
-    LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
+		MenuExtender->AddMenuBarExtension(
+			"Help", // Positionner après le menu "Help"
+			EExtensionHook::After, // Définir la position après le menu "Help"
+			nullptr, // Aucune commande supplémentaire
+			FMenuBarExtensionDelegate::CreateRaw(this, &FLevelSelectionModule::AddMenuEntry)
+		);
+		bIsTabRegistered = true;
+		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
+	}	
 }
 
 void FLevelSelectionModule::ShutdownModule()
 {
+	if (bIsTabRegistered)
+	{
+		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
+		bIsTabRegistered = false;
+	}
+
 	UToolMenus::UnRegisterStartupCallback(this);
 	UToolMenus::UnregisterOwner(this);
 
 	FLevelSelectionStyle::Shutdown();
 	FLevelSelectionCommands::Unregister();
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
 }
 
 TSharedRef<SDockTab> FLevelSelectionModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
@@ -122,7 +130,8 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 TArray<FString> FLevelSelectionModule::GetAllMapNames()
 {
     auto ObjectLibrary = UObjectLibrary::CreateLibrary(UWorld::StaticClass(), false, true);
-    ObjectLibrary->LoadAssetDataFromPath(TEXT("/Game"));
+	ObjectLibrary->LoadAssetDataFromPath(TEXT("/Game"));
+	
     TArray<FAssetData> AssetDatas;
     ObjectLibrary->GetAssetDataList(AssetDatas);
     UE_LOG(LogTemp, Warning, TEXT("Found maps: %d"), AssetDatas.Num());
@@ -142,10 +151,11 @@ TArray<FString> FLevelSelectionModule::GetAllMapNames()
 
 void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 {
-	// Ouvrir le niveau spécifié
 	FEditorFileUtils::LoadMap(LevelPath, true);
 }
 
 #undef LOCTEXT_NAMESPACE
 	
 IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
+
+#endif

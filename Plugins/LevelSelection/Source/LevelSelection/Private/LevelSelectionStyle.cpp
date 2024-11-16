@@ -1,5 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #include "LevelSelectionStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Application/SlateApplication.h"
@@ -58,3 +58,4 @@ const ISlateStyle& FLevelSelectionStyle::Get()
 {
 	return *StyleInstance;
 }
+#endif

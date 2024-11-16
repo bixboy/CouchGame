@@ -1,9 +1,10 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+#pragma once
+#if WITH_EDITOR
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "ToolMenus.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
@@ -22,9 +23,7 @@ public:
 	void PluginButtonClicked();
 	
 private:
-
-	void RegisterMenus();
-
+	
 	void AddMenuEntry(FMenuBarBuilder& MenuBuilder);
 	void FillSubmenu(FMenuBuilder& MenuBuilder);
 	TArray<FString> GetAllMapNames();
@@ -34,4 +33,7 @@ private:
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
+
+	bool bIsTabRegistered = false;
 };
+#endif

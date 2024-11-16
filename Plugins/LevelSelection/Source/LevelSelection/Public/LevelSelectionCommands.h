@@ -1,5 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #pragma once
 
 #include "CoreMinimal.h"
@@ -21,3 +20,5 @@ public:
 public:
 	TSharedPtr< FUICommandInfo > OpenPluginWindow;
 };
+
+#endif

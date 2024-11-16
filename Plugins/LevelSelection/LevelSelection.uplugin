@@ -20,5 +20,9 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
+	],
+	"EnabledByDefault": true,
+	"TargetAllowList": [
+		"Editor"
 	]
 }

@@ -29,11 +29,14 @@ public class LevelSelection : ModuleRules
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
 		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
+		
+		if (Target.Type == TargetType.Editor)
+		{
+			PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+			// Dépendances privées pour l'éditeur
+			PrivateDependencyModuleNames.AddRange(new string[] {
 				"Projects",
 				"InputCore",
 				"EditorFramework",
@@ -43,9 +46,11 @@ public class LevelSelection : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
-			}
-			);
+				"PropertyEditor",
+				"AssetRegistry",
+				"EditorSubsystem"
+			});
+		}
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(
