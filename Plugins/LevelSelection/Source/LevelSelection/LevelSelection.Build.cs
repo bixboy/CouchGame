@@ -26,12 +26,40 @@ public class LevelSelection : ModuleRules
 			new string[]
 			{
 				"Core",
+<<<<<<< Updated upstream
 				"CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore"
 			}
 			);
+=======
+				// ... add other public dependencies that you statically link with here ...
+			}
+			);
+		
+		
+		if (Target.Type == TargetType.Editor)
+		{
+			PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+			// Dépendances privées pour l'éditeur
+			PrivateDependencyModuleNames.AddRange(new string[] {
+				"Projects",
+				"InputCore",
+				"EditorFramework",
+				"UnrealEd",
+				"ToolMenus",
+				"CoreUObject",
+				"Engine",
+				"Slate",
+				"SlateCore",
+				"PropertyEditor",
+				"AssetRegistry",
+				"EditorSubsystem"
+			});
+		}
+>>>>>>> Stashed changes
 		
 		
 		// Dépendances privées pour l'éditeur

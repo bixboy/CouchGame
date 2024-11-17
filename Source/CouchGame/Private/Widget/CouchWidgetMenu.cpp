@@ -4,36 +4,36 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-bool UCouchWidgetPause::Initialize()
+bool UCouchWidgetMenu::Initialize()
 {
 	bool Success = Super::Initialize();
 	if (!Success) return false;
 	
 	if (Btn_Quit)
 	{
-		Btn_Quit->OnPressed.AddDynamic(this, &UCouchWidgetPause::OnQuitPressed);	
+		Btn_Quit->OnPressed.AddDynamic(this, &UCouchWidgetMenu::OnQuitPressed);	
 	}
 	if (Btn_Option)
 	{
-		Btn_Option->OnPressed.AddDynamic(this, &UCouchWidgetPause::OnOptionPressed);	
+		Btn_Option->OnPressed.AddDynamic(this, &UCouchWidgetMenu::OnOptionPressed);	
 	}
-	if (Btn_Menu)
+	if (Btn_Play)
 	{
-		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetPause::OnPlayPressed);	
+		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetMenu::OnPlayPressed);	
 	}
 	return true;
 }
 
-void UCouchWidgetPause::OnQuitPressed()
+void UCouchWidgetMenu::OnQuitPressed()
 {
 	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
 }
 
-void UCouchWidgetPause::OnOptionPressed()
+void UCouchWidgetMenu::OnOptionPressed()
 {
 }
 
-void UCouchWidgetPause::OnPlayPressed()
+void UCouchWidgetMenu::OnPlayPressed()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), LobbyName);
 }

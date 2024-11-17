@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "CouchWidgetPause.generated.h"
+#include "CouchWidgetMenu.generated.h"
 
 class UTextBlock;
 class UButton;
 
 UCLASS()
-class COUCHGAME_API UCouchWidgetPause : public UUserWidget
+class COUCHGAME_API UCouchWidgetMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
