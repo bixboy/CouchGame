@@ -3,6 +3,7 @@
 #include "Animation/WidgetAnimation.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 
@@ -11,6 +12,7 @@ void UCouchWidgetWin::NativeConstruct()
 	Super::NativeConstruct();
 	if (OpenAnimation)
 	{
+		CheckLight();
 		FTimerHandle RoundTimerHandle;
 		PlayAnimationForward(OpenAnimation);
 		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);	
@@ -49,6 +51,46 @@ void UCouchWidgetWin::OnNewRoundPressed()
 
 #pragma endregion
 
+
+void UCouchWidgetWin::CheckLight()
+{
+	int RoundNumber = 3;
+	if(RoundNumber == 3)
+	{
+		Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+		Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+		
+		Img_Light2->SetVisibility(ESlateVisibility::Visible);
+		Img_Light3->SetVisibility(ESlateVisibility::Visible);
+		Img_Light4->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if(RoundNumber == 2)
+	{
+		Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+		Img_Light3->SetVisibility(ESlateVisibility::Hidden);
+		Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+		
+		Img_Light2->SetVisibility(ESlateVisibility::Visible);
+		Img_Light4->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if(RoundNumber == 4)
+	{
+		Img_Light3->SetVisibility(ESlateVisibility::Hidden);
+
+		Img_Light1->SetVisibility(ESlateVisibility::Visible);
+		Img_Light2->SetVisibility(ESlateVisibility::Visible);
+		Img_Light4->SetVisibility(ESlateVisibility::Visible);
+		Img_Light5->SetVisibility(ESlateVisibility::Visible);
+	}
+	else if(RoundNumber == 5)
+	{
+		Img_Light1->SetVisibility(ESlateVisibility::Visible);
+		Img_Light2->SetVisibility(ESlateVisibility::Visible);
+		Img_Light3->SetVisibility(ESlateVisibility::Visible);
+		Img_Light4->SetVisibility(ESlateVisibility::Visible);
+		Img_Light5->SetVisibility(ESlateVisibility::Visible);
+	}
+}
 
 void UCouchWidgetWin::EndAnimation()
 {
