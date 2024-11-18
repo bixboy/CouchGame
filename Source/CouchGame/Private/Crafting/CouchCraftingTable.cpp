@@ -174,6 +174,7 @@ void ACouchCraftingTable::CraftItem()
 {
 	if (!ItemToCraft) return;
 	MoveTimeline.PlayFromStart();
+	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
 }
 
 // Called when the game starts or when spawned
@@ -206,7 +207,7 @@ void ACouchCraftingTable::InitializeMoveTimeline()
 
 void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
+	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
 	FVector TargetLocation = FinalDishSpawnPosition->GetComponentLocation();
 	if (Plate1)
 	{

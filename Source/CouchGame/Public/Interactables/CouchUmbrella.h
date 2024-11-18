@@ -31,7 +31,7 @@ private:
 public:
 	UFUNCTION()
 	int GetCurrentPv() const;
-	virtual void Hit_Implementation(FHitResult HitResult) override;
+	virtual void Hit_Implementation(FHitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 	
 private:	
 	UPROPERTY(EditAnywhere, Category = DefaultValues)

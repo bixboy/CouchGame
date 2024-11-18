@@ -20,20 +20,22 @@ ACouchStaticCanonBall::ACouchStaticCanonBall()
 	Down->SetupAttachment(RootComponent);
 }
 
-void ACouchStaticCanonBall::InitCanonBall(TObjectPtr<ACouchPickableCannonBall> PickableCannonBall)
+void ACouchStaticCanonBall::InitCanonBall(TObjectPtr<ACouchPickableCannonBall> RefPickableCannonBall)
 {
-	SetActorTransform(PickableCannonBall->GetActorTransform());
-	Base->SetStaticMesh(PickableCannonBall->Mesh->GetStaticMesh());
-	Base->SetRelativeTransform(PickableCannonBall->Mesh->GetRelativeTransform());
+	SetActorTransform(RefPickableCannonBall->GetActorTransform());
+	Base->SetStaticMesh(RefPickableCannonBall->Mesh->GetStaticMesh());
+	Base->SetRelativeTransform(RefPickableCannonBall->Mesh->GetRelativeTransform());
 
 	
-	Top->SetStaticMesh( PickableCannonBall->Top->GetStaticMesh());
-	Top->SetRelativeTransform(PickableCannonBall->Top->GetRelativeTransform());
+	Top->SetStaticMesh( RefPickableCannonBall->Top->GetStaticMesh());
+	Top->SetRelativeTransform(RefPickableCannonBall->Top->GetRelativeTransform());
 
 	
-	Down->SetStaticMesh( PickableCannonBall->Down->GetStaticMesh());
-	Down->SetRelativeTransform(PickableCannonBall->Down->GetRelativeTransform());
+	Down->SetStaticMesh( RefPickableCannonBall->Down->GetStaticMesh());
+	Down->SetRelativeTransform(RefPickableCannonBall->Down->GetRelativeTransform());
 
+	ProjectileEffects = RefPickableCannonBall->ProjectileEffects;
+	PickableCannonBall = RefPickableCannonBall;
 }
 
 

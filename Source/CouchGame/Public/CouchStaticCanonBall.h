@@ -7,6 +7,7 @@
 #include "CouchStaticCanonBall.generated.h"
 class UStaticMeshComponent;
 class ACouchPickableCannonBall;
+class ACouchProjectileEffect;
 UCLASS()
 class COUCHGAME_API ACouchStaticCanonBall : public AActor
 {
@@ -25,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Down;
 
-	void InitCanonBall(TObjectPtr<ACouchPickableCannonBall> PickableCannonBall);
+	TArray<TSubclassOf<ACouchProjectileEffect>> ProjectileEffects;
+	UPROPERTY()
+	TObjectPtr<ACouchPickableCannonBall> PickableCannonBall;
+	void InitCanonBall(TObjectPtr<ACouchPickableCannonBall> RefPickableCannonBall);
 };
 

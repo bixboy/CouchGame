@@ -52,6 +52,7 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 {
 	ICouchPickable::PickUp_Implementation(player);
 	if (!PhysicsCollider) return;
+	CurrentPlayer->AnimationManager->IsCarryingItem = true;
 	PhysicsCollider->SetSimulatePhysics(false);
 	AttachToComponent(player->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	FVector ItemLocation = player->PickUpItemPosition->GetComponentLocation();
@@ -67,6 +68,7 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 void ACouchPickableMaster::Drop_Implementation()
 {
 	if (!PhysicsCollider) return;
+	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCarryingItem = false;
 	ICouchPickable::Drop_Implementation();
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	if (!CraftingTable) PhysicsCollider->SetSimulatePhysics(true);
@@ -81,6 +83,7 @@ void ACouchPickableMaster::InteractWithObject_Implementation(ACouchInteractableM
 	{
 		ACouchCraftingTable* CraftTable = Cast<ACouchCraftingTable>(interactable);
 		if (!CraftTable || CraftTable->IsCraftingTableFull()) return;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCarryingItem = false;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with CraftingTable"));
 		CraftTable->AddIngredient(this);
 		CraftingTable = CraftTable;

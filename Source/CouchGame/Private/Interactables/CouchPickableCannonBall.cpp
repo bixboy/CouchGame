@@ -23,7 +23,9 @@ void ACouchPickableCannonBall::InteractWithObject_Implementation(ACouchInteracta
 	{
 		ACouchCatapult* catapult = Cast<ACouchCatapult>(interactable);
 		if (!catapult) return;
-		catapult->Reload(this);
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsInteractCatapultWithAmmo = true;
+		catapult->Reload(this); /// Il va falloir appelez cette fonction quand le joueur a fini son anim sinon
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsInteractCatapultWithAmmo = false; //ça va direct cancel l'anim
 	}
 }
 

@@ -31,9 +31,11 @@ ACouchPlank::ACouchPlank()
 	InterractiveBoxRange->OnComponentEndOverlap.AddDynamic(this, &ACouchPlank::OnOverlapEnd);
 }
 
-void ACouchPlank::Init(ABoatFloor* floor)
+void ACouchPlank::Init(ABoatFloor* floor, float RepairingTime, float Scale)
 {
 	Floor = floor;
+	if (RepairingTime > 0) TimeToRepair *= RepairingTime;
+	if (Scale > 0) this->SetActorScale3D(GetActorScale()*Scale);
 }
 
 #pragma region Overlap
@@ -73,6 +75,7 @@ void ACouchPlank::Tick(float DeltaTime)
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 			// APlayer->IsInteracting = false;
+			CurrentPlayer->AnimationManager->IsRepairing = false;
 			Destroy();
 		}
 	}
@@ -98,11 +101,13 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 	{
 		APlayer = Player;
 		IsPlayerRepairing = true;
+		Player->AnimationManager->IsRepairing = true;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting");
 	}
 	else if (IsPlayerRepairing && Player == APlayer)
 	{
 		APlayer = nullptr;
+		Player->AnimationManager->IsRepairing = false;
 		IsPlayerRepairing = false;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player stopped interacting");
 	}
