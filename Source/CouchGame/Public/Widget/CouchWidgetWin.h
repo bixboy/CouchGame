@@ -6,6 +6,7 @@
 #include "NiagaraSystemWidget.h"
 #include "CouchWidgetWin.generated.h"
 
+class UImage;
 class UButton;
 class UTextBlock;
 class UVerticalBox;
@@ -18,6 +19,25 @@ class COUCHGAME_API UCouchWidgetWin : public UUserWidget
 protected:
 	virtual bool Initialize() override;
 	virtual void NativeConstruct() override;
+
+#pragma region Light
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UImage> Img_Light1;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UImage> Img_Light2;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UImage> Img_Light3;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UImage> Img_Light4;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UImage> Img_Light5;
+
+private:
+	void CheckLight();
+
+#pragma endregion	
 	
 
 #pragma region Animation
