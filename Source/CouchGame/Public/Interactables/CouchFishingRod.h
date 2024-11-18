@@ -45,11 +45,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCouchWidgetSpawn>WidgetSpawner;
-	
-private:
+
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> CurrentPlayer;
-
+	
+private:
+	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TObjectPtr<UClass> PowerChargeWidget;
 	

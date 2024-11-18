@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "CouchPickableCannonBall.generated.h"
 
+class ACouchProjectileEffect;
+
 UCLASS()
 class COUCHGAME_API ACouchPickableCannonBall : public ACouchPickableMaster
 {
@@ -22,4 +24,7 @@ public:
 	TObjectPtr<UStaticMeshComponent> Down;
 
 	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<ACouchProjectileEffect>> ProjectileEffects;
 };

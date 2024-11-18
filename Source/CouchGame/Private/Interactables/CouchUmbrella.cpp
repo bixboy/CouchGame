@@ -53,9 +53,9 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 
 #pragma region Life
 
-void ACouchUmbrella::Hit_Implementation(FHitResult HitResult)
+void ACouchUmbrella::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
-	ICouchDamageable::Hit_Implementation(HitResult);
+	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	DecreasePv();
 }
 

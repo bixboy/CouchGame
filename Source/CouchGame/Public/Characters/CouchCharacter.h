@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchCharacterAnimationManager.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/CouchDamageable.h"
@@ -18,6 +19,7 @@ class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
 class UCouchCharacterSettings;
+class UAnimationManager;
 
 UCLASS()
 class COUCHGAME_API ACouchCharacter : public ACharacter, public ICouchDamageable
@@ -41,7 +43,7 @@ public:
 #pragma endregion
 #pragma region Move And Orient
 public:
-	virtual void Hit_Implementation(FHitResult HitResult) override;
+	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
 	
 	FVector2D GetOrient() const;
 
@@ -124,8 +126,7 @@ private:
 
 	UPROPERTY()
 	bool CanDashAgain = true;
-
-	UPROPERTY()
+	
 	float DashTimer;
 	
 	
@@ -198,6 +199,9 @@ public:
 	public:
 	UPROPERTY()
 	TObjectPtr<AItemSpawnerManager> SpawnerManager;
-
+#pragma endregion
+#pragma region Animation Manager
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCouchCharacterAnimationManager* AnimationManager;
 #pragma endregion
 };
