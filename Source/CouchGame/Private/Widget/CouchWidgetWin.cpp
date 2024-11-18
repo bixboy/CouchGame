@@ -1,5 +1,6 @@
 
 #include "Widget/CouchWidgetWin.h"
+#include "Animation/WidgetAnimation.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -8,6 +9,12 @@
 void UCouchWidgetWin::NativeConstruct()
 {
 	Super::NativeConstruct();
+	if (OpenAnimation)
+	{
+		FTimerHandle RoundTimerHandle;
+		PlayAnimationForward(OpenAnimation);
+		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);	
+	}
 }
 
 bool UCouchWidgetWin::Initialize()
@@ -20,6 +27,8 @@ bool UCouchWidgetWin::Initialize()
 	}
 	return true;
 }
+
+#pragma region Button & Text
 
 void UCouchWidgetWin::ChangeWinnerText(FText Winner)
 {
@@ -36,4 +45,20 @@ void UCouchWidgetWin::OnNewRoundPressed()
 	{
 		GameManager->StartNewRound();
 	}
+}
+
+#pragma endregion
+
+
+void UCouchWidgetWin::EndAnimation()
+{
+	PlayAnimationForward(TextAppearAnimation);
+	StartConfetti();
+}
+
+void UCouchWidgetWin::StartConfetti()
+{
+	NSWidget_0->ActivateSystem(true);
+	NSWidget_1->ActivateSystem(true);
+	NSWidget_2->ActivateSystem(true);
 }

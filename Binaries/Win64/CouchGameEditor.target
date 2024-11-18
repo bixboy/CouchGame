@@ -5122,6 +5122,26 @@
 			"Type": "RequiredResource"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/Binaries/Win64/UnrealEditor-NiagaraUIRenderer.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/Binaries/Win64/UnrealEditor-NiagaraUIRenderer.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/Binaries/Win64/UnrealEditor-NiagaraUIRendererEditor.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/Binaries/Win64/UnrealEditor-NiagaraUIRendererEditor.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Media/AndroidMedia/Binaries/Win64/UnrealEditor-AndroidMediaEditor.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -27373,6 +27393,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Marketplace/Developer/RiderLink/RiderLink.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/NiagaraUIRenderer/NiagaraUIRenderer.uplugin",
 			"Type": "UFS"
 		},
 		{
