@@ -16,7 +16,6 @@ static const FName LevelSelectionTabName("LevelSelection");
 DEFINE_LOG_CATEGORY(MyMenuLog)
 
 
-
 #pragma region Setup Plugin
 
 // Start Module
@@ -42,8 +41,7 @@ void FLevelSelectionModule::StartupModule()
 //Close Module
 void FLevelSelectionModule::ShutdownModule()
 {
-<<<<<<< Updated upstream
-		// if (bIsTabRegistered)
+	// if (bIsTabRegistered)
 	// {
 	// 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
 	// 	bIsTabRegistered = false;
@@ -54,19 +52,6 @@ void FLevelSelectionModule::ShutdownModule()
 
 	//FLevelSelectionStyle::Shutdown();
 	//FLevelSelectionCommands::Unregister();
-=======
-	if (bIsTabRegistered)
-	{
-		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
-		bIsTabRegistered = false;
-	}
-
-	UToolMenus::UnRegisterStartupCallback(this);
-	UToolMenus::UnregisterOwner(this);
-
-	FLevelSelectionStyle::Shutdown();
-	FLevelSelectionCommands::Unregister();
->>>>>>> Stashed changes
 }
 
 TSharedRef<SDockTab> FLevelSelectionModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
@@ -190,13 +175,7 @@ void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 #pragma endregion
 
 
-
 #undef LOCTEXT_NAMESPACE
-<<<<<<< Updated upstream
-IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
-=======
-	
 IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
 
->>>>>>> Stashed changes
 #endif
