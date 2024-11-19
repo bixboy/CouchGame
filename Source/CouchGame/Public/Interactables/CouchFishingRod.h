@@ -54,7 +54,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TObjectPtr<UClass> PowerChargeWidget;
 	
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"), Category = DefaultValue)
 	int CurrentTeam = 1;
 	
 	bool IsInCharge = false;
@@ -78,15 +78,10 @@ private:
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
 	TObjectPtr<UCableComponent> Cable;
-	UPROPERTY()
+	
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float CableScale = 1.0f;
-	
-	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
-	float MaxCableLength;
-	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
-	float MinCableLength;
-	
-	UPROPERTY(EditAnywhere, Category = DefaultCableValue)
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TObjectPtr<UMaterial> CableMaterial;
 
 	UFUNCTION()
@@ -100,23 +95,20 @@ private:
 	float Threshold;
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
 	float RewindSpeed;
+	
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
 	float StopRewindDistance = 100.f;
-	
-	float PreviousAngle;
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float StopRewindZ = 2.f;
 
 	void RewindCable(float DeltaTime);
+	
 	UFUNCTION(BlueprintCallable)
 	void SpawnPickableObject();
 	FVector GetRandomPos(float MinDistance, float MaxDistance, float Width);
-	
-	UPROPERTY(EditAnywhere)
-	float StopRewindZ = 2.f;
-
 
 public:
 	void StopRewindCable();
-public:
 	bool isPlayerFishing;
 
 #pragma endregion
