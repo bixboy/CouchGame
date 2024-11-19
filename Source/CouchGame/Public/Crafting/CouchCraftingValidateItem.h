@@ -6,6 +6,8 @@
 #include "Interactables/CouchInteractableMaster.h"
 #include "CouchCraftingValidateItem.generated.h"
 
+class ACouchWidget3D;
+class UCouchWidgetSpawn;
 class ACouchCraftingTable;
 
 UCLASS()
@@ -13,13 +15,15 @@ class COUCHGAME_API ACouchCraftingValidateItem : public ACouchInteractableMaster
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this actor's properties
+protected:
 	ACouchCraftingValidateItem();
+	virtual void BeginPlay() override;
 
+public:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -30,8 +34,17 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<ACouchCraftingTable> CraftingTable;
-
 	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USceneComponent> WidgetPose;
 
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> WidgetInteract;
+
+	UFUNCTION()
+	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+								int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 };
