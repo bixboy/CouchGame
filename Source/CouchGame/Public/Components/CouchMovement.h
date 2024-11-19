@@ -16,9 +16,7 @@ class COUCHGAME_API UCouchMovement : public UActorComponent
 
 public:
 	UCouchMovement();
-
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,26 +24,33 @@ protected:
 #pragma region Movement
 private:
 	UPROPERTY()
+	TObjectPtr<USplineComponent> LinePathComponent;
+	UPROPERTY()
 	FTimeline MoveTimeline;
-	UPROPERTY(EditAnywhere)
-	UCurveFloat* MoveCurve;
+
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float SpeedMovement;
-	
-	UPROPERTY()
-	USplineComponent* LinePathComponent;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TObjectPtr<UCurveFloat> MoveCurve;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	bool CanMove = true;
 	
 	UFUNCTION()
 	void MoveActor(float Alpha);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
-	AActor* LinePath;
+	TObjectPtr<AActor> LinePath;
 
 	UFUNCTION()
 	void StartMovement(int InputDirection);
 	UFUNCTION()
 	void StopMovement();
+
+	UFUNCTION()
+	bool GetCanMove() const;
+	UFUNCTION()
+	void SetCanMove(bool Value);
 	
 #pragma endregion	
 };

@@ -93,7 +93,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection)
 {
 	Super::StartMoveActor_Implementation(InputDirection);
-	if (Execute_IsUsedByPlayer(this))
+	if (Execute_IsUsedByPlayer(this) && MovementComponent->GetCanMove())
 	{
 		CanUse = false;
 		MovementComponent->StartMovement(InputDirection);

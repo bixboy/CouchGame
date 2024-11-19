@@ -24,30 +24,38 @@ void ACouchUmbrella::Tick(float DeltaTime)
 	else if (Timer > 0)
 	{
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
-		SetCanUse(false);
 	}
 }
 
 void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 {
 	// Si un autre joueur utilise déjà la planche, empêcher l'interaction
-	if (IsPlayerRepairing && Player != GetCurrentPlayer())
+	if (IsPlayerRepairing && Player != GetCurrentPlayer() && CurrentPv == 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Already in use by another player");
 		return;
 	}
 	
 	// Execute le parent
-	Super::Interact_Implementation(Player);
+	if (CurrentPv > 0)
+	{
+		Super::Interact_Implementation(Player);	
+	}
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{
+		SetCurrentPlayer(Player);
+		SetPlayerIsIn(true);
+		SetCanUse(true);
 		IsPlayerRepairing = true;
 	}
 	else if (IsPlayerRepairing && Player == GetCurrentPlayer() && CurrentPv == 0)
 	{
 		IsPlayerRepairing = false;
+		RemoveCurrentPlayer();
+		SetPlayerIsIn(false);
+		SetCanUse(false);
 	}
 }
 
@@ -85,12 +93,11 @@ int ACouchUmbrella::GetCurrentPv() const
 
 void ACouchUmbrella::FinishRepairing()
 {
-	if (WidgetComponent->GetCurrentWidget()) WidgetComponent->DestroyWidget();
-	SetCanUse(true);
-	RemoveCurrentPlayer();
+	SetInteractWidget();
+	if (WidgetComponent->GetCurrentWidget()){ WidgetComponent->DestroyWidget();}
+	
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
-	SetInteractWidget();
 }
 
 float ACouchUmbrella::GetPercentRepair_Implementation()
