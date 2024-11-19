@@ -16,7 +16,6 @@ static const FName LevelSelectionTabName("LevelSelection");
 DEFINE_LOG_CATEGORY(MyMenuLog)
 
 
-
 #pragma region Setup Plugin
 
 // Start Module
@@ -42,7 +41,7 @@ void FLevelSelectionModule::StartupModule()
 //Close Module
 void FLevelSelectionModule::ShutdownModule()
 {
-		// if (bIsTabRegistered)
+	// if (bIsTabRegistered)
 	// {
 	// 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
 	// 	bIsTabRegistered = false;
@@ -176,7 +175,7 @@ void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 #pragma endregion
 
 
-
 #undef LOCTEXT_NAMESPACE
 IMPLEMENT_MODULE(FLevelSelectionModule, LevelSelection)
+
 #endif
