@@ -7,9 +7,7 @@
 UCouchMovement::UCouchMovement()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
-
 
 void UCouchMovement::BeginPlay()
 {
@@ -36,6 +34,8 @@ void UCouchMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	MoveTimeline.TickTimeline(DeltaTime);
 }
 
+
+
 void UCouchMovement::StartMovement(int InputDirection)
 {
 	int Direction = FMath::Clamp(InputDirection, -1, 1);
@@ -61,5 +61,16 @@ void UCouchMovement::MoveActor(float Alpha)
 		FTransform Transform = FTransform(Rotation, Location, GetOwner()->GetActorScale());
 		GetOwner()->SetActorTransform(Transform, false);
 	}
+}
+
+
+bool UCouchMovement::GetCanMove() const
+{
+	return CanMove;
+}
+
+void UCouchMovement::SetCanMove(bool Value)
+{
+	CanMove = Value;
 }
 

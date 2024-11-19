@@ -48,5 +48,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DamageFrequency = 1;
 	float Timer;
+
+	UPROPERTY(EditAnywhere)
+	FVector PlankLocationOffset;
 	
 };

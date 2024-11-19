@@ -17,7 +17,7 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AA
 	IgnoredActors = ActorsToIgnore;
 }
 
-bool UCouchProjectile::GetCanMove() {return CanMove;}
+bool UCouchProjectile::GetCanMove() const {return CanMove;}
 
 void UCouchProjectile::SetCanMove(bool Value) {CanMove = Value;}
 
@@ -28,7 +28,7 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if (CanMove)
 	{
 		TimeElapsed += DeltaTime;
-		FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
+		FVector NewLocation = Location + (Velocity * SpeedMultiplier * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
 
 		FHitResult HitResult;
 		FVector Start = Location;

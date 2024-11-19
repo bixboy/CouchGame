@@ -2,6 +2,7 @@
 
 
 #include "ProjectileEffect/Effects/Storm/Storm.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 
 
 // Sets default values
@@ -11,6 +12,18 @@ AStorm::AStorm()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComponent"));
+	RadialForceComponent->SetupAttachment(RootComponent);
+	RadialForceComponent->bImpulseVelChange = true;
+	RadialForceComponent->bAutoActivate = false; // On l'active manuellement
+	RadialForceComponent->bIgnoreOwningActor = true;
+}
+
+void AStorm::Init(float StormStrength, float ForceRadius) const
+{
+	RadialForceComponent->Radius = ForceRadius;
+	RadialForceComponent->ImpulseStrength = StormStrength;
+	RadialForceComponent->SetWorldLocation(GetActorLocation());
 }
 
 
