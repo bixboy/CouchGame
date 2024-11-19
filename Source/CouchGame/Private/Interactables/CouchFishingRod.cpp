@@ -98,6 +98,7 @@ void ACouchFishingRod::SpawnLure()
 
    if (LureRef)
    {
+      LureRef->DetachAttachedObject();
       DestroyLureAndCable();
    }
       
