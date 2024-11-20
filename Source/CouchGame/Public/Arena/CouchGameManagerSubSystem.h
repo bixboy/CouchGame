@@ -56,6 +56,9 @@ protected:
 	float RoundDurationMinutes  = 3.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
 	FName LevelName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
+	TSoftObjectPtr<UWorld> LevelPtr;
+	
 
 public:	
 	// Fonctions pour gérer les manches
@@ -65,6 +68,8 @@ public:
 	void CheckRoundWinCondition(int TeamWin);
 	UFUNCTION(BlueprintCallable)
 	void SetupRounds(int RoundsNumber, float RoundDuration, FName Level, TSubclassOf<UCouchWidgetWin> Widget);
+	UFUNCTION(BlueprintCallable)
+	void SetupRoundsByRef(int RoundsNumber, float RoundDuration, TSoftObjectPtr<UWorld> Level, TSubclassOf<UCouchWidgetWin> Widget);
 
 	void ResetRound();
 	void OnRoundTimerEnd();

@@ -53,6 +53,7 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 
 void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
+	if (SpawnPoints.Num() == 0) return;
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
