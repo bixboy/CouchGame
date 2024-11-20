@@ -68,8 +68,6 @@ public:
 	void CheckRoundWinCondition(int TeamWin);
 	UFUNCTION(BlueprintCallable)
 	void SetupRounds(int RoundsNumber, float RoundDuration, FName Level, TSubclassOf<UCouchWidgetWin> Widget);
-	UFUNCTION(BlueprintCallable)
-	void SetupRoundsByRef(int RoundsNumber, float RoundDuration, TSoftObjectPtr<UWorld> Level, TSubclassOf<UCouchWidgetWin> Widget);
 
 	void ResetRound();
 	void OnRoundTimerEnd();

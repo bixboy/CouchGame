@@ -64,10 +64,7 @@ void ACouchCannonBall::InitEffect(ACouchCannonBall* CanonBall, ACouchPickableCan
 	{
 		if (Effect)
 		{
-			if (CanonBall) Effect->Init(CanonBall);
-			if (PickCannonBall) Effect->Init(PickCannonBall);
-			if (ActorToInteractWith) Effect->Init(ActorToInteractWith);
-			if (HitResult.IsValidBlockingHit()) Effect->Init(HitResult);
+			Effect->Init(CanonBall, PickCannonBall, ActorToInteractWith, HitResult);
 		}
 	}
 }
@@ -79,10 +76,7 @@ void ACouchCannonBall::InitEffectWithExecuteTime(ECouchProjectileExecuteTime Exe
 	{
 		if (Effect && Effect->ExecuteTime == ExecuteTime)
 		{
-			if (CanonBall) Effect->Init(CanonBall);
-			if (PickCannonBall) Effect->Init(PickCannonBall);
-			if (ActorToInteractWith) Effect->Init(ActorToInteractWith);
-			if (HitResult.IsValidBlockingHit()) Effect->Init(HitResult);
+			 Effect->Init(CanonBall, PickCannonBall, ActorToInteractWith, HitResult);
 		}
 	}
 }

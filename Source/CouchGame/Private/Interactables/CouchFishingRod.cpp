@@ -20,8 +20,9 @@ ACouchFishingRod::ACouchFishingRod()
    WidgetPose->SetupAttachment(SkeletalMesh);
 }
 
-void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player)
+void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int Team)
 {
+   CurrentTeam = Team;
    CurrentPlayer = Player;
    if (CurrentPlayer)
    {
