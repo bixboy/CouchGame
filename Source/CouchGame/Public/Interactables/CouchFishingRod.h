@@ -63,14 +63,15 @@ private:
 #pragma endregion	
 
 #pragma region Lure Actor
+public:
+	UFUNCTION()
+	void SpawnLure();	
+	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TObjectPtr<UClass> Lure;
 	UPROPERTY()
 	TObjectPtr<ACouchLure> LureRef;
-	
-	UFUNCTION()
-	void SpawnLure();	
 	
 #pragma endregion	
 	

@@ -14,7 +14,7 @@ ACouchWidget3D* UCouchWidgetSpawn::GetCurrentWidget()
 	return CurrentWidget;
 }
 
-void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent)
+void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent, bool WantToAttach)
 {
 	if (CurrentWidget == nullptr)
 	{
@@ -32,7 +32,7 @@ void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, U
 	// Vérification de CurrentWidget avant l’attachement
 	if (CurrentWidget != nullptr)
 	{
-		if (AttachParent)
+		if (AttachParent && WantToAttach)
 			CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
 
 		if (CurrentWidget->IsA<ACouchWidget3D>())

@@ -511,7 +511,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
-				AnimationManager->IsFishingStart = true;
 			}
 			else
 			{
@@ -520,7 +519,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
-				AnimationManager->IsFishingStart = true;
 			}
 		}
 		else
@@ -528,7 +526,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			if (FishingRod)
 			{
 				ICouchInteractable::Execute_StopChargeActor(FishingRod);
-				AnimationManager->IsFishingStart = false;
 			}
 			CanMove = true;
 		}
@@ -571,6 +568,11 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	CanFish = false;
 	DestroyFishingRod();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
+}
+
+TObjectPtr<ACouchFishingRod> ACouchCharacter::GetFishingRod() const
+{
+	return FishingRod;
 }
 
 void ACouchCharacter::DestroyFishingRod()
