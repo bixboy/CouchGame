@@ -26,10 +26,7 @@ public:
 
 	float GetDelay() const;
 
-	void Init(ACouchCannonBall* InBall);
-	void Init(ACouchPickableCannonBall* InBall);
-	void Init(AActor* InActor);
-	void Init(FHitResult InHitResult);
+	void Init(ACouchCannonBall* InBall, ACouchPickableCannonBall* InPickBall = nullptr,AActor* InActor = nullptr, FHitResult InHitResult = FHitResult());
 
 protected:
 	virtual void BeginPlay() override;

@@ -34,7 +34,7 @@ void ACouchProjectileEffectMultiplicator::ExecuteEffect()
 	{
 		ICouchDamageable::Execute_Hit(ActorToInterractWith, HitResult, TimeToRepair, Scale);
 	}
-	CouchCannonBall->Destroy();
+	if (CouchCannonBall) CouchCannonBall->Destroy();
 	Destroy();
 }
 
