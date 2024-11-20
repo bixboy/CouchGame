@@ -169,7 +169,7 @@ TArray<FString> FLevelSelectionModule::GetAllMapNames()
 // Open Levels
 void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 {
-	FEditorFileUtils::LoadMap(LevelPath, true);
+	FEditorFileUtils::LoadMap(LevelPath, false);
 }
 
 #pragma endregion
