@@ -19,7 +19,7 @@ public:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 	UFUNCTION(BlueprintCallable)
-	AActor* GetCurrentPlayer() const;
+	ACouchCharacter* GetCurrentPlayer() const;
 	UFUNCTION()
 	void SetCurrentPlayer(ACouchCharacter* Player);
 	UFUNCTION()

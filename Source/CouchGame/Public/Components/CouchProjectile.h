@@ -15,18 +15,20 @@ public:
 	UCouchProjectile();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<USphereComponent> ProjectileCollision;
 
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore);
 
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
-	bool GetCanMove();
+	bool GetCanMove() const;
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void SetCanMove(bool Value);
 
 private:
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float SpeedMultiplier = 1.f;
 	FVector Velocity;      // Vélocité du projectile
 	FVector Location;      // Position actuelle du projectile
 	float TimeElapsed;     // Temps écoulé depuis le lancement
@@ -35,6 +37,6 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> IgnoredActors;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	bool CanMove = false;
 };
