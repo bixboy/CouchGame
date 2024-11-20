@@ -1,8 +1,8 @@
 "C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Module.LevelSelection.cpp"
-/FI"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.Cpp20.h"
+/FI"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.NonOptimized.Cpp20.h"
 /FI"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Definitions.LevelSelection.h"
-/Yu"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.Cpp20.h"
-/Fp"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.Cpp20.h.pch"
+/Yu"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.NonOptimized.Cpp20.h"
+/Fp"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\DebugGame\UnrealEd\SharedPCH.UnrealEd.NonOptimized.Cpp20.h.pch"
 /Fo"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Module.LevelSelection.cpp.obj"
 /sourceDependencies "C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\Module.LevelSelection.cpp.dep.json"
 @"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LevelSelection\LevelSelection.Shared.rsp"
@@ -24,9 +24,7 @@
 /D_WINDLL
 /D_DISABLE_EXTENDED_ALIGNED_STORAGE
 /Ob2
-/Ox
-/Ot
-/GF
+/Od
 /errorReport:prompt
 /EHsc
 /DPLATFORM_EXCEPTIONS_DISABLED=0
@@ -34,7 +32,6 @@
 /MD
 /bigobj
 /fp:fast
-/Zo
 /Zp8
 /we4456
 /we4458

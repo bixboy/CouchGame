@@ -585,5 +585,6 @@ void ACouchCharacter::DestroyFishingRod()
 	AnimationManager->IsFishingStart = false;
 	AnimationManager->IsFishingRelease = false;
 	AnimationManager->IsFishingPull = false;
+	AnimationManager->IsFishing = false;
 }
 #pragma endregion
