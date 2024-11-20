@@ -46,6 +46,7 @@ SourceArt/**/*.png
 SourceArt/**/*.tga
 
 # Binary Files
+<<<<<<< Updated upstream
 Binaries/*
 !Binaries/Win64
 Binaries/Win64/*
@@ -53,6 +54,9 @@ Binaries/Win64/*
 !Binaries/Win64/UnrealEditor.modules
 !Binaries/Win64/UnrealEditor-CouchGame.dll
 
+=======
+Binaries/Win64/*
+>>>>>>> Stashed changes
 
 # Builds
 Build/*
