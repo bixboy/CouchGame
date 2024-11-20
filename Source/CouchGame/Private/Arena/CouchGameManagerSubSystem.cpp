@@ -33,9 +33,28 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	StartNewRound();
 }
 
+void UCouchGameManagerSubSystem::SetupRoundsByRef(int RoundsNumber, float RoundDuration, TSoftObjectPtr<UWorld> Level,
+	TSubclassOf<UCouchWidgetWin> Widget)
+{
+	MaxRounds = RoundsNumber;
+	RoundDurationMinutes = RoundDuration;
+	LevelPtr = Level;
+	WinWidget = Widget;
+	StartNewRound();
+}
+
 void UCouchGameManagerSubSystem::StartNewRound()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	if (LevelPtr)
+	{
+		UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), LevelPtr);
+	}
+	else if (!LevelName.IsNone())
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	}
+	
+	
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	CurrentRound++;
@@ -152,3 +171,34 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 		}
 	}
 }
+
+#pragma region Local Multiplayer
+void UCouchGameManagerSubSystem::AddPlayer()
+{
+	NbPlayers = FMath::Clamp( NbPlayers+1, 0, 4);
+}
+
+void UCouchGameManagerSubSystem::RemovePlayer()
+{
+	NbPlayers = FMath::Clamp( NbPlayers-1, 0, 4);
+}
+
+void UCouchGameManagerSubSystem::SwitchMappingType()
+{
+	switch (MappingType)
+	{
+	case ELocalMultiplayerInputMappingType::Menu :
+		{
+			MappingType = ELocalMultiplayerInputMappingType::InGame;
+			break;
+		}
+	case ELocalMultiplayerInputMappingType::InGame:
+		{
+			MappingType = ELocalMultiplayerInputMappingType::Menu;
+			break;
+		}
+	default:
+		break;
+	}
+}
+#pragma endregion

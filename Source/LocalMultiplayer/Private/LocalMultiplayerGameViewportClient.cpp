@@ -4,6 +4,7 @@
 #include "LocalMultiplayerGameViewportClient.h"
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 
 
 void ULocalMultiplayerGameViewportClient::PostInitProperties()
@@ -19,7 +20,7 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
         if (const ULocalMultiplayerSettings* LocalMultiplayerSettings = GetDefault<ULocalMultiplayerSettings>())
         {
             int PlayerIndex;
-        	
+        	if (!GameManagerSubSystem) GameManagerSubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
             if (EventArgs.IsGamepad())
             {
                 int GamepadDeviceID = EventArgs.InputDevice.GetId();
@@ -27,11 +28,15 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
                 if (PlayerIndex < 0)
                 {
                     PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToGamepadDeviceID(GamepadDeviceID);
-                    LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
+                    LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, GameManagerSubSystem->MappingType);
                 }
                 else
                 {
                     PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(GamepadDeviceID);
+                	if (!LocalMultiplayerSubsystem->PlayerHasTheRelevantIMC(PlayerIndex, GameManagerSubSystem->MappingType))
+                	{
+                		LocalMultiplayerSubsystem->SwitchGamepadInputMappingType(PlayerIndex, GameManagerSubSystem->MappingType);
+                	}
                 }
                 
                 if (ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex))
@@ -44,16 +49,20 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
             }
             else 
             {
-                if (int KeyboardProfileIndex = LocalMultiplayerSettings->FindKeyboardProfileIndexFromKey(EventArgs.Key, ELocalMultiplayerInputMappingType::InGame); KeyboardProfileIndex != -1)
+                if (int KeyboardProfileIndex = LocalMultiplayerSettings->FindKeyboardProfileIndexFromKey(EventArgs.Key, GameManagerSubSystem->MappingType); KeyboardProfileIndex != -1)
                 {
                     if (LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex) < 0)
                     {
                         PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToKeyboardProfile(KeyboardProfileIndex);
-                        LocalMultiplayerSubsystem->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, ELocalMultiplayerInputMappingType::InGame);
+                        LocalMultiplayerSubsystem->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, GameManagerSubSystem->MappingType);
                     }
                     else
                     {
                         PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex);
+                    	if (!LocalMultiplayerSubsystem->PlayerHasTheRelevantIMC(PlayerIndex, GameManagerSubSystem->MappingType, KeyboardProfileIndex))
+                    	{
+                    		LocalMultiplayerSubsystem->SwitchKeyboardMappingType(PlayerIndex, KeyboardProfileIndex, GameManagerSubSystem->MappingType);
+                    	}
                     }
                     if (ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex))
                     {
@@ -79,15 +88,20 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 
 	if (ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GetGameInstance()->GetSubsystem<ULocalMultiplayerSubsystem>())
 	{
+		if (!GameManagerSubSystem) GameManagerSubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
 		int32 PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(DeviceID);
 		if (PlayerIndex < 0)
 		{
 			PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToGamepadDeviceID(DeviceID);
-			LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
+			LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, GameManagerSubSystem->MappingType);
 		}
 		else
 		{
 			PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(DeviceID);
+			if (!LocalMultiplayerSubsystem->PlayerHasTheRelevantIMC(PlayerIndex, GameManagerSubSystem->MappingType))
+			{
+				LocalMultiplayerSubsystem->SwitchGamepadInputMappingType(PlayerIndex, GameManagerSubSystem->MappingType);
+			}
 		}
 		
 		if (PlayerIndex != -1)

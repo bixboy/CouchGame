@@ -10,6 +10,7 @@
 #include "Characters/CouchCharacterInputData.h"
 #include "InputMappingContext.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Characters/CouchCharacterSettings.h"
 
 
@@ -52,10 +53,14 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 
 void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
+	if (SpawnPoints.Num() == 0) return;
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
-	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
+	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	for	(int i = 0; i < GameManager->NbPlayers; i++)
 	{
+		ACouchPlayerStart * SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
+		if (!SpawnPoint) return ;
 		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
 		TSubclassOf<ACouchCharacter> CouchCharacterClass = GetCouchCharacterClassFromInputType(InputType);
 		if (!CouchCharacterClass) continue;
@@ -80,20 +85,21 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 TSubclassOf<ACouchCharacter> ACouchGameMode::GetCouchCharacterClassFromInputType(
 	EAutoReceiveInput::Type InputType) const
 {
-	const UArenaSettings* ArenaSettings = GetDefault<UArenaSettings>();
+	const UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (!GameManager) return nullptr;
 	switch (InputType)
 	{
 		case EAutoReceiveInput::Player0 :
-			return ArenaSettings->CouchCharacterClassPO;
+			return GameManager->CouchCharacterClassPO;
 		
 		case EAutoReceiveInput::Player1 :
-			return ArenaSettings->CouchCharacterClassP1;
+			return GameManager->CouchCharacterClassP1;
 		
 		case EAutoReceiveInput::Player2 :
-			return ArenaSettings->CouchCharacterClassP2;
+			return GameManager->CouchCharacterClassP2;
 		
 		case EAutoReceiveInput::Player3 :
-			return ArenaSettings->CouchCharacterClassP3;
+			return GameManager->CouchCharacterClassP3;
 
 		default:
 			return nullptr;
@@ -108,6 +114,7 @@ void ACouchGameMode::CreateAndInitPlayers() const
 	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance
 	->GetSubsystem<ULocalMultiplayerSubsystem>();
 	if (!LocalMultiplayerSubsystem) return;
-
-	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::InGame);
+	const UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (!GameManager) return;
+	LocalMultiplayerSubsystem->CreateAndInitPlayers(GameManager->MappingType);
 }

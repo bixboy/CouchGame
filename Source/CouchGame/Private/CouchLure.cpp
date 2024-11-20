@@ -53,6 +53,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
 			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishingRelease = false;
+			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishing = true;
 		}	
 	}
 
@@ -66,7 +67,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			{
 				FishingObject->PhysicsCollider->SetSimulatePhysics(false);
 				FishingObject->AttachToComponent(LureMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-				CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);	
+				CouchFishingRod->GetCharacter()->SpawnerManager->DestroyItem(FishingObject, false);
+				CouchFishingRod->CurrentPlayer->AnimationManager->IsFishing = true;
 			}
 			else
 			{

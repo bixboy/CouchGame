@@ -12,7 +12,7 @@ public class LocalMultiplayer : ModuleRules
                 "Core",
                 "EnhancedInput",
                 "DeveloperSettings",
-                "InputCore",
+                "InputCore", "CouchGame",
             }
         );
 
@@ -22,7 +22,7 @@ public class LocalMultiplayer : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "Slate",
-                "SlateCore",
+                "SlateCore", "CouchGame",
             }
         );
     }

@@ -23,6 +23,9 @@ public:
 	bool IsCarryingItem;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "States")
+	bool IsFishing;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "States")
 	bool IsFishingStart;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "States")

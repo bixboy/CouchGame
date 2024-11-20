@@ -29,4 +29,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputActionFire;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionNavigate;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionValidate;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionCancel;
 };
