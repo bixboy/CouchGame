@@ -33,24 +33,19 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	StartNewRound();
 }
 
-void UCouchGameManagerSubSystem::SetupRoundsByRef(int RoundsNumber, float RoundDuration, TSoftObjectPtr<UWorld> Level,
-	TSubclassOf<UCouchWidgetWin> Widget)
-{
-	MaxRounds = RoundsNumber;
-	RoundDurationMinutes = RoundDuration;
-	LevelPtr = Level;
-	WinWidget = Widget;
-	StartNewRound();
-}
-
 void UCouchGameManagerSubSystem::StartNewRound()
 {
-	if (LevelPtr)
+	 if (!LevelName.IsNone())
 	{
-		UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), LevelPtr);
-	}
-	else if (!LevelName.IsNone())
-	{
+		if (LevelName.ToString() == GetWorld()->GetName())
+		{
+			// Charger un niveau temporaire avant de recharger le niveau actuel
+			UGameplayStatics::OpenLevel(GetWorld(), FName("TempLevel"));
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {
+				UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+			});
+			return;
+		}
 		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 	}
 	
