@@ -33,7 +33,6 @@ void ACouchProjectileEffectStorm::Tick(float DeltaTime)
 void ACouchProjectileEffectStorm::ExecuteEffect()
 {
 	Super::ExecuteEffect();
-	if (!CouchCannonBall) return;
 	FTransform Transform = FTransform(FRotator::ZeroRotator, CouchCannonBall->GetActorLocation(), FVector(1.0f));
 	StormPtr = GetWorld()->SpawnActor<AStorm>(Storm, Transform);
 	if (StormPtr)
