@@ -2,7 +2,6 @@
 #include "Arena/CouchGameManagerSubSystem.h"
 
 #include "Blueprint/UserWidget.h"
-#include "GameFramework/GameSession.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidgetWin.h"
 
@@ -154,3 +153,34 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 		}
 	}
 }
+
+#pragma region Local Multiplayer
+void UCouchGameManagerSubSystem::AddPlayer()
+{
+	NbPlayers = FMath::Clamp( NbPlayers+1, 0, 4);
+}
+
+void UCouchGameManagerSubSystem::RemovePlayer()
+{
+	NbPlayers = FMath::Clamp( NbPlayers-1, 0, 4);
+}
+
+void UCouchGameManagerSubSystem::SwitchMappingType()
+{
+	switch (MappingType)
+	{
+	case ELocalMultiplayerInputMappingType::Menu :
+		{
+			MappingType = ELocalMultiplayerInputMappingType::InGame;
+			break;
+		}
+	case ELocalMultiplayerInputMappingType::InGame:
+		{
+			MappingType = ELocalMultiplayerInputMappingType::Menu;
+			break;
+		}
+	default:
+		break;
+	}
+}
+#pragma endregion

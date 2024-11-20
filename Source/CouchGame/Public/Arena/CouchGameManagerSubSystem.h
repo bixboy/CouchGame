@@ -2,6 +2,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LocalMultiplayerSettings.h"
+#include "Characters/CouchCharacter.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "CouchGameManagerSubSystem.generated.h"
 
@@ -68,5 +70,30 @@ public:
 	void OnRoundTimerEnd();
 	
 #pragma endregion
+
+
+#pragma region Local Multiplayer
+public:
+	UPROPERTY(EditAnywhere, Category = "Characters")
+	TSubclassOf<ACouchCharacter> CouchCharacterClassPO;
+
+	UPROPERTY(EditAnywhere, Category = "Characters")
+	TSubclassOf<ACouchCharacter> CouchCharacterClassP1;
+
+	UPROPERTY(EditAnywhere, Category = "Characters")
+	TSubclassOf<ACouchCharacter> CouchCharacterClassP2;
+
+	UPROPERTY(EditAnywhere, Category = "Characters")
+	TSubclassOf<ACouchCharacter> CouchCharacterClassP3;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
+	int NbPlayers;
+	void AddPlayer();
+	void RemovePlayer();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
+	ELocalMultiplayerInputMappingType MappingType = ELocalMultiplayerInputMappingType::InGame;
+
+	UFUNCTION(BlueprintCallable)
+	void SwitchMappingType();
+#pragma endregion
 };

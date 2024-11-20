@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Engine/GameViewportClient.h"
 #include "LocalMultiplayerGameViewportClient.generated.h"
 
@@ -21,4 +22,9 @@ public:
 
 	virtual bool InputAxis(FViewport* InViewport, FInputDeviceId InputDevice, FKey Key,
 		float Delta, float DeltaTime, int32 NumSamples = 1, bool bGamepad = false) override;
+private :
+
+	UPROPERTY()
+	TObjectPtr<UCouchGameManagerSubSystem> GameManagerSubSystem;
+	ELocalMultiplayerInputMappingType InputMappingType = ELocalMultiplayerInputMappingType::Menu;
 };
