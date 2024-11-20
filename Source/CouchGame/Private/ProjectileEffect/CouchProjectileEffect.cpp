@@ -15,7 +15,7 @@ ACouchProjectileEffect::ACouchProjectileEffect()
 
 void ACouchProjectileEffect::ExecuteEffect()
 {
-	SetActorTransform(CouchCannonBall->GetActorTransform());
+	if (CouchCannonBall) SetActorTransform(CouchCannonBall->GetActorTransform());
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Projectile Effect");
 	HasExecutedEffect = true;
 }
@@ -25,23 +25,11 @@ float ACouchProjectileEffect::GetDelay() const
 	return Delay;
 }
 
-void ACouchProjectileEffect::Init(ACouchCannonBall* InBall)
+void ACouchProjectileEffect::Init(ACouchCannonBall* InBall, ACouchPickableCannonBall* InPickBall,AActor* InActor, FHitResult InHitResult)
 {
 	CouchCannonBall = InBall;
-}
-
-void ACouchProjectileEffect::Init(ACouchPickableCannonBall* InBall)
-{
-	PickableCannonBall = InBall;
-}
-
-void ACouchProjectileEffect::Init(AActor* InActor)
-{
+	PickableCannonBall = InPickBall;
 	ActorToInterractWith = InActor;
-}
-
-void ACouchProjectileEffect::Init(FHitResult InHitResult)
-{
 	HitResult = InHitResult;
 }
 
