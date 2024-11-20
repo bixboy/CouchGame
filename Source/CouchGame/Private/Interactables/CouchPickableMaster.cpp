@@ -53,10 +53,12 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 	ICouchPickable::PickUp_Implementation(player);
 	if (!PhysicsCollider) return;
 	CurrentPlayer->AnimationManager->IsCarryingItem = true;
+	
 	PhysicsCollider->SetSimulatePhysics(false);
-	AttachToComponent(player->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
-	FVector ItemLocation = player->PickUpItemPosition->GetComponentLocation();
-	SetActorLocation(ItemLocation);
+	SetActorEnableCollision(false);
+	
+	AttachToComponent(player->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("GripAttachObject")));
+	
 	if (CraftingTable)
 	{
 		CraftingTable->RemoveIngredient(this);
@@ -69,9 +71,11 @@ void ACouchPickableMaster::Drop_Implementation()
 {
 	if (!PhysicsCollider) return;
 	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCarryingItem = false;
+	
 	ICouchPickable::Drop_Implementation();
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	if (!CraftingTable) PhysicsCollider->SetSimulatePhysics(true);
+	SetActorEnableCollision(true);
 
 }
 
