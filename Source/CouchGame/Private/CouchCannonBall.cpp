@@ -3,8 +3,10 @@
 #include "CouchCannonBall.h"
 
 #include "CouchStaticCanonBall.h"
+#include "Boat/BoatFloor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Interactables/CouchUmbrella.h"
 #include "Interfaces/CouchDamageable.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
 
@@ -129,7 +131,7 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 	Sphere->SetSimulatePhysics(true);
 
 	// Pour éviter que le bullet de cannon ne soit bloqué dans les collisions si jamais il touche le rebord avant
-	// Calculer la direction opposée à la collision
+	// Calcule la direction opposée à la collision
 	FVector RepulsionDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
 
 	// Calculer une nouvelle position en se déplaçant légèrement hors de la collision
@@ -140,7 +142,7 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 	SetActorLocation(NewLocation);
 	
 
-	if (OtherActor->Implements<UCouchDamageable>())
+	if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ABoatFloor::StaticClass()))
 	{
 		if (!ProjectileEffects.IsEmpty())
 		{
@@ -183,6 +185,11 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 			ICouchDamageable::Execute_Hit(OtherActor, Hit,0,0);
 			Destroy();
 		}
+	}
+	else if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ACouchUmbrella::StaticClass()))
+	{
+		ICouchDamageable::Execute_Hit(OtherActor, Hit,0,0);
+		Destroy();
 	}
 }
 
