@@ -35,11 +35,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
+	int CurrentTeam = 1;
 #pragma endregion
 #pragma region Move And Orient
 public:
