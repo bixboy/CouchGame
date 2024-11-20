@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Interfaces/CouchDamageable.h"
+#include "Misc/OutputDeviceNull.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
 
 
@@ -142,6 +143,16 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 
 	if (OtherActor->Implements<UCouchDamageable>())
 	{
+		FName FunctionName = "PlaySound";
+		UFunction* Function = this->FindFunction(FunctionName);
+		if (Function)
+		{
+			this->ProcessEvent(Function, nullptr); // Exécute la fonction.
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Function %s not found on %s"), *FunctionName.ToString(), *this->GetName());
+		}
 		if (!ProjectileEffects.IsEmpty())
 		{
 			bool HasEffectWithExecuteTimeDelay;
