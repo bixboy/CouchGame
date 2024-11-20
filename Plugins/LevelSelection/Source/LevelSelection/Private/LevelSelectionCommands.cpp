@@ -1,5 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #include "LevelSelectionCommands.h"
 
 #define LOCTEXT_NAMESPACE "FLevelSelectionModule"
@@ -10,3 +10,4 @@ void FLevelSelectionCommands::RegisterCommands()
 }
 
 #undef LOCTEXT_NAMESPACE
+#endif

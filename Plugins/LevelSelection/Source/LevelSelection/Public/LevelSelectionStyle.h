@@ -1,5 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+#if WITH_EDITOR
 #pragma once
 
 #include "CoreMinimal.h"
@@ -30,3 +29,5 @@ private:
 
 	static TSharedPtr< class FSlateStyleSet > StyleInstance;
 };
+
+#endif

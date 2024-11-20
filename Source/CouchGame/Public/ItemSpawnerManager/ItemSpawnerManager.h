@@ -1,10 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemSpawnerCycle.h"
 #include "GameFramework/Actor.h"
 #include "ItemSpawnerManager.generated.h"
-
 
 class UBoxComponent;
 class ACouchPickableMaster;

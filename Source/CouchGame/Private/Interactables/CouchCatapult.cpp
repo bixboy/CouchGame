@@ -25,6 +25,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
+			MovementComponent->SetCanMove(false);
 		}
 		else
 		{
@@ -32,6 +33,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
+			MovementComponent->SetCanMove(false);
 		}
 	}
 }
@@ -48,6 +50,7 @@ void ACouchCatapult::StopChargeActor_Implementation()
 		
 		SetCanUse(false);
 		IsInCharge = false;
+		MovementComponent->SetCanMove(true);
 	}
 }
 
@@ -55,7 +58,7 @@ void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
 {
 	if (IsInCharge && Execute_IsUsedByPlayer(this))
 	{
-		IsInCharge = false;
+		Execute_StopChargeActor(this);
 	}
 	Super::Interact_Implementation(Player);
 }

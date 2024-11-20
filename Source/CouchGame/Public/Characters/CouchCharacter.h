@@ -164,8 +164,6 @@ private :
 	float InputFireValue = 0.f;
 
 	void OnInputMoveInteracting(const FInputActionValue& InputActionValue);
-
-	void OnInputFishing(const FInputActionValue& InputActionValue);
 #pragma endregion
 #pragma region Hold Item
 
