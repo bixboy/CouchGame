@@ -62,7 +62,7 @@ void ACouchFishingRod::StartChargeActor_Implementation()
    if(!IsInCharge)
    {
       WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose);
-      ChargePower->StartCharging(SkeletalMesh, WidgetSpawner);
+      ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
       IsInCharge = true;
    }
 }

@@ -29,10 +29,18 @@ void UCouchChargePower::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 }
 
 
-void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner)
+void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner, bool UseMesh,  AActor* Actor)
 {
 	PowerTimeline.PlayFromStart();
-	Mesh = MeshComp;
+	if (UseMesh)
+	{
+		Mesh = MeshComp;	
+	}
+	else
+	{
+		Mesh = MeshComp;
+		StartTransform = FTransform(FRotator(Actor->GetActorRotation().Pitch, Actor->GetActorRotation().Yaw - 90.0f, Actor->GetActorRotation().Roll), FVector(Mesh->GetSocketLocation(FName("barrel"))), FVector(1, 1, 1));
+	}
 	ChargeWidget = WidgetSpawner;
 }
 
@@ -71,9 +79,17 @@ FVector UCouchChargePower::LineTrace()
 	{
 		return FVector::ZeroVector;
 	}
-  
-	const FVector Start = Mesh->GetSocketLocation(FName("barrel"));
-	const FVector End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;
+
+	if (!StartTransform.IsValid())
+	{
+		Start = Mesh->GetSocketLocation(FName("barrel"));
+		End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;	
+	}
+	else
+	{
+		Start = StartTransform.GetLocation();
+		End = Start + UKismetMathLibrary::GetForwardVector(StartTransform.Rotator()) * CurrentPower;
+	}
      
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
