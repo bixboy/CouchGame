@@ -10,6 +10,7 @@
 #include "Characters/CouchCharacterInputData.h"
 #include "InputMappingContext.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "SkeletalMeshTypes.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Characters/CouchCharacterSettings.h"
 
@@ -71,6 +72,21 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 		);
 
 		if (!NewCharacter) continue;
+		switch (SpawnPoint->Team)
+		{
+			case EBoatTeam::Team1:
+			{
+				NewCharacter->CurrentTeam = 1;
+				break;
+			}
+			case EBoatTeam::Team2:
+			{
+				NewCharacter->CurrentTeam = 2;
+				break;
+			}
+			default:
+				break;
+		}
 		NewCharacter->InputData = InputData;
 		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;

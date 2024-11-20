@@ -505,7 +505,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			if (!FishingRod)
 			{
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
-				FishingRod->SetupFishingRod(this);
+				FishingRod->SetupFishingRod(this, CurrentTeam);
 				isFishing = true;
 				CanMove = false;
 				InputMove = FVector2D::ZeroVector;

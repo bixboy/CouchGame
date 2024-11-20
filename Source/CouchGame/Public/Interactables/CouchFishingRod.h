@@ -20,7 +20,7 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 public:
 	ACouchFishingRod();
 	virtual void Tick(float DeltaSeconds) override;
-	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player);
+	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int Team);
 	
 	virtual bool IsUsedByPlayer_Implementation() override;
 	virtual void StartChargeActor_Implementation() override;
