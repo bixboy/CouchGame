@@ -33,8 +33,6 @@ void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int T
    }
 }
 
-#pragma endregion
-
 void ACouchFishingRod::Tick(float DeltaSeconds)
 {
    Super::Tick(DeltaSeconds);
@@ -55,8 +53,11 @@ void ACouchFishingRod::Tick(float DeltaSeconds)
    }
 }
 
+#pragma endregion
+
 #pragma region ChargingPower
 
+// Start Charge
 void ACouchFishingRod::StartChargeActor_Implementation()
 {
    ICouchInteractable::StartChargeActor_Implementation();
@@ -64,17 +65,20 @@ void ACouchFishingRod::StartChargeActor_Implementation()
    {
       WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
       ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
+      
       CurrentPlayer->AnimationManager->IsFishingStart = true;
       IsInCharge = true;
    }
 }
 
+// Stop Charge
 void ACouchFishingRod::StopChargeActor_Implementation()
 {
    ICouchInteractable::StopChargeActor_Implementation();
    if (IsInCharge)
    {
       ChargePower->StopCharging();
+      
       CurrentPlayer->AnimationManager->IsFishingStart = false;
       CurrentPlayer->AnimationManager->IsFishingRelease = true;
       IsInCharge = false;
@@ -89,7 +93,6 @@ void ACouchFishingRod::SpawnLure()
 {
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
    FVector SuggestedVelocity;
-  
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
       this,
       SuggestedVelocity,
@@ -104,7 +107,8 @@ void ACouchFishingRod::SpawnLure()
       LureRef->DetachAttachedObject();
       DestroyLureAndCable();
    }
-      
+
+   // Spawn Lure
    FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
    if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
    {
@@ -156,7 +160,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
       FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
       LureRef->SetActorLocation(NewPositionXY);
       
-      // Si la position est proche de start position, monter
+      // Si la position est proche de start position, monter sur l'axe Z
       if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= StopRewindZ)
       {
          FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
@@ -282,15 +286,14 @@ void ACouchFishingRod::RewindQte()
 #pragma endregion
 
 #pragma region Getter
-
+// Is Used
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
+// Get Player
 TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
-int ACouchFishingRod::GetTeam() const
-{
-   return CurrentTeam;
-}
+// Get Team
+int ACouchFishingRod::GetTeam() const {return CurrentTeam;}
 
 #pragma endregion
 

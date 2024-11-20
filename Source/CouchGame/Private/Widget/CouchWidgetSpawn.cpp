@@ -1,8 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Widget/CouchWidgetSpawn.h"
 #include "Widget/CouchWidget3D.h"
-
 
 UCouchWidgetSpawn::UCouchWidgetSpawn()
 {
@@ -14,7 +12,7 @@ ACouchWidget3D* UCouchWidgetSpawn::GetCurrentWidget()
 	return CurrentWidget;
 }
 
-void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent, bool WantToAttach)
+void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent, bool WantAttachToParent)
 {
 	if (CurrentWidget == nullptr)
 	{
@@ -32,7 +30,7 @@ void UCouchWidgetSpawn::SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, U
 	// Vérification de CurrentWidget avant l’attachement
 	if (CurrentWidget != nullptr)
 	{
-		if (AttachParent && WantToAttach)
+		if (AttachParent && WantAttachToParent)
 			CurrentWidget->AttachToComponent(AttachParent, FAttachmentTransformRules::KeepWorldTransform);
 
 		if (CurrentWidget->IsA<ACouchWidget3D>())

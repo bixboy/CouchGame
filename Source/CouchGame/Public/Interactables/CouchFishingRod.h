@@ -17,9 +17,11 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 {
 	GENERATED_BODY()
 
-public:
+protected:	
 	ACouchFishingRod();
 	virtual void Tick(float DeltaSeconds) override;
+	
+public:
 	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int Team);
 	
 	virtual bool IsUsedByPlayer_Implementation() override;
@@ -28,9 +30,6 @@ public:
 
 	void DestroyLureAndCable();
 	void DestroyFishingRod();
-
-	TObjectPtr<ACouchCharacter> GetCharacter() const;
-	int GetTeam() const;
 
 #pragma region Default Values
 public:
@@ -131,6 +130,13 @@ private:
 	UFUNCTION()
 	void RewindQte();
 	
+#pragma endregion
+
+#pragma region Getter
+public:
+	UFUNCTION(BlueprintCallable)
+	int GetTeam() const;
+	TObjectPtr<ACouchCharacter> GetCharacter() const;
+
 #pragma endregion	
-	
 };
