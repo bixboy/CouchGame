@@ -52,7 +52,7 @@ private:
 	TObjectPtr<UBoxComponent> SpawnBox;
 
 	UPROPERTY(EditAnywhere, Category = ItemSpawner, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UBoxComponent> DestroyBox;
+	TArray<TObjectPtr<UBoxComponent>> DestroyBoxes;
 
 	UPROPERTY(EditAnywhere)
 	int MaxItemSpawnedAtSameTime;
