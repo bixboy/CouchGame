@@ -26,7 +26,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner = nullptr);
+	void StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner = nullptr, bool UseMesh = true,  AActor* Actor = nullptr);
 	UFUNCTION(BlueprintCallable)
 	void StopCharging();
 
@@ -57,6 +57,10 @@ private:
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 	UPROPERTY()
 	TObjectPtr<UCouchWidgetSpawn> ChargeWidget;
+
+	FTransform StartTransform;
+	FVector Start;
+	FVector End;
 
 	UFUNCTION()
 	float UpdatePower(float Alpha);
