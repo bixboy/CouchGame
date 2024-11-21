@@ -126,6 +126,11 @@ bool ACouchPickableMaster::AttachLure(TObjectPtr<ACouchLure> LureRef)
 
 void ACouchPickableMaster::Detachlure(TObjectPtr<ACouchLure> LureRef)
 {
+	if (CurrentLuresAttached.Num() == 2)
+	{
+		StopQte();
+	}
+	
 	CurrentLuresAttached.Remove(LureRef);
 	if (CurrentLuresAttached.Num() == 0)
 	{

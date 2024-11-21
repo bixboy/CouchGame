@@ -10,13 +10,21 @@ AItemSpawnerManager::AItemSpawnerManager()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SpawnBox = CreateDefaultSubobject<UBoxComponent>("SpawnBox");
-	DestroyBox = CreateDefaultSubobject<UBoxComponent>("DestroyBox");
+	DestroyBoxes.Add( CreateDefaultSubobject<UBoxComponent>("DestroyBox"));
+	DestroyBoxes.Add( CreateDefaultSubobject<UBoxComponent>("DestroyBox1"));
+	DestroyBoxes.Add( CreateDefaultSubobject<UBoxComponent>("DestroyBox2"));
+	DestroyBoxes.Add( CreateDefaultSubobject<UBoxComponent>("DestroyBox3"));
 
 	SpawnBox->SetupAttachment(RootComponent);
-	DestroyBox->SetupAttachment(RootComponent);
-
-	DestroyBox->OnComponentBeginOverlap.AddDynamic(this, &AItemSpawnerManager::OnItemBeginOverlapDestoryBox);
+	DestroyBoxes[0]->SetupAttachment(RootComponent);
+	DestroyBoxes[1]->SetupAttachment(RootComponent);
+	DestroyBoxes[2]->SetupAttachment(RootComponent);
+	DestroyBoxes[3]->SetupAttachment(RootComponent);
 	
+	DestroyBoxes[0]->OnComponentBeginOverlap.AddDynamic(this, &AItemSpawnerManager::OnItemBeginOverlapDestoryBox);
+	DestroyBoxes[1]->OnComponentBeginOverlap.AddDynamic(this, &AItemSpawnerManager::OnItemBeginOverlapDestoryBox);
+	DestroyBoxes[2]->OnComponentBeginOverlap.AddDynamic(this, &AItemSpawnerManager::OnItemBeginOverlapDestoryBox);
+	DestroyBoxes[3]->OnComponentBeginOverlap.AddDynamic(this, &AItemSpawnerManager::OnItemBeginOverlapDestoryBox);
 }
 
 // Called when the game starts or when spawned
