@@ -294,12 +294,12 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 			if (!IsInInteractingRange)
 			{
 				IsInInteractingRange = true;
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					3.0f,
-					FColor::Red,
-					"Enter InteractingActor Zone"
-				);
+				//GEngine->AddOnScreenDebugMessage(
+				//	-1,
+				//	3.0f,
+				//	FColor::Red,
+				//	"Enter InteractingActor Zone"
+				//);
 			}
 		}
 
@@ -321,12 +321,12 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 				if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
 				{
 					IsInInteractingRange = false;
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						3.0f,
-						FColor::Red,
-						"Exit InteractingActor Zone"
-					);
+					//GEngine->AddOnScreenDebugMessage(
+					//	-1,
+					//	3.0f,
+					//	FColor::Red,
+					//	"Exit InteractingActor Zone"
+					//);
 				}
 			}
 		}
@@ -465,7 +465,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 		InteractingActor = nullptr;
 		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
 	}
 	else if (ActionValue > 0.1f && bAlreadyUsed)
 	{
@@ -473,7 +473,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
 	}
 }
 
