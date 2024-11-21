@@ -25,7 +25,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(false);
@@ -33,7 +33,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 		else
 		{
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(false);
