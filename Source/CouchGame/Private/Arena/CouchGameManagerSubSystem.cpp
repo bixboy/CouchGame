@@ -41,16 +41,7 @@ void UCouchGameManagerSubSystem::StartNewRound()
 {
 	 if (!LevelName.IsNone())
 	{
-		if (LevelName.ToString() == GetWorld()->GetName())
-		{
-			// Charger un niveau temporaire avant de recharger le niveau actuel
-			UGameplayStatics::OpenLevel(GetWorld(), FName("TempLevel"));
-			GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {
-				UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-			});
-			return;
-		}
-		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+		UGameplayStatics::OpenLevel(this, LevelName, false);
 	}
 	
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());

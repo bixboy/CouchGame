@@ -2,7 +2,7 @@
 	"BuildId": "27405482",
 	"Modules": 
 	{
-		"CouchGame": "UnrealEditor-CouchGame-5915.dll",
-		"LocalMultiplayer": "UnrealEditor-LocalMultiplayer-0001.dll"
+		"CouchGame": "UnrealEditor-CouchGame.dll",
+		"LocalMultiplayer": "UnrealEditor-LocalMultiplayer.dll"
 	}
 }
