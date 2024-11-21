@@ -1,6 +1,7 @@
 #include "Components/CouchCameraMove.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
 UCouchCameraMove::UCouchCameraMove()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -9,48 +10,55 @@ UCouchCameraMove::UCouchCameraMove()
 void UCouchCameraMove::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	MoveTimeline.SetPlayRate(1.f/Speed);
+	FOnTimelineFloat TimelineCallback;
+	TimelineCallback.BindUFunction(this, FName("MoveCamera"));
+
+	MoveTimeline.AddInterpFloat(MoveCurve, TimelineCallback);
+	MoveTimeline.SetLooping(false);
+	
 	StartCameraMove();
+}
+
+void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	MoveTimeline.TickTimeline(DeltaTime);
 }
 
 void UCouchCameraMove::StartCameraMove()
 {
 	PointA = GetOwner()->GetActorLocation();
 	bIsMoving = true;
+	MoveTimeline.PlayFromStart();
 }
 
-void UCouchCameraMove::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UCouchCameraMove::MoveCamera(float Alpha)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
 	if (bIsMoving)
 	{
-		MoveCamera(DeltaTime);	
-	}
-}
+		// Interpolation entre PointA et DestinationPoint basée sur la progression de la Timeline
+		FVector NewLocation = FMath::Lerp(PointA, DestinationPoint, Alpha);
 
-void UCouchCameraMove::MoveCamera(float DeltaTime)
-{
-	TimeElapsed += DeltaTime;
-	float Alpha = FMath::Clamp(TimeElapsed / Duration, 0.0f, 1.0f);
+		// Ajoute l'effet de plongée (Plunge)
+		float PlungeOffset = FMath::Sin(Alpha * PI) * PlungeHeight;
+		NewLocation.Z += PlungeOffset;
 
-	// Calculate position
-	FVector NewLocation = FMath::Lerp(PointA, DestinationPoint, Alpha);
+		// Met à jour la position de la caméra
+		GetOwner()->SetActorLocation(NewLocation);
 
-	// Add plunging effect
-	float PlungeOffset = FMath::Sin(Alpha * PI) * PlungeHeight;
-	NewLocation.Z += PlungeOffset;
+		// Regarde vers le point médian entre les deux bateaux
+		FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
+		GetOwner()->SetActorRotation(LookAtRotation);
 
-	// Set camera location
-	GetOwner()->SetActorLocation(NewLocation);
-
-	// Look at the midpoint between boats
-	FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
-	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
-	GetOwner()->SetActorRotation(LookAtRotation);
-
-	if (Alpha >= 1.0f)
-	{
-		bIsMoving = false;
+		// Si la Timeline est terminée, arrêter le mouvement
+		if (Alpha >= 1.0f)
+		{
+			bIsMoving = false;
+		}
 	}
 }
 

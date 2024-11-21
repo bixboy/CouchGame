@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/TimelineComponent.h"
 #include "CouchCameraMove.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -10,7 +11,7 @@ class COUCHGAME_API UCouchCameraMove : public UActorComponent
 	GENERATED_BODY()
 	
 protected:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UCouchCameraMove();
 	virtual void BeginPlay() override;
 
@@ -23,8 +24,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Movement")
 	FVector DestinationPoint;
 
+	UPROPERTY()
+	FTimeline MoveTimeline;
 	UPROPERTY(EditAnywhere, Category = "Camera Movement")
-	float Duration;
+	TObjectPtr<UCurveFloat> MoveCurve;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Movement")
+	float Speed;
 	UPROPERTY(EditAnywhere, Category = "Camera Movement")
 	float PlungeHeight;
 
@@ -33,8 +39,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Movement")
 	TObjectPtr<AActor> Boat2;
 
-	float TimeElapsed;
 	bool bIsMoving;
 
+	UFUNCTION()
 	void MoveCamera(float DeltaTime);
 };
