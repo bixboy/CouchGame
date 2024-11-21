@@ -13,9 +13,13 @@ void UCouchWidgetWin::NativeConstruct()
 	if (OpenAnimation)
 	{
 		CheckLight();
-		FTimerHandle RoundTimerHandle;
-		PlayAnimationForward(OpenAnimation);
-		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);	
+		
+		if (ConstructAnim)
+		{
+			FTimerHandle RoundTimerHandle;
+			PlayAnimationForward(OpenAnimation);
+			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);		
+		}
 	}
 }
 

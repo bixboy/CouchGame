@@ -23,19 +23,31 @@ ACouchStaticCanonBall::ACouchStaticCanonBall()
 void ACouchStaticCanonBall::InitCanonBall(TObjectPtr<ACouchPickableCannonBall> RefPickableCannonBall)
 {
 	SetActorTransform(RefPickableCannonBall->GetActorTransform());
-	Base->SetStaticMesh(RefPickableCannonBall->Mesh->GetStaticMesh());
-	Base->SetRelativeTransform(RefPickableCannonBall->Mesh->GetRelativeTransform());
 
+	CopyMeshData(Base, RefPickableCannonBall->Mesh);
+	CopyMeshData(Top, RefPickableCannonBall->Top);
+	CopyMeshData(Down, RefPickableCannonBall->Down);
 	
-	Top->SetStaticMesh( RefPickableCannonBall->Top->GetStaticMesh());
-	Top->SetRelativeTransform(RefPickableCannonBall->Top->GetRelativeTransform());
-
-	
-	Down->SetStaticMesh( RefPickableCannonBall->Down->GetStaticMesh());
-	Down->SetRelativeTransform(RefPickableCannonBall->Down->GetRelativeTransform());
-
 	ProjectileEffects = RefPickableCannonBall->ProjectileEffects;
 	PickableCannonBall = RefPickableCannonBall;
+}
+
+void ACouchStaticCanonBall::CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source)
+{
+	if (!Target || !Source) return;
+
+	// Copier le StaticMesh
+	Target->SetStaticMesh(Source->GetStaticMesh());
+
+	// Copier la transformation relative
+	Target->SetRelativeTransform(Source->GetRelativeTransform());
+
+	// Copier tous les matériaux d'un seul coup
+	const TArray<UMaterialInterface*>& Materials = Source->GetMaterials();
+	for (int32 i = 0; i < Materials.Num(); i++)
+	{
+		Target->SetMaterial(i, Materials[i]);
+	}
 }
 
 

@@ -131,14 +131,18 @@ void ACouchFishingRod::InitializeCableAndConstraint()
       // Setup Cable
       Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
       Cable->SetMaterial(0, CableMaterial);
-      Cable->NumSegments = 17.f;
+      //Cable->NumSegments = 17.f;
+      
       float Distance = FVector::Dist(SkeletalMesh->GetSocketLocation(FName("barrel")), ChargePower->TargetLocation);
       Cable->CableLength = Distance;
 
       // Attache le cable
-      Cable->SetAttachEndToComponent(LureRef->SphereComponent);
-      Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
-      Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
+      if (LureRef && LureRef->SphereComponent && SkeletalMesh)
+      {
+         Cable->SetAttachEndToComponent(LureRef->SphereComponent);
+         Cable->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, FName("barrel"));
+         Cable->SetAttachEndTo(LureRef, FName(TEXT("TopMesh")), FName(TEXT("barrel")));
+      }
 
       Cable->EndLocation = FVector(0.0f, 0.0f, 30.0f);
       Cable->SetVisibility(true, true); 
