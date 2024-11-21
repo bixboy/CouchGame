@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactables/CouchCatapult.h"
-
 #include "CouchCannonBall.h"
+#include "CouchStaticCanonBall.h"
 #include "Components/CouchChargePower.h"
 #include "Kismet/GameplayStatics.h"
-#include "Misc/OutputDeviceNull.h"
 
 ACouchCatapult::ACouchCatapult()
 {
@@ -23,13 +22,18 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
-			PowerChargeComponent->StartCharging(SkeletalMesh);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
+			MovementComponent->SetCanMove(false);
 		}
 		else
 		{
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
-			ICouchInteractable::Execute_StartChargeActor(this);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
+			IsInCharge = true;
+			MovementComponent->SetCanMove(false);
 		}
 	}
 }
@@ -40,23 +44,27 @@ void ACouchCatapult::StopChargeActor_Implementation()
 	if (GetCanUse() && CurrentAmmo >= 1 && IsInCharge)
 	{
 		PowerChargeComponent->StopCharging();
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = false;
 		if (SkeletalMesh && ShootAnimation) SkeletalMesh->PlayAnimation(ShootAnimation, false);
-		
-		if (WidgetComponent && WidgetComponent->PowerChargeActor)
-		{
-			FOutputDeviceNull ar;
-			FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
-			
-			WidgetComponent->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
-			WidgetComponent->DestroyWidget();
-		}
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = true;
 		
 		SetCanUse(false);
 		IsInCharge = false;
+		MovementComponent->SetCanMove(true);
 	}
 }
 
+void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
+{
+	if (IsInCharge && Execute_IsUsedByPlayer(this))
+	{
+		Execute_StopChargeActor(this);
+	}
+	Super::Interact_Implementation(Player);
+}
+
 #pragma endregion
+
 
 #pragma region Shoot / Reload
 
@@ -78,13 +86,16 @@ void ACouchCatapult::SpawnBullet()
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
 	if (Projectile)
 	{
+		Projectile->InitCanonBall(AmmoActor);
 		Projectile->Initialize(SuggestedVelocity);
 		if (AmmoActor)
 		{
 			CurrentAmmo --;
 			AmmoActor->Destroy();
 			AmmoActor = nullptr;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
 		}
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(CameraShake, 1.0f);
 	}
 }
 
@@ -92,8 +103,15 @@ void ACouchCatapult::Reload(ACouchPickableCannonBall* CannonBallReload)
 {
 	if(CurrentAmmo < 1)
 	{
-		AmmoActor = CannonBallReload;
-		CannonBallReload->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
+		FTransform Transform = FTransform(FRotator::ZeroRotator,
+			SkeletalMesh->GetSocketLocation(FName("barrel")),
+			CannonBallReload->GetActorScale());
+		ACouchStaticCanonBall* StaticBall = GetWorld()->SpawnActor<ACouchStaticCanonBall>(StaticBullet,Transform);
+		CannonBallReload->Destroy();
+		StaticBall->InitCanonBall(CannonBallReload);
+		StaticBall->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
+
+		AmmoActor = StaticBall;
 		CurrentAmmo = 1;
 		SetCanUse(true);		
 	}

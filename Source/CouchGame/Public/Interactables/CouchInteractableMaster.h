@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"
 #include "CouchInteractableMaster.generated.h"
@@ -19,8 +18,8 @@ public:
 	virtual bool IsUsedByPlayer_Implementation() override;
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
-	UFUNCTION()
-	AActor* GetCurrentPlayer() const;
+	UFUNCTION(BlueprintCallable)
+	ACouchCharacter* GetCurrentPlayer() const;
 	UFUNCTION()
 	void SetCurrentPlayer(ACouchCharacter* Player);
 	UFUNCTION()
@@ -29,7 +28,8 @@ public:
 	UFUNCTION()
 	void SetPlayerIsIn(bool IsIn);
 
-private:
+
+protected:
 	UPROPERTY()
 	ACouchCharacter* CurrentPlayer;
 	UPROPERTY()

@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "CouchProjectile.generated.h"
 
 UCLASS()
@@ -14,20 +15,28 @@ public:
 	UCouchProjectile();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
-	void Initialize(const FVector& LaunchVelocity);
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<USphereComponent> ProjectileCollision;
 
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
-	bool GetCanMove();
+	void Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore);
+
+	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
+	bool GetCanMove() const;
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	void SetCanMove(bool Value);
 
 private:
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	float SpeedMultiplier = 1.f;
 	FVector Velocity;      // Vélocité du projectile
 	FVector Location;      // Position actuelle du projectile
 	float TimeElapsed;     // Temps écoulé depuis le lancement
 	const float Gravity = -980.0f;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> IgnoredActors;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	bool CanMove = false;
 };

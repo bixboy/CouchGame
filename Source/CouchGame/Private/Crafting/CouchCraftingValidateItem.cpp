@@ -1,0 +1,54 @@
+#include "Crafting/CouchCraftingValidateItem.h"
+#include "Components/BoxComponent.h"
+#include "Crafting/CouchCraftingTable.h"
+#include "Widget/CouchWidgetSpawn.h"
+
+ACouchCraftingValidateItem::ACouchCraftingValidateItem()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawner"));
+
+	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractiveBox"));
+	RootComponent = Box;
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(RootComponent);
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
+	WidgetPose->SetupAttachment(RootComponent);
+
+	Box->OnComponentBeginOverlap.AddDynamic(this, &ACouchCraftingValidateItem::OnCharacterBeginOverlap);
+	Box->OnComponentEndOverlap.AddDynamic(this, &ACouchCraftingValidateItem::OnCharacterEndOverlap);
+}
+
+void ACouchCraftingValidateItem::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!CraftingTable)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, this->GetName() + " is not set properly");
+	}
+}
+
+void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player)
+{
+	Super::Interact_Implementation(Player);
+	if (!CraftingTable) return;
+	CraftingTable->CraftItem();
+	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = !CurrentPlayer->AnimationManager->IsCheckingChef;
+}
+
+
+void ACouchCraftingValidateItem::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "UIIIIIIIIIIIIIIIIII.");
+	WidgetSpawner->SpawnWidget(WidgetInteract, WidgetPose);
+}
+
+void ACouchCraftingValidateItem::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	WidgetSpawner->DestroyWidget();
+}
+
+

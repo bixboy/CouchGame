@@ -1,17 +1,13 @@
 #include "Components//CouchChargePower.h"
 
-
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-
+#include "Misc/OutputDeviceNull.h"
 
 UCouchChargePower::UCouchChargePower()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
-
-
-
 
 void UCouchChargePower::BeginPlay()
 {
@@ -33,16 +29,33 @@ void UCouchChargePower::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 }
 
 
-void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp)
+void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner, bool UseMesh,  AActor* Actor)
 {
 	PowerTimeline.PlayFromStart();
-	Mesh = MeshComp;
+	if (UseMesh)
+	{
+		Mesh = MeshComp;	
+	}
+	else
+	{
+		Mesh = MeshComp;
+		StartTransform = FTransform(FRotator(Actor->GetActorRotation().Pitch, Actor->GetActorRotation().Yaw - 90.0f, Actor->GetActorRotation().Roll), FVector(Mesh->GetSocketLocation(FName("barrel"))), FVector(1, 1, 1));
+	}
+	ChargeWidget = WidgetSpawner;
 }
 
 
 void UCouchChargePower::StopCharging()
 {
 	PowerTimeline.Stop();
+	if (ChargeWidget && ChargeWidget->PowerChargeActor)
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("StopCharge"));
+			
+		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+		ChargeWidget->DestroyWidget();
+	}
 }
 
 
@@ -50,6 +63,12 @@ float UCouchChargePower::UpdatePower(float Alpha)
 {
 	CurrentPower = Alpha * MaxPower;
 	TargetLocation = LineTrace();
+	if (ChargeWidget && ChargeWidget->PowerChargeActor)
+	{
+		FOutputDeviceNull ar;
+		FString CmdAndParams = FString::Printf(TEXT("UpdatePower %f"), SpeedCharge);
+		ChargeWidget->PowerChargeActor->CallFunctionByNameWithArguments(*CmdAndParams, ar, NULL, true);
+	}
 	return CurrentPower;
 }
 
@@ -60,15 +79,23 @@ FVector UCouchChargePower::LineTrace()
 	{
 		return FVector::ZeroVector;
 	}
-  
-	const FVector Start = Mesh->GetSocketLocation(FName("barrel"));
-	const FVector End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;
+
+	if (!StartTransform.IsValid())
+	{
+		Start = Mesh->GetSocketLocation(FName("barrel"));
+		End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;	
+	}
+	else
+	{
+		Start = StartTransform.GetLocation();
+		End = Start + UKismetMathLibrary::GetForwardVector(StartTransform.Rotator()) * CurrentPower;
+	}
      
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
 	FHitResult HitResult;
     
-	// Line Trace
+	// Line Trace*
 	UKismetSystemLibrary::LineTraceSingle(
 	   GetWorld(),
 	   Start,

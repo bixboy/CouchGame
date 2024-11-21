@@ -1,18 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "Interactables/CoucheCannon.h"
+#include "Interactables/CouchFishingRod.h"
+#include "Interactables/CouchPickableCannonBall.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Interfaces/CouchPickable.h"
+#include "ItemSpawnerManager/ItemSpawnerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Camera/CameraActor.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -22,18 +27,28 @@ ACouchCharacter::ACouchCharacter()
 	InteractionZone->SetupAttachment(GetMesh());
 	PickUpItemPosition = CreateDefaultSubobject<USceneComponent>(TEXT("PickUpItemPosition"));
 	PickUpItemPosition->SetupAttachment(InteractionZone);
-
+	FishingZoneDetectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("FishingZoneDetectionBox"));
+	FishingZoneDetectionBox->SetupAttachment(GetMesh());
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlap);
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlap);
-	
-}
 
+	FishingZoneDetectionBox->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlapFishingZone);
+	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
+	
+	
+	//Récupère le SpawnerManager et le mets dans un TObjectPtr
+	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
+	if (!SpawnerManagerActor) return;
+	AItemSpawnerManager* SpawnerManagerPtr = Cast<AItemSpawnerManager>(SpawnerManagerActor);
+	if (!SpawnerManagerPtr) return;
+	SpawnerManager = TObjectPtr<AItemSpawnerManager>(SpawnerManagerPtr);
+}
 
 void ACouchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	CreateStateMachine();
-
+	AnimationManager = NewObject<UCouchCharacterAnimationManager>();
 	InitStateMachine();
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
 }
@@ -50,6 +65,7 @@ void ACouchCharacter::Tick(float DeltaTime)
 		{
 			DashTimer = 0;
 			CanDashAgain = true;
+			AnimationManager->IsDashCooldown = false;
 		}
 	}
 }
@@ -68,7 +84,22 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputInteractAndActions(EnhancedInputComponent);
 }
 
+void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+{
+	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
+	CanMove = false;
+	
+	FTimerHandle RoundTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
+}
+
+void ACouchCharacter::OnTimerStunEnd()
+{
+	CanMove = true;
+}
+
 #pragma endregion Unreal Default
+
 #pragma region Move And Orient
 FVector2D ACouchCharacter::GetOrient() const
 {
@@ -98,7 +129,9 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 	}
 }
 #pragma endregion
+
 #pragma region State Machine
+
 void ACouchCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<UCouchCharacterStateMachine>(this);
@@ -116,6 +149,7 @@ void ACouchCharacter::TickStateMachine(float DeltaTime) const
 	StateMachine->Tick(DeltaTime);
 }
 #pragma endregion
+
 #pragma region InputData / MappingContext
 void ACouchCharacter::SetupMappingContextIntoController() const
 {
@@ -131,6 +165,7 @@ void ACouchCharacter::SetupMappingContextIntoController() const
 	InputSystem->AddMappingContext(InputMappingContext, 0);
 }
 #pragma endregion
+
 #pragma region InputMove
 FVector2D ACouchCharacter::GetInputMove() const
 {
@@ -192,22 +227,32 @@ void ACouchCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedI
 			this,
 			&ACouchCharacter::OnInputDash
 		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionDash,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacter::OnInputDash
+		);
 	}
 }
 
 void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	FVector2D Input = InputActionValue.Get<FVector2D>();
-	if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+	if (CanMove)
 	{
-		InputMove = Input;
-	}
-	else
-	{
-		InputMove = FVector2D::Zero();
+		FVector2D Input = InputActionValue.Get<FVector2D>();
+		if (FMath::Abs(Input.X )>= CharacterSettings->InputMoveThreshold || FMath::Abs(Input.Y)>= CharacterSettings->InputMoveThreshold)
+		{
+			InputMove = Input;
+		}
+		else
+		{
+			InputMove = FVector2D::Zero();
+		}	
 	}
 }
 #pragma endregion
+
 #pragma region Dash
 bool ACouchCharacter::GetCanDash() const
 {
@@ -217,32 +262,47 @@ bool ACouchCharacter::GetCanDash() const
 
 void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+	if (InputActionValue.Get<float>() > 0.1f)
 	{
-		CanDashAgain = false;
-		InputDashEvent.Broadcast(InputMove);
+		AnimationManager->HasPressedDashInput = true;
+		if (CanDash && CanDashAgain && GetMovementComponent()->IsMovingOnGround())
+		{
+			CanDashAgain = false;
+			AnimationManager->IsDashCooldown = true;
+			InputDashEvent.Broadcast(InputMove);
+		}
 	}
+	else
+	{
+		AnimationManager->HasPressedDashInput = false;
+	}
+	
 	
 }
 
 #pragma endregion
+
 #pragma region Interraction
 void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->Implements<UCouchInteractable>())
 	{
-		InteractingActors.Add(OtherActor);
-		if (!IsInInteractingRange)
+		if (TObjectPtr<ACouchInteractableMaster> Actor = Cast<ACouchInteractableMaster>(OtherActor); Actor)
 		{
-			IsInInteractingRange = true;
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				3.0f,
-				FColor::Red,
-				"Enter InteractingActor Zone"
-			);
+			InteractingActors.Add(Actor);
+			if (!IsInInteractingRange)
+			{
+				IsInInteractingRange = true;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					3.0f,
+					FColor::Red,
+					"Enter InteractingActor Zone"
+				);
+			}
 		}
+
 
 	}
 	
@@ -255,26 +315,29 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 	{
 		if (InteractingActors.Contains(OtherActor))
 		{
-			InteractingActors.Remove(OtherActor);
-			if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
+			if (TObjectPtr<ACouchInteractableMaster> Actor = Cast<ACouchInteractableMaster>(OtherActor); Actor)
 			{
-				IsInInteractingRange = false;
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					3.0f,
-					FColor::Red,
-					"Exit InteractingActor Zone"
-				);
+				InteractingActors.Remove(Actor);
+				if (InteractingActors.Num() == 0 && !IsInteracting && !InteractingActor)
+				{
+					IsInInteractingRange = false;
+					GEngine->AddOnScreenDebugMessage(
+						-1,
+						3.0f,
+						FColor::Red,
+						"Exit InteractingActor Zone"
+					);
+				}
 			}
 		}
 	}
 }
 
-TObjectPtr<AActor> ACouchCharacter::FindNearestInteractingActor() const
+TObjectPtr<ACouchInteractableMaster> ACouchCharacter::FindNearestInteractingActor() const
 {
 	float minDistanceFromPlayer = 10000;
-	TObjectPtr<AActor> nearestInteractingActor = nullptr;
-	for (TObjectPtr<AActor> InteractActor : InteractingActors)
+	TObjectPtr<ACouchInteractableMaster> nearestInteractingActor = nullptr;
+	for (auto InteractActor : InteractingActors)
 	{
 		if (!InteractActor) continue;
 		float DistanceToPlayer = GetDistanceTo(InteractActor);
@@ -329,9 +392,25 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 	}
 }
 
+// Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if (InteractingActors.IsEmpty() && !IsInteracting)
+	float ActionValue = InputActionValue.Get<float>();
+	if (isFishing && FishingRod)
+	{
+		if (ActionValue > 0)
+		{
+			FishingRod->isPlayerFishing = true;
+		}
+		else
+		{
+			FishingRod->isPlayerFishing = false;
+			FishingRod->StopRewindCable();
+		}
+		return;
+	}
+	
+	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
 		return;
 	}
@@ -344,7 +423,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			return;
 		}
 	}
-	float ActionValue = InputActionValue.Get<float>();
+	
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
 	
 	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
@@ -365,8 +444,18 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	{
 		if (IsHoldingItem)
 		{
+			if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
+			{
+				TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
+					PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
+				if (ItemToInteractWith)
+				{
+					ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
+				}
+			}
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 			IsHoldingItem = false;
+			AnimationManager->IsCarryingItem = false;
 		}
 		else
 		{
@@ -388,8 +477,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 }
 
-
-
+// Fire
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 {
 	if (IsInteracting)
@@ -410,25 +498,95 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			}
 		}
 	}
-}
-
-
-void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
-{
-	if (IsInInteractingRange && IsInteracting)
+	else if (CanFish)
 	{
-		if (UCouchMovement* CouchMovement = InteractingActor->FindComponentByClass<UCouchMovement>())
+		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
-			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f) CouchMovement->StartMovement(-InputMove.Y);
-			else CouchMovement->StopMovement();	
+			if (!FishingRod)
+			{
+				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
+				FishingRod->SetupFishingRod(this, CurrentTeam);
+				isFishing = true;
+				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			}
+			else
+			{
+				isFishing = true;
+				CanMove = false;
+				InputMove = FVector2D::ZeroVector;
+				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				ICouchInteractable::Execute_StartChargeActor(FishingRod);
+			}
+		}
+		else
+		{
+			if (FishingRod)
+			{
+				ICouchInteractable::Execute_StopChargeActor(FishingRod);
+			}
+			CanMove = true;
 		}
 	}
 }
 
-#pragma endregion 
+// Interacting
+void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActionValue)
+{
+	if (IsInInteractingRange && IsInteracting && InteractingActor && !FishingRod)
+	{
+			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f)
+				ICouchInteractable::Execute_StartMoveActor(InteractingActor,-InputMove.Y);
+			else ICouchInteractable::Execute_StopMoveActor(InteractingActor);	
+	}
+}
+
+#pragma endregion
+
 #pragma region Hold Item
 bool ACouchCharacter::GetIsHoldingItem() const
 {
 	return IsHoldingItem;
+}
+#pragma endregion
+
+#pragma region Fishing
+
+// Fishing
+void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	CanFish = true;
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
+}
+
+void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	CanFish = false;
+	DestroyFishingRod();
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
+}
+
+TObjectPtr<ACouchFishingRod> ACouchCharacter::GetFishingRod() const
+{
+	return FishingRod;
+}
+
+void ACouchCharacter::DestroyFishingRod()
+{
+	if (FishingRod)
+	{
+		FishingRod->DestroyFishingRod();
+		FishingRod->Destroy();
+		FishingRod = nullptr;
+	}
+	isFishing = false;
+	AnimationManager->IsFishingStart = false;
+	AnimationManager->IsFishingRelease = false;
+	AnimationManager->IsFishingPull = false;
+	AnimationManager->IsFishing = false;
 }
 #pragma endregion

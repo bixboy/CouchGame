@@ -29,5 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Drop();
 	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void InteractWithObject(ACouchInteractableMaster* interactable);
+	
 	
 };

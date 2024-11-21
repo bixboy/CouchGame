@@ -4,8 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "CouchInteractableMaster.h"
+#include "Components/CouchProjectile.h"
 #include "Interfaces/CouchPickable.h"
 #include "CouchPickableMaster.generated.h"
+
+class ACouchWidget3D;
+class ACouchCraftingTable;
+class ACouchLure;
+class UCouchWidgetSpawn;
+class UCouchInteractableMaster;
 
 UCLASS()
 class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, public ICouchPickable
@@ -14,17 +21,20 @@ class COUCHGAME_API ACouchPickableMaster : public ACouchInteractableMaster, publ
 
 #pragma region Unreal Default
 public:
-	// Sets default values for this actor's properties
 	ACouchPickableMaster();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Mesh;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> InteractionBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchProjectile> CouchProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+protected:
+	virtual void BeginPlay() override;
+
 #pragma endregion
 
 #pragma region Interactables
@@ -38,9 +48,54 @@ public:
 
 	virtual void Drop_Implementation() override;
 
-private:
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+	
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> PhysicsCollider;
 #pragma endregion
+#pragma region Interact with other Class
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<ACouchInteractableMaster>> ClassesPickableItemCanInteractWith;
+
+	TObjectPtr<ACouchInteractableMaster> PlayerCanUsePickableItemToInteract(
+		TObjectPtr<ACouchInteractableMaster>  PickableItem, 
+		TArray<TObjectPtr<ACouchInteractableMaster>> InteractableActors
+	);
+
+private:
+	bool CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const;
+#pragma endregion
+
+#pragma region Fishing
+public:
+	bool AttachLure(TObjectPtr<ACouchLure> LureRef);
+	void Detachlure(TObjectPtr<ACouchLure> LureRef);
+	void UpdatePercent(float Value);
+	void StopQte();
+
+	UFUNCTION(BlueprintCallable)
+	float GetQtePercent() const;
+
+private:
+	UPROPERTY()
+	TObjectPtr<USceneComponent> QteWidgetPose;
 	
+	void InitQte();
+	
+	UPROPERTY()
+	TArray<TObjectPtr<ACouchLure>> CurrentLuresAttached;
+
+	UPROPERTY(EditAnywhere, Category = DefaultsValue)
+	TSubclassOf<ACouchWidget3D> WidgetQte;
+
+	UPROPERTY()
+	float CurrentPercentQte = 0.5f;
+	
+#pragma endregion	
+
+#pragma region Crafting
+	TObjectPtr<ACouchCraftingTable> CraftingTable;
+	
+#pragma endregion
 };

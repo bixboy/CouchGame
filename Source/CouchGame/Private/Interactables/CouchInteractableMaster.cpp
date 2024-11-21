@@ -25,11 +25,12 @@ void ACouchInteractableMaster::Interact_Implementation(ACouchCharacter* Player)
 	}
 }
 
-AActor* ACouchInteractableMaster::GetCurrentPlayer() const {return CurrentPlayer;}
+ACouchCharacter* ACouchInteractableMaster::GetCurrentPlayer() const {return CurrentPlayer;}
 
 void ACouchInteractableMaster::SetCurrentPlayer(ACouchCharacter* Player) {CurrentPlayer = Player;}
 
 void ACouchInteractableMaster::RemoveCurrentPlayer() {CurrentPlayer = nullptr;}
 
 void ACouchInteractableMaster::SetPlayerIsIn(bool IsIn) {PlayerIsIn = IsIn;}
+
 

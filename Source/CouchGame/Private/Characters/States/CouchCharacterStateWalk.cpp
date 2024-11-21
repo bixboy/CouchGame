@@ -31,6 +31,8 @@ void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID
 	);
 	Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeedMax;
 	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
+	if (!Character->AnimationManager) return;
+	Character->AnimationManager->IsRunning = true;
 }
 
 void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
@@ -44,6 +46,8 @@ void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
 		TEXT("Exit StateWalk")
 	);
 	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
+	if (!Character->AnimationManager) return;
+	Character->AnimationManager->IsRunning = false;
 }
 
 void UCouchCharacterStateWalk::StateTick(float DeltaTime)

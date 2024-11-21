@@ -3,6 +3,7 @@
 
 #include "Boat/CouchBoat.h"
 
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Boat/BoatFloor.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -56,23 +57,30 @@ void ACouchBoat::BoatRepair()
 
 void ACouchBoat::SinkBoatAndGameOver()
 {
+	if (IsDestroyed) return;
+	
+	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
 	switch (Team)
 	{
 		case EBoatTeam::Team1:
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 2 Win");
+			// Team 2 Win	
+			GameManager->CheckRoundWinCondition(2);
 			break;
 		}
 		case EBoatTeam::Team2:
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Team 1 Win");
+			// Team 1 Win		
+			GameManager->CheckRoundWinCondition(1);
 			break;
 		}
 		default:
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "No Team Win");
+			// no Team Win	
+			GameManager->CheckRoundWinCondition(1);
 			break;
 		
 	}
+	IsDestroyed = true;
 }
 
 float ACouchBoat::GetBoatLife() const

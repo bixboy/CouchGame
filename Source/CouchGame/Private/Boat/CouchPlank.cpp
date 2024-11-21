@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Boat/CouchPlank.h"
 
@@ -11,7 +10,6 @@
 #include "Characters/CouchCharacter.h"
 #include "Widget/CouchWidget3D.h"
 
-// Sets default values
 ACouchPlank::ACouchPlank()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -33,16 +31,14 @@ ACouchPlank::ACouchPlank()
 	InterractiveBoxRange->OnComponentEndOverlap.AddDynamic(this, &ACouchPlank::OnOverlapEnd);
 }
 
-void ACouchPlank::Init(ABoatFloor* floor)
+void ACouchPlank::Init(ABoatFloor* floor, float RepairingTime, float Scale)
 {
 	Floor = floor;
+	if (RepairingTime > 0) TimeToRepair *= RepairingTime;
+	if (Scale > 0) this->SetActorScale3D(GetActorScale()*Scale);
 }
 
-bool ACouchPlank::IsUsedByPlayer_Implementation()
-{
-	ICouchInteractable::IsUsedByPlayer_Implementation();
-	return IsPlayerRepairing;
-}
+#pragma region Overlap
 
 void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -64,20 +60,7 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	}
 }
 
-float ACouchPlank::GetRepairingPercent() const
-{
-	return Timer / TimeToRepair;
-}
-
-AActor* ACouchPlank::GetInteractWidget() const
-{
-	return InteractWidgetPtr;
-}
-
-void ACouchPlank::BeginPlay()
-{
-	Super::BeginPlay();
-}
+#pragma endregion
 
 void ACouchPlank::Tick(float DeltaTime)
 {
@@ -91,7 +74,9 @@ void ACouchPlank::Tick(float DeltaTime)
 		{
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-			APlayer->IsInteracting = false;
+			// APlayer->IsInteracting = false;
+			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsRepairing = false;
+			SetActorTickEnabled(false);
 			Destroy();
 		}
 	}
@@ -99,13 +84,6 @@ void ACouchPlank::Tick(float DeltaTime)
 	{
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
 	}
-}
-
-UStaticMesh* ACouchPlank::GetRandomStaticMesh()
-{
-	if (DamagedPlanckMeshes.Num() == 0) return nullptr;
-	int RandomIndex = FMath::RandRange(0, DamagedPlanckMeshes.Num() - 1);
-	return DamagedPlanckMeshes[RandomIndex];
 }
 
 void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
@@ -124,12 +102,41 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 	{
 		APlayer = Player;
 		IsPlayerRepairing = true;
+		Player->AnimationManager->IsRepairing = true;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting");
 	}
 	else if (IsPlayerRepairing && Player == APlayer)
 	{
 		APlayer = nullptr;
+		Player->AnimationManager->IsRepairing = false;
 		IsPlayerRepairing = false;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player stopped interacting");
 	}
 }
+
+#pragma region Getters
+
+bool ACouchPlank::IsUsedByPlayer_Implementation()
+{
+	ICouchInteractable::IsUsedByPlayer_Implementation();
+	return IsPlayerRepairing;
+}
+
+float ACouchPlank::GetRepairingPercent() const
+{
+	return Timer / TimeToRepair;
+}
+
+AActor* ACouchPlank::GetInteractWidget() const
+{
+	return InteractWidgetPtr;
+}
+
+UStaticMesh* ACouchPlank::GetRandomStaticMesh()
+{
+	if (DamagedPlanckMeshes.Num() == 0) return nullptr;
+	int RandomIndex = FMath::RandRange(0, DamagedPlanckMeshes.Num() - 1);
+	return DamagedPlanckMeshes[RandomIndex];
+}
+
+#pragma endregion

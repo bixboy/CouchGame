@@ -8,6 +8,8 @@
 #include "Components/CouchChargePower.h"
 #include "CouchCatapult.generated.h"
 
+class ACouchStaticCanonBall;
+
 UCLASS()
 class COUCHGAME_API ACouchCatapult : public ACouchInteractableWeapons
 {
@@ -18,6 +20,8 @@ public:
 
 	virtual void StartChargeActor_Implementation() override;
 	virtual void StopChargeActor_Implementation() override;
+
+	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCouchChargePower* PowerChargeComponent;
@@ -43,14 +47,20 @@ private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	UClass* PowerChargeWidget;
 
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
 	UClass* Bullet;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)
+	TSubclassOf<ACouchStaticCanonBall> StaticBullet;
+
 #pragma region Reload
 private:
 	UPROPERTY()
-	ACouchPickableCannonBall* AmmoActor;
+	ACouchStaticCanonBall* AmmoActor;
 
 	UPROPERTY()
 	int CurrentAmmo;

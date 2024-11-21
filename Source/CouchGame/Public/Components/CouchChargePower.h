@@ -1,11 +1,10 @@
 #pragma once
 
-
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Widget/CouchWidgetSpawn.h"
 #include "CouchChargePower.generated.h"
-
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class COUCHGAME_API UCouchChargePower : public UActorComponent
@@ -27,42 +26,47 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void StartCharging(USkeletalMeshComponent* Mesh);
+	void StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner = nullptr, bool UseMesh = true,  AActor* Actor = nullptr);
 	UFUNCTION(BlueprintCallable)
 	void StopCharging();
 
-
 	UPROPERTY()
 	FVector TargetLocation;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	UClass* PowerChargeWidget;
   
 private:   
 	UPROPERTY()
 	FTimeline PowerTimeline;
   
 	UPROPERTY(EditAnywhere)
-	UCurveFloat* PowerCurve;
+	TObjectPtr<UCurveFloat> PowerCurve;
   
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float MaxPower = 500.f;
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float MinPower = 100.f;
-  
 	UPROPERTY()
 	float CurrentPower;
-
-
+	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	float SpeedCharge = 1.f;
 
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> Mesh;
+	UPROPERTY()
+	TObjectPtr<UCouchWidgetSpawn> ChargeWidget;
+
+	FTransform StartTransform;
+	FVector Start;
+	FVector End;
 
 	UFUNCTION()
 	float UpdatePower(float Alpha);
   
 	UFUNCTION()
 	FVector LineTrace();
-	UPROPERTY()
-	USkeletalMeshComponent* Mesh;
-
 
 #pragma endregion
 };

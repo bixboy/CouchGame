@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "CouchPickableCannonBall.generated.h"
 
+class ACouchProjectileEffect;
+
 UCLASS()
 class COUCHGAME_API ACouchPickableCannonBall : public ACouchPickableMaster
 {
@@ -16,12 +18,13 @@ public:
 	ACouchPickableCannonBall();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> Base;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Top;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> Down;
-	
+
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<ACouchProjectileEffect>> ProjectileEffects;
 };

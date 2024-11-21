@@ -17,6 +17,8 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 public:
 	ACouchInteractableWeapons();
 
+	virtual void BeginPlay() override;
+
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	
 	UFUNCTION()
@@ -34,20 +36,21 @@ private:
 #pragma region Setup
 public:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	USkeletalMeshComponent* SkeletalMesh;
+	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchMovement* MovementComponent;
+	TObjectPtr<UCouchMovement> MovementComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USceneComponent* PlayerPose;
+	TObjectPtr<USceneComponent> PlayerPose;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCouchWidgetSpawn* WidgetComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USceneComponent* WidgetPose;
+	TObjectPtr<UCouchWidgetSpawn> WidgetComponent;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* BoxInteract;
+	TObjectPtr<UBoxComponent> BoxInteract;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
 	
 	UFUNCTION()
 	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -60,16 +63,23 @@ public:
 #pragma region Movement
 private:	
 	UFUNCTION()
-	void StartMovement(int InputDirection);
+	virtual void StartMoveActor_Implementation(int InputDirection) override;
 	UFUNCTION()
-	void StopMovement();
+	virtual void StopMoveActor_Implementation() override;
 	
 #pragma endregion
 
 #pragma region Widgets
+public:
+	UFUNCTION()
+	void SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget = nullptr);
+	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	UClass* InteractWidget;
+	TSubclassOf<ACouchWidget3D> InteractWidget;
+
+	UPROPERTY()
+	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
 
 #pragma endregion	
 };

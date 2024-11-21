@@ -29,8 +29,9 @@ void UCouchCharacterStateIdle::StateEnter(ECouchCharacterStateID PreviousStateID
 		FColor::White,
 		TEXT("Enter StateIdle")
 	);
-
+	if (!Character) return;
 	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
+
 }
 
 void UCouchCharacterStateIdle::StateExit(ECouchCharacterStateID NextStateID)

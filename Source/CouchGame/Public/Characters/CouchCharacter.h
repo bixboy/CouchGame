@@ -3,18 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchCharacterAnimationManager.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
+class UBoxComponent;
+class AItemSpawnerManager;
+class ACouchFishingRod;
+class ACouchInteractableMaster;
 class USphereComponent;
 class UCouchCharacterInputData;
 class UCouchCharacterStateMachine;
 class UInputMappingContext;
 class UEnhancedInputComponent;
 class UCouchCharacterSettings;
+class UAnimationManager;
+
 UCLASS()
-class COUCHGAME_API ACouchCharacter : public ACharacter
+class COUCHGAME_API ACouchCharacter : public ACharacter, public ICouchDamageable
 {
 	GENERATED_BODY()
 #pragma region Unreal Default
@@ -27,14 +35,16 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
+	int CurrentTeam = 1;
 #pragma endregion
 #pragma region Move And Orient
 public:
+	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
+	
 	FVector2D GetOrient() const;
 
 	void SetOrient(FVector2D NewOrient);
@@ -48,6 +58,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float CharacterRotationSpeed = 20.0f;
 	void RotateMeshUsingOrient(float DeltaTime) const;
+	bool CanMove = true;
+
+	UPROPERTY(EditAnywhere)
+	float StunDelay = 2.f;
+	void OnTimerStunEnd();
 
 #pragma endregion
 #pragma region State Machine
@@ -111,8 +126,7 @@ private:
 
 	UPROPERTY()
 	bool CanDashAgain = true;
-
-	UPROPERTY()
+	
 	float DashTimer;
 	
 	
@@ -132,10 +146,10 @@ public:
 		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY()
-	TArray<AActor*> InteractingActors;
+	TArray<TObjectPtr<ACouchInteractableMaster>> InteractingActors;
 	UPROPERTY()
-	TObjectPtr<AActor> InteractingActor;
-	TObjectPtr<AActor> FindNearestInteractingActor() const;
+	TObjectPtr<ACouchInteractableMaster> InteractingActor;
+	TObjectPtr<ACouchInteractableMaster> FindNearestInteractingActor() const;
 	bool IsInInteractingRange;
 	bool IsInteracting;
 	
@@ -157,5 +171,36 @@ public:
 	bool GetIsHoldingItem() const;
 private:
 	bool IsHoldingItem;
+#pragma endregion
+#pragma region Fishing
+private:
+	UPROPERTY()
+	TObjectPtr<ACouchFishingRod> FishingRod;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
+	bool isFishing = false;
+	bool CanFish = false;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> FishingZoneDetectionBox;
+
+	UFUNCTION()
+	void OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+											const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	TObjectPtr<ACouchFishingRod> GetFishingRod() const;
+	void DestroyFishingRod();
+#pragma endregion
+#pragma region Item Spawner
+	public:
+	UPROPERTY()
+	TObjectPtr<AItemSpawnerManager> SpawnerManager;
+#pragma endregion
+#pragma region Animation Manager
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCouchCharacterAnimationManager* AnimationManager;
 #pragma endregion
 };
