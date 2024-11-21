@@ -3,8 +3,10 @@
 #include "CouchCannonBall.h"
 
 #include "CouchStaticCanonBall.h"
+#include "Boat/BoatFloor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Interactables/CouchUmbrella.h"
 #include "Interfaces/CouchDamageable.h"
 #include "Misc/OutputDeviceNull.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
@@ -33,6 +35,17 @@ void ACouchCannonBall::BeginPlay()
 	Super::BeginPlay();
 
 }
+ACouchProjectileEffect* ACouchCannonBall::GetEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime)
+{
+	for (auto ProjectileEffect : ProjectileEffects)
+	{
+		if (ProjectileEffect && ProjectileEffect->ExecuteTime == ExecuteTime)
+		{
+			return ProjectileEffect;
+		}
+	}
+	return nullptr;
+}
 
 bool ACouchCannonBall::HasEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime)
 {
@@ -48,14 +61,15 @@ bool ACouchCannonBall::HasEffectWithExecuteTime(ECouchProjectileExecuteTime Exec
 
 void ACouchCannonBall::ExecuteEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime)
 {
-	for (auto ProjectileEffect : ProjectileEffects)
+	ProjectileEffects.RemoveAll([ExecuteTime](ACouchProjectileEffect* ProjectileEffect)
 	{
 		if (ProjectileEffect && ProjectileEffect->ExecuteTime == ExecuteTime)
 		{
 			ProjectileEffect->ExecuteEffect();
-			ProjectileEffects.Remove(ProjectileEffect);
+			if (ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnLaunch) return true; // Supprime l'élément
 		}
-	}
+		return false; // Conserve l'élément
+	});
 }
 
 void ACouchCannonBall::InitEffect(ACouchCannonBall* CanonBall, ACouchPickableCannonBall* PickCannonBall,
@@ -94,11 +108,15 @@ void ACouchCannonBall::InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCan
 	SetActorTransform(StaticCannonBall->GetActorTransform());
 	Base->SetStaticMesh(StaticCannonBall->Base->GetStaticMesh());
 	
-	Top->SetStaticMesh( StaticCannonBall->Top->GetStaticMesh());
-	Top->SetRelativeTransform(StaticCannonBall->Top->GetRelativeTransform());
+	const TArray<UMaterialInterface*>& Materials = StaticCannonBall->Base->GetMaterials();
+	for (int32 i = 0; i < Materials.Num(); i++)
+	{
+		Base->SetMaterial(i, Materials[i]);
+	}
 	
-	Down->SetStaticMesh( StaticCannonBall->Down->GetStaticMesh());
-	Down->SetRelativeTransform(StaticCannonBall->Down->GetRelativeTransform());
+	CopyMeshData(Top, StaticCannonBall->Top);
+	CopyMeshData(Down, StaticCannonBall->Down);
+
 
 	ProjectileEffectsClass = StaticCannonBall->ProjectileEffects;
 	this->PickableCannonBall = StaticCannonBall->PickableCannonBall;
@@ -121,27 +139,46 @@ void ACouchCannonBall::InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCan
 	}
 }
 
+void ACouchCannonBall::CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source)
+{
+	if (!Target || !Source) return;
+
+	// Copier le StaticMesh
+	Target->SetStaticMesh(Source->GetStaticMesh());
+
+	// Copier la transformation relative
+	Target->SetRelativeTransform(Source->GetRelativeTransform());
+
+	// Copier tous les matériaux d'un seul coup
+	const TArray<UMaterialInterface*>& Materials = Source->GetMaterials();
+	for (int32 i = 0; i < Materials.Num(); i++)
+	{
+		Target->SetMaterial(i, Materials[i]);
+	}
+}
+
 void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
+	if (Sphere->IsSimulatingPhysics()) return;
 	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
 	Sphere->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	Sphere->SetSimulatePhysics(true);
 
 	// Pour éviter que le bullet de cannon ne soit bloqué dans les collisions si jamais il touche le rebord avant
-	// Calculer la direction opposée à la collision
+	// Calcule la direction opposée à la collision
 	FVector RepulsionDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
 
 	// Calculer une nouvelle position en se déplaçant légèrement hors de la collision
-	float RepulsionDistance = 10.0f;
+	float RepulsionDistance = 20.0f;
 	FVector NewLocation = GetActorLocation() + RepulsionDirection * RepulsionDistance;
         
 	// Déplacer l'Actor vers la nouvelle position
 	SetActorLocation(NewLocation);
 	
 
-	if (OtherActor->Implements<UCouchDamageable>())
+	if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ABoatFloor::StaticClass()))
 	{
 		FName FunctionName = "PlaySound";
 		UFunction* Function = this->FindFunction(FunctionName);
@@ -195,7 +232,14 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 			Destroy();
 		}
 	}
+	else if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ACouchUmbrella::StaticClass()))
+	{
+		ICouchDamageable::Execute_Hit(OtherActor, Hit,0,0);
+		Destroy();
+	}
 }
+
+
 
 void ACouchCannonBall::Tick(float DeltaTime)
 {

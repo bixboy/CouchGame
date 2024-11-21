@@ -15,7 +15,8 @@ ACouchProjectileEffect::ACouchProjectileEffect()
 
 void ACouchProjectileEffect::ExecuteEffect()
 {
-	if (CouchCannonBall) SetActorTransform(CouchCannonBall->GetActorTransform());
+	if (!CouchCannonBall) return;
+	SetActorTransform(CouchCannonBall->GetActorTransform());
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Projectile Effect");
 	HasExecutedEffect = true;
 }
@@ -49,4 +50,9 @@ void ACouchProjectileEffect::Tick(float DeltaTime)
 			ExecuteEffect();
 		}
 	}
+}
+
+bool ACouchProjectileEffect::IsExecutingOnDelay() const
+{
+	return ExecuteTime == ECouchProjectileExecuteTime::OnDelay;
 }
