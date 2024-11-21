@@ -35,11 +35,11 @@ void AFog::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AFog::UpdateFog(float Value) const
+void AFog::UpdateFog(float Value, float MaxOpacity) const
 {
 	if (MaterialInstance)
 	{
-		MaterialInstance->SetScalarParameterValue(FName("Opacity"), FMath::Clamp(Value, 0, 1));
+		MaterialInstance->SetScalarParameterValue(FName("Opacity"), FMath::Clamp(Value, 0, MaxOpacity));
 	}
 }
 

@@ -17,7 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	AFog();
 	virtual void Tick(float DeltaTime) override;
-	void UpdateFog(float Value) const;
+	void UpdateFog(float Value, float MaxOpacity) const;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

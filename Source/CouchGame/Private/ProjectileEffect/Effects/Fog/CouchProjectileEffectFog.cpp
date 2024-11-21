@@ -20,7 +20,7 @@ void ACouchProjectileEffectFog::Tick(float DeltaTime)
 	if (HasExecutedEffect && FogPtr)
 	{
 		Timer += DeltaTime;
-		FogPtr->UpdateFog(1 - FMath::Clamp(Timer / DelayToExecute, 0.0f, 1.0f));
+		FogPtr->UpdateFog(MaxOpacity * (1.0f - FMath::Clamp(Timer / DelayToExecute, 0.0f, 1.0f)), MaxOpacity);
 		if (Timer >= DelayToExecute)
 		{
 			FogPtr->Destroy();

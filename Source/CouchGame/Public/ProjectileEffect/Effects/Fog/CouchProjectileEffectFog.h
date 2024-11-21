@@ -33,4 +33,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DelayToExecute = 5.0;
 	float Timer;
+	UPROPERTY(EditAnywhere)
+	float MaxOpacity = 5.f;
 };
