@@ -191,6 +191,7 @@ private:
 	void OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
+	TObjectPtr<ACouchFishingRod> GetFishingRod() const;
 	void DestroyFishingRod();
 #pragma endregion
 #pragma region Item Spawner

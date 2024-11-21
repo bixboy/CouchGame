@@ -27,12 +27,11 @@ void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int T
    if (CurrentPlayer)
    {
       AttachToComponent(CurrentPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripAttach"));
+      CurrentPlayer->AnimationManager->IsFishing = true;
       //FVector SocketLocation = FVector(SkeletalMesh->GetSocketTransform(FName("GripPoint"), RTS_Component).GetLocation());
       //AddActorLocalOffset(SocketLocation);
    }
 }
-
-#pragma endregion
 
 void ACouchFishingRod::Tick(float DeltaSeconds)
 {
@@ -54,27 +53,34 @@ void ACouchFishingRod::Tick(float DeltaSeconds)
    }
 }
 
+#pragma endregion
+
 #pragma region ChargingPower
 
+// Start Charge
 void ACouchFishingRod::StartChargeActor_Implementation()
 {
    ICouchInteractable::StartChargeActor_Implementation();
    if(!IsInCharge)
    {
-      WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose);
-      ChargePower->StartCharging(SkeletalMesh, WidgetSpawner);
+      WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
+      ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
+      
+      CurrentPlayer->AnimationManager->IsFishingStart = true;
       IsInCharge = true;
    }
 }
 
+// Stop Charge
 void ACouchFishingRod::StopChargeActor_Implementation()
 {
    ICouchInteractable::StopChargeActor_Implementation();
    if (IsInCharge)
    {
       ChargePower->StopCharging();
+      
+      CurrentPlayer->AnimationManager->IsFishingStart = false;
       CurrentPlayer->AnimationManager->IsFishingRelease = true;
-      SpawnLure();
       IsInCharge = false;
    }
 }
@@ -87,7 +93,6 @@ void ACouchFishingRod::SpawnLure()
 {
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
    FVector SuggestedVelocity;
-  
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
       this,
       SuggestedVelocity,
@@ -102,13 +107,15 @@ void ACouchFishingRod::SpawnLure()
       LureRef->DetachAttachedObject();
       DestroyLureAndCable();
    }
-      
+
+   // Spawn Lure
    FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
    if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
    {
       LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
       InitializeCableAndConstraint();
-      LureRef->Initialize(SuggestedVelocity, this);  
+      LureRef->Initialize(SuggestedVelocity, this);
+      CurrentPlayer->AnimationManager->IsFishingRelease = false;
    }
 }
 
@@ -153,7 +160,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
       FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
       LureRef->SetActorLocation(NewPositionXY);
       
-      // Si la position est proche de start position, monter
+      // Si la position est proche de start position, monter sur l'axe Z
       if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= StopRewindZ)
       {
          FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
@@ -279,15 +286,14 @@ void ACouchFishingRod::RewindQte()
 #pragma endregion
 
 #pragma region Getter
-
+// Is Used
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
+// Get Player
 TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
-int ACouchFishingRod::GetTeam() const
-{
-   return CurrentTeam;
-}
+// Get Team
+int ACouchFishingRod::GetTeam() const {return CurrentTeam;}
 
 #pragma endregion
 

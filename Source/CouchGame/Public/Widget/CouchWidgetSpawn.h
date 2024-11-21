@@ -26,7 +26,7 @@ public:
 	ACouchWidget3D* GetCurrentWidget();
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent);
+	void SpawnWidget(TSubclassOf<ACouchWidget3D> WidgetToSpawn, USceneComponent* AttachParent, bool WantAttachToParent = true);
 	
 	UFUNCTION(BlueprintCallable)
 	void DestroyWidget();
