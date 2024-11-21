@@ -36,11 +36,12 @@ void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWi
 	{
 		Mesh = MeshComp;	
 	}
-	else
+	else if (!UseMesh)
 	{
 		Mesh = MeshComp;
 		StartTransform = FTransform(FRotator(Actor->GetActorRotation().Pitch, Actor->GetActorRotation().Yaw - 90.0f, Actor->GetActorRotation().Roll), FVector(Mesh->GetSocketLocation(FName("barrel"))), FVector(1, 1, 1));
 	}
+	UsedMesh = UseMesh;
 	ChargeWidget = WidgetSpawner;
 }
 
@@ -80,12 +81,12 @@ FVector UCouchChargePower::LineTrace()
 		return FVector::ZeroVector;
 	}
 
-	if (!StartTransform.IsValid())
+	if (UsedMesh)
 	{
 		Start = Mesh->GetSocketLocation(FName("barrel"));
 		End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;	
 	}
-	else
+	else if (!UsedMesh)
 	{
 		Start = StartTransform.GetLocation();
 		End = Start + UKismetMathLibrary::GetForwardVector(StartTransform.Rotator()) * CurrentPower;
