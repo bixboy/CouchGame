@@ -1,5 +1,4 @@
 #include "Components//CouchChargePower.h"
-
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/OutputDeviceNull.h"
