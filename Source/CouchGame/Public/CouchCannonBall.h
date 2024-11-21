@@ -24,13 +24,15 @@ public:
 	void Initialize(const FVector& LaunchVelocity);
 
 	void InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCannonBall);
+	void CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source);
 
 	UFUNCTION()
 	void OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	ACouchProjectileEffect* GetEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime);
 
 protected:
 	virtual void BeginPlay() override;
-
+	
 private:
 	UPROPERTY()
 	FVector Velocity;      // Vélocité du projectile

@@ -51,3 +51,8 @@ void ACouchProjectileEffect::Tick(float DeltaTime)
 		}
 	}
 }
+
+bool ACouchProjectileEffect::IsExecutingOnDelay() const
+{
+	return ExecuteTime == ECouchProjectileExecuteTime::OnDelay;
+}
