@@ -30,5 +30,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<ACouchPickableCannonBall> PickableCannonBall;
 	void InitCanonBall(TObjectPtr<ACouchPickableCannonBall> RefPickableCannonBall);
+	void CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source);
 };
 
