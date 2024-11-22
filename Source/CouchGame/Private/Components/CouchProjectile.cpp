@@ -1,12 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Components/CouchProjectile.h"
 
 UCouchProjectile::UCouchProjectile()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
-
+// Init
 void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore, bool UnableCollision)
 {
 	Velocity = LaunchVelocity;
@@ -18,16 +16,14 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AA
 	IgnoredActors = ActorsToIgnore;
 }
 
-bool UCouchProjectile::GetCanMove() const {return CanMove;}
-
-void UCouchProjectile::SetCanMove(bool Value) {CanMove = Value;}
-
+// tick movement & collision
 void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (CanMove)
 	{
+		// Movement
 		TimeElapsed += DeltaTime;
 		FVector NewLocation = Location + (Velocity * SpeedMultiplier * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
 
@@ -78,4 +74,8 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 }
+
+bool UCouchProjectile::GetCanMove() const {return CanMove;}
+
+void UCouchProjectile::SetCanMove(bool Value) {CanMove = Value;}
 

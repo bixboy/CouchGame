@@ -28,6 +28,7 @@ void ACouchLure::SetupLure()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
 
+// Init Lure
 void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
 	TArray<TObjectPtr<AActor>> ActorToIgnore;
@@ -41,6 +42,7 @@ void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* Fis
 
 #pragma endregion
 
+// Overlap Attach
 void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Stop Movement
@@ -87,7 +89,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-void ACouchLure::DetachAttachedObject()
+// Detach Object
+void ACouchLure::DetachAttachObject()
 {
 	if (FishingObject)
 	{
@@ -96,6 +99,7 @@ void ACouchLure::DetachAttachedObject()
 	}
 }
 
+// Destoy Lure
 void ACouchLure::DestroyLure()
 {
 	if (FishingObject)
@@ -106,6 +110,7 @@ void ACouchLure::DestroyLure()
 
 #pragma region Getter
 
+// Get Attached Object class
 TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 {
 	if (FishingObject)
@@ -115,6 +120,7 @@ TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 	return nullptr;
 }
 
+// Get Attached Object Actor
 ACouchPickableMaster* ACouchLure::GetFishingObjectActor() const
 {
 	if (FishingObject)

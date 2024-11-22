@@ -85,7 +85,7 @@ private:
 	TObjectPtr<UMaterial> CableMaterial;
 
 	UFUNCTION()
-	void InitializeCableAndConstraint();
+	void InitializeCable();
 
 #pragma endregion
 
