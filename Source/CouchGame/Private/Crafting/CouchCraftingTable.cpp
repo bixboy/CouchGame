@@ -8,6 +8,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Crafting/CouchOctopusAnimationManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Curves/CurveFloat.h"
 #include "Interactables/CouchPickableMaster.h"
@@ -33,7 +34,7 @@ ACouchCraftingTable::ACouchCraftingTable()
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 
 	TableInteractiveZone = CreateDefaultSubobject<UBoxComponent>(TEXT("TableInteractiveZone"));
-	TableInteractiveZone->SetupAttachment(SkeletalMesh);
+	TableInteractiveZone->SetupAttachment(RootComponent);
 	
 	// Initialisation de Table
 	Table = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Table"));
@@ -49,14 +50,14 @@ ACouchCraftingTable::ACouchCraftingTable()
 
 	// Initialisation de PlateSuggestionPos
 	PlateSuggestionPos = CreateDefaultSubobject<USceneComponent>(TEXT("PlateSuggestionPos"));
-	PlateSuggestionPos->SetupAttachment(SkeletalMesh);
+	PlateSuggestionPos->SetupAttachment(RootComponent);
 
 	// Initialisation de FinalDishSpawnPosition
 	FinalDishSpawnPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishSpawnPosition"));
-	FinalDishSpawnPosition->SetupAttachment(SkeletalMesh);
+	FinalDishSpawnPosition->SetupAttachment(RootComponent);
 
 	FinalDishTargetPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishTargetPosition"));
-	FinalDishTargetPosition->SetupAttachment(SkeletalMesh);
+	FinalDishTargetPosition->SetupAttachment(RootComponent);
 
 	WidgetSpawn = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawn"));
 }
@@ -125,7 +126,7 @@ void ACouchCraftingTable::SpawnCraft()
 	
 	CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Spawn Craft Item");
-
+	AnimationManager->IsCooking = false;
 }
 
 void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
@@ -147,12 +148,13 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 			PlaceActor(Plate2, Plate2Position);
 		}
 	}
+	AnimationManager->HasObjectOnTheTable = true;
 	UpdateCraftSuggestion();
 }
 
 void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
 {
-	if (!Plate1 && !Plate2) return;
+	if (!Plate1 && !Plate2){AnimationManager->HasObjectOnTheTable = false; return;}
 	if (Plate1.Get() != Ingredient && Plate2.Get() != Ingredient) return;
 	if (Plate1.Get() == Ingredient)
 	{
@@ -174,6 +176,7 @@ void ACouchCraftingTable::CraftItem()
 {
 	if (!ItemToCraft) return;
 	MoveTimeline.PlayFromStart();
+	AnimationManager->IsCooking = true;
 	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
 }
 
@@ -182,6 +185,7 @@ void ACouchCraftingTable::BeginPlay()
 {
 	Super::BeginPlay();
 	InitializeMoveTimeline();
+	AnimationManager = NewObject<UCouchOctopusAnimationManager>();
 }
 
 void ACouchCraftingTable::Tick(float DeltaTime)

@@ -5,10 +5,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/BoxComponent.h"
+#include "Components/Button.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CouchFishingRod.h"
@@ -17,7 +19,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "ItemSpawnerManager/ItemSpawnerManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "Camera/CameraActor.h"
+#include "Widget/CouchWidgetPause.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -82,6 +84,7 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	BindInputMoveAndActions(EnhancedInputComponent);
 	BindInputInteractAndActions(EnhancedInputComponent);
+	BindInputWidget(EnhancedInputComponent);
 }
 
 void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
@@ -113,8 +116,7 @@ void ACouchCharacter::SetOrient(FVector2D NewOrient)
 
 void ACouchCharacter::MoveInDirectionOfRotation(float InputStrength)
 {
-	FRotator MeshRotation = GetMesh()->GetRelativeRotation();
-	FVector LeftDirection = FRotationMatrix(MeshRotation).GetScaledAxis(EAxis::Y);
+	FVector LeftDirection = FRotationMatrix(GetActorRotation()).GetScaledAxis(EAxis::Y);
 	AddMovementInput(LeftDirection, InputStrength, true);
 }
 
@@ -122,10 +124,21 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 {
 	if (InputMove.SizeSquared() > 0.0f)
 	{
+		// Calculate the desired rotation based on input
 		FRotator DesiredRotation = FRotationMatrix::MakeFromX(FVector(InputMove.X, -InputMove.Y, 0.0f)).Rotator();
-		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, CharacterRotationSpeed);
-		GetMesh()->SetRelativeRotation(NewRotation);
+
+		// Interpolate between the current control rotation and the desired rotation
+		if (Controller)
+		{
+			FRotator CurrentRotation = Controller->GetControlRotation();
+			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, CharacterRotationSpeed);
+
+			// Apply the new rotation to the controller
+			Controller->SetControlRotation(NewRotation);
+		}
+
+		// Synchronize the mesh's rotation with the actor's current rotation
+		GetMesh()->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 }
 #pragma endregion
@@ -434,7 +447,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		else if (!IsHoldingItem)
+		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
 		}
@@ -589,4 +602,49 @@ void ACouchCharacter::DestroyFishingRod()
 	AnimationManager->IsFishingPull = false;
 	AnimationManager->IsFishing = false;
 }
+#pragma endregion
+
+#pragma region Widget
+
+	void ACouchCharacter::BindInputWidget(UEnhancedInputComponent* EnhancedInputComponent)
+	{
+		if (!InputData) return;
+		if (InputData->InputActionPause)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionPause,
+				ETriggerEvent::Started,
+				this,
+				&ACouchCharacter::OnInputPause
+			);
+		}
+	}
+
+void ACouchCharacter::OnInputPause(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		3.0f,
+		FColor::Red,
+		"Enter InteractingActor Zone"
+	);
+	if (!WidgetRef)
+	{
+		WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause);
+		if (WidgetRef)
+		{
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(WidgetRef->Btn_Resume->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
+			WidgetRef->AddToViewport();
+		}	
+	}
+	else if (WidgetRef)
+	{
+		WidgetRef->RemoveFromParent();
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	}
+}
+
 #pragma endregion

@@ -100,6 +100,9 @@ void UCouchWidgetWin::EndAnimation()
 {
 	PlayAnimationForward(TextAppearAnimation);
 	StartConfetti();
+
+	FTimerHandle RoundTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &UCouchWidgetWin::OnNewRoundPressed, TimeToNewRound, false);
 }
 
 void UCouchWidgetWin::StartConfetti()
