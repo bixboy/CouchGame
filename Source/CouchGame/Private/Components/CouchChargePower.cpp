@@ -1,4 +1,6 @@
 #include "Components//CouchChargePower.h"
+
+#include "Characters/CouchCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/OutputDeviceNull.h"
@@ -28,7 +30,7 @@ void UCouchChargePower::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 }
 
 
-void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner, bool UseMesh,  AActor* Actor)
+void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner, bool UseMesh,  ACouchCharacter* Actor)
 {
 	PowerTimeline.PlayFromStart();
 	if (UseMesh)
@@ -38,7 +40,7 @@ void UCouchChargePower::StartCharging(USkeletalMeshComponent* MeshComp, UCouchWi
 	else if (!UseMesh)
 	{
 		Mesh = MeshComp;
-		StartTransform = FTransform(FRotator(Actor->GetActorRotation().Pitch, Actor->GetActorRotation().Yaw - 90.0f, Actor->GetActorRotation().Roll), FVector(Mesh->GetSocketLocation(FName("barrel"))), FVector(1, 1, 1));
+		StartTransform = FTransform(FRotator(Actor->GetActorRotation().Pitch, Actor->GetMesh()->GetComponentRotation().Yaw + 90.f, Actor->GetActorRotation().Roll), FVector(Actor->GetActorLocation()), FVector(1, 1, 1));
 	}
 	UsedMesh = UseMesh;
 	ChargeWidget = WidgetSpawner;
@@ -103,7 +105,7 @@ FVector UCouchChargePower::LineTrace()
 	   UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 	   false,
 	   ActorsToIgnore,
-	   EDrawDebugTrace::None,
+	   EDrawDebugTrace::Persistent,
 	   HitResult,
 	   true,
 	   FLinearColor::Red,
