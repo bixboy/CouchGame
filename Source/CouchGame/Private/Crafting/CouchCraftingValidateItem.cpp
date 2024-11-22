@@ -41,8 +41,8 @@ void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player
 void ACouchCraftingValidateItem::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "UIIIIIIIIIIIIIIIIII.");
-	WidgetSpawner->SpawnWidget(WidgetInteract, WidgetPose);
+	if (!CraftingTable) return;
+	if (CraftingTable->IsCraftingPossible()) WidgetSpawner->SpawnWidget(WidgetInteract, WidgetPose);
 }
 
 void ACouchCraftingValidateItem::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
