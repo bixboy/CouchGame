@@ -37,7 +37,7 @@ void UCouchCameraMove::StartCameraMove()
 
 void UCouchCameraMove::MoveCamera(float Alpha)
 {
-	if (bIsMoving)
+	if (bIsMoving && Boat2 && Boat1)
 	{
 		// Interpolation entre PointA et DestinationPoint basée sur la progression de la Timeline
 		FVector NewLocation = FMath::Lerp(PointA, DestinationPoint, Alpha);
