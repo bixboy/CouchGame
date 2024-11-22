@@ -33,7 +33,7 @@ ACouchCraftingTable::ACouchCraftingTable()
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 
 	TableInteractiveZone = CreateDefaultSubobject<UBoxComponent>(TEXT("TableInteractiveZone"));
-	TableInteractiveZone->SetupAttachment(SkeletalMesh);
+	TableInteractiveZone->SetupAttachment(RootComponent);
 	
 	// Initialisation de Table
 	Table = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Table"));
@@ -49,14 +49,14 @@ ACouchCraftingTable::ACouchCraftingTable()
 
 	// Initialisation de PlateSuggestionPos
 	PlateSuggestionPos = CreateDefaultSubobject<USceneComponent>(TEXT("PlateSuggestionPos"));
-	PlateSuggestionPos->SetupAttachment(SkeletalMesh);
+	PlateSuggestionPos->SetupAttachment(RootComponent);
 
 	// Initialisation de FinalDishSpawnPosition
 	FinalDishSpawnPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishSpawnPosition"));
-	FinalDishSpawnPosition->SetupAttachment(SkeletalMesh);
+	FinalDishSpawnPosition->SetupAttachment(RootComponent);
 
 	FinalDishTargetPosition = CreateDefaultSubobject<USceneComponent>(TEXT("FinalDishTargetPosition"));
-	FinalDishTargetPosition->SetupAttachment(SkeletalMesh);
+	FinalDishTargetPosition->SetupAttachment(RootComponent);
 
 	WidgetSpawn = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgetSpawn"));
 }
