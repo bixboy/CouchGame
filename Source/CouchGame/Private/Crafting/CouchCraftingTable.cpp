@@ -75,6 +75,20 @@ const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible(
 	return nullptr;
 }
 
+// Called when the game starts or when spawned
+void ACouchCraftingTable::BeginPlay()
+{
+	Super::BeginPlay();
+	InitializeMoveTimeline();
+	AnimationManager = NewObject<UCouchOctopusAnimationManager>(this);
+}
+
+void ACouchCraftingTable::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	MoveTimeline.TickTimeline(DeltaTime);
+}
+
 const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible()
 {
 	TArray<TSubclassOf<ACouchPickableMaster>> Ingredients;
@@ -178,20 +192,6 @@ void ACouchCraftingTable::CraftItem()
 	MoveTimeline.PlayFromStart();
 	AnimationManager->IsCooking = true;
 	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
-}
-
-// Called when the game starts or when spawned
-void ACouchCraftingTable::BeginPlay()
-{
-	Super::BeginPlay();
-	InitializeMoveTimeline();
-	AnimationManager = NewObject<UCouchOctopusAnimationManager>();
-}
-
-void ACouchCraftingTable::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	MoveTimeline.TickTimeline(DeltaTime);
 }
 
 void ACouchCraftingTable::InitializeMoveTimeline()

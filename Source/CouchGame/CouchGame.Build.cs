@@ -10,14 +10,9 @@ public class CouchGame : ModuleRules
 		
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "DeveloperSettings", "LocalMultiplayer", "UMG", "Niagara", "CableComponent", "NiagaraUIRenderer", "Slate", "SlateCore"  });
 		
-		PrivateDependencyModuleNames.AddRange(new string[]
-		{
-			"EditorInteractiveToolsFramework"
-		});
-
 		if (Target.bBuildEditor)
 		{
-			PrivateDependencyModuleNames.Add("UnrealEd");
+			PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "EditorInteractiveToolsFramework" });
 		}
 	}
 }
