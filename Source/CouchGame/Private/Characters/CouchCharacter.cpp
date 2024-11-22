@@ -116,8 +116,7 @@ void ACouchCharacter::SetOrient(FVector2D NewOrient)
 
 void ACouchCharacter::MoveInDirectionOfRotation(float InputStrength)
 {
-	FRotator MeshRotation = GetMesh()->GetRelativeRotation();
-	FVector LeftDirection = FRotationMatrix(MeshRotation).GetScaledAxis(EAxis::Y);
+	FVector LeftDirection = FRotationMatrix(GetActorRotation()).GetScaledAxis(EAxis::Y);
 	AddMovementInput(LeftDirection, InputStrength, true);
 }
 
@@ -125,10 +124,21 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 {
 	if (InputMove.SizeSquared() > 0.0f)
 	{
+		// Calculate the desired rotation based on input
 		FRotator DesiredRotation = FRotationMatrix::MakeFromX(FVector(InputMove.X, -InputMove.Y, 0.0f)).Rotator();
-		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, CharacterRotationSpeed);
-		GetMesh()->SetRelativeRotation(NewRotation);
+
+		// Interpolate between the current control rotation and the desired rotation
+		if (Controller)
+		{
+			FRotator CurrentRotation = Controller->GetControlRotation();
+			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, CharacterRotationSpeed);
+
+			// Apply the new rotation to the controller
+			Controller->SetControlRotation(NewRotation);
+		}
+
+		// Synchronize the mesh's rotation with the actor's current rotation
+		GetMesh()->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 }
 #pragma endregion
