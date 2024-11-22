@@ -18,6 +18,7 @@ class COUCHGAME_API ACouchCraftingValidateItem : public ACouchInteractableMaster
 protected:
 	ACouchCraftingValidateItem();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
@@ -26,6 +27,7 @@ public:
 	TObjectPtr<UCouchWidgetSpawn> WidgetSpawner;
 
 private:
+	bool IsWidgetActive;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;
 

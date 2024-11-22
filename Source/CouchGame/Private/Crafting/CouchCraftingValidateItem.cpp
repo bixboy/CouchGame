@@ -1,6 +1,7 @@
 #include "Crafting/CouchCraftingValidateItem.h"
 #include "Components/BoxComponent.h"
 #include "Crafting/CouchCraftingTable.h"
+#include "Widget/CouchWidget3D.h"
 #include "Widget/CouchWidgetSpawn.h"
 
 ACouchCraftingValidateItem::ACouchCraftingValidateItem()
@@ -29,6 +30,17 @@ void ACouchCraftingValidateItem::BeginPlay()
 	}
 }
 
+void ACouchCraftingValidateItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (!CraftingTable) return;
+	if (IsWidgetActive && !CraftingTable->IsCraftingPossible())
+	{
+		WidgetSpawner->DestroyWidget();
+		IsWidgetActive = false;
+	}
+}
+
 void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player)
 {
 	Super::Interact_Implementation(Player);
@@ -42,13 +54,18 @@ void ACouchCraftingValidateItem::OnCharacterBeginOverlap(UPrimitiveComponent* Ov
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!CraftingTable) return;
-	if (CraftingTable->IsCraftingPossible()) WidgetSpawner->SpawnWidget(WidgetInteract, WidgetPose);
+	if (CraftingTable->IsCraftingPossible() && WidgetInteract)
+	{
+		WidgetSpawner->SpawnWidget(WidgetInteract, WidgetPose);
+		IsWidgetActive = true;
+	}
 }
 
 void ACouchCraftingValidateItem::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	WidgetSpawner->DestroyWidget();
+	IsWidgetActive = false;
 }
 
 
