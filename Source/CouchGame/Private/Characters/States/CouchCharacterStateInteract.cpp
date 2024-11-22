@@ -36,7 +36,7 @@ void UCouchCharacterStateInteract::StateExit(ECouchCharacterStateID NextStateID)
 		FColor::Green,
 		TEXT("Exit StateInteract")
 	);
-	if (Character->InteractingActor && Character->IsInteracting && Character->IsInInteractingRange) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
+	if (Character->InteractingActor && Character->IsInteracting /*&& Character->IsInInteractingRange*/ ) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
 }
 
 void UCouchCharacterStateInteract::StateTick(float DeltaTime)
