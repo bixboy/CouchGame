@@ -434,7 +434,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		else if (!IsHoldingItem)
+		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
 		}
