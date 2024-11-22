@@ -27,7 +27,7 @@ public:
 	float GetDelay() const;
 
 	void Init(ACouchCannonBall* InBall, ACouchPickableCannonBall* InPickBall = nullptr,AActor* InActor = nullptr, FHitResult InHitResult = FHitResult());
-
+	bool IsExecutingOnDelay() const;
 protected:
 	virtual void BeginPlay() override;
 
@@ -41,10 +41,13 @@ protected:
 	UPROPERTY()
 	FHitResult HitResult;
 	bool HasExecutedEffect;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, meta = (EditCondition = "IsExecutingOnDelay()"))
+	float Delay = 5.0f;
 	
 private:
-	UPROPERTY(EditAnywhere)
-	float Delay = 5.0f;
+	
+	
 	float Timer;
 
 	

@@ -46,7 +46,7 @@ private:
 	void StartConfetti();
 
 public:
-	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UPROPERTY(meta = (BindWidgetAnim), Transient, BlueprintReadWrite)
 	TObjectPtr<UWidgetAnimation> OpenAnimation;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> TextAppearAnimation;
@@ -57,6 +57,9 @@ public:
 	TObjectPtr<UNiagaraSystemWidget> NSWidget_1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UNiagaraSystemWidget> NSWidget_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool ConstructAnim = true;
 	
 #pragma endregion 	
 

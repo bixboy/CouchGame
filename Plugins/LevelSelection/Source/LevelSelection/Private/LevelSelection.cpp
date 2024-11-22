@@ -2,8 +2,6 @@
 #if WITH_EDITOR
 #include "LevelSelection.h"
 #include "FileHelpers.h"
-#include "LevelSelectionStyle.h"
-#include "LevelSelectionCommands.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Layout/SBox.h"
@@ -169,7 +167,12 @@ TArray<FString> FLevelSelectionModule::GetAllMapNames()
 // Open Levels
 void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 {
-	FEditorFileUtils::LoadMap(LevelPath, false);
+	// Vérifie s'il y a des modifications non sauvegardées
+	if (FEditorFileUtils::SaveDirtyPackages(true, true, true))
+	{
+		FEditorFileUtils::LoadMap(LevelPath, false);
+	}
+
 }
 
 #pragma endregion

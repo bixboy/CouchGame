@@ -61,6 +61,7 @@ private:
 	FTransform StartTransform;
 	FVector Start;
 	FVector End;
+	bool UsedMesh;
 
 	UFUNCTION()
 	float UpdatePower(float Alpha);
