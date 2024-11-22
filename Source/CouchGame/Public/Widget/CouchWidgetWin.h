@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "NiagaraSystemWidget.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 #include "CouchWidgetWin.generated.h"
 
 class UImage;
@@ -19,6 +20,9 @@ class COUCHGAME_API UCouchWidgetWin : public UUserWidget
 protected:
 	virtual bool Initialize() override;
 	virtual void NativeConstruct() override;
+
+private:
+	float TimeToNewRound = 5.f;
 
 #pragma region Light
 
@@ -38,7 +42,6 @@ private:
 	void CheckLight();
 
 #pragma endregion	
-	
 
 #pragma region Animation
 private:

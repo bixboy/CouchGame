@@ -31,7 +31,7 @@ void UCouchWidgetPause::NativeConstruct()
 	{
 		FTimerHandle RoundTimerHandle;
 		PlayAnimationForward(OpenAnimation);
-		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(true); }, OpenAnimation->GetEndTime(), false);	
+		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(true); }, 2.f, false);	
 	}
 }
 

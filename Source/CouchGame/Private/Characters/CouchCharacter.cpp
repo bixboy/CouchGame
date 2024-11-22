@@ -5,10 +5,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
 #include "Components/BoxComponent.h"
+#include "Components/Button.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CouchFishingRod.h"
@@ -17,7 +19,7 @@
 #include "Interfaces/CouchPickable.h"
 #include "ItemSpawnerManager/ItemSpawnerManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "Camera/CameraActor.h"
+#include "Widget/CouchWidgetPause.h"
 
 #pragma region Unreal Default
 ACouchCharacter::ACouchCharacter()
@@ -82,6 +84,7 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	BindInputMoveAndActions(EnhancedInputComponent);
 	BindInputInteractAndActions(EnhancedInputComponent);
+	BindInputWidget(EnhancedInputComponent);
 }
 
 void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
@@ -434,7 +437,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		else if (!IsHoldingItem)
+		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
 		}
@@ -589,4 +592,49 @@ void ACouchCharacter::DestroyFishingRod()
 	AnimationManager->IsFishingPull = false;
 	AnimationManager->IsFishing = false;
 }
+#pragma endregion
+
+#pragma region Widget
+
+	void ACouchCharacter::BindInputWidget(UEnhancedInputComponent* EnhancedInputComponent)
+	{
+		if (!InputData) return;
+		if (InputData->InputActionPause)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionPause,
+				ETriggerEvent::Started,
+				this,
+				&ACouchCharacter::OnInputPause
+			);
+		}
+	}
+
+void ACouchCharacter::OnInputPause(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		3.0f,
+		FColor::Red,
+		"Enter InteractingActor Zone"
+	);
+	if (!WidgetRef)
+	{
+		WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause);
+		if (WidgetRef)
+		{
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(WidgetRef->Btn_Resume->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
+			WidgetRef->AddToViewport();
+		}	
+	}
+	else if (WidgetRef)
+	{
+		WidgetRef->RemoveFromParent();
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	}
+}
+
 #pragma endregion

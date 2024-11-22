@@ -1,6 +1,7 @@
 
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidgetTimer.h"
 #include "Widget/CouchWidgetWin.h"
@@ -34,6 +35,21 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	StartNewRound();
 }
 
+void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FText Text)
+{
+	if (UCouchWidgetWin* WidgetRef = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
+	{
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(WidgetRef->TakeWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
+		
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		WidgetRef->ChangeWinnerText(Text);
+		WidgetRef->AddToViewport();
+	}
+}
+
 #pragma region Rounds
 
 //Start Round
@@ -63,44 +79,26 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 
 	if (TeamWin == 1)
 	{
-		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
-		{
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-			Widget->ChangeWinnerText(FText::FromString("Team A wins the round!"));
-			Widget->AddToViewport();
-		}
-		
 		// L'équipe A gagne la manche
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Team A wins the round!"));
 		TeamAPRoundWin++;
+
+		OpenUi(WinWidget, FText::FromString("Team A wins the round!"));
 	}
 	else if (TeamWin == 2)
 	{
-		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
-		{
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-			Widget->ChangeWinnerText(FText::FromString("Team B wins the round!"));
-			Widget->AddToViewport();
-		}
-		
 		// L'équipe B gagne la manche
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Team B wins the round!"));
 		TeamBPRoundWin++;
+		
+		OpenUi(WinWidget, FText::FromString("Team B wins the round!"));
 	}
 	else if (TeamWin == 0)
 	{
 		// No Team win
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("No Team Win!"));
-
-		if (UCouchWidgetWin* Widget = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
-		{
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-			Widget->ChangeWinnerText(FText::FromString("No Team wins the round!"));
-			Widget->AddToViewport();
-		}
+		
+		OpenUi(WinWidget, FText::FromString("No Team wins the round!"));
 	}
 
 	// Condition de fin de jeu si le nombre maximum de manches est atteint
@@ -108,11 +106,13 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Game Finish!"));
 
-		if (UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WinWidget))
+		if (TeamAPRoundWin > TeamBPRoundWin)
 		{
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-			WidgetInstance->AddToViewport();
+			OpenUi(WinWidget, FText::FromString("Team A win this game!"));
+		}
+		else if (TeamBPRoundWin > TeamAPRoundWin)
+		{
+			OpenUi(WinWidget, FText::FromString("Team B win this game!"));
 		}
 	}
 }
