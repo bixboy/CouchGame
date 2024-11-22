@@ -11,8 +11,8 @@ class COUCHGAME_API UCouchOctopusAnimationManager : public UObject
 
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "States")
-	bool HasObjectOnTheTable;
+	bool HasObjectOnTheTable = false;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "States")
-	bool IsCooking;
+	bool IsCooking = false;
 };
