@@ -27,7 +27,13 @@ void ABoatFloor::Tick(float DeltaTime)
 		Timer += DeltaTime;
 		if (Timer >= DamageFrequency)
 		{
-			ABoat->BoatDamage(Hits.Num());
+			// ABoat->BoatDamage(Hits.Num());
+			for(int i = 0; i < Hits.Num(); i++)
+			{
+				FVector Scale = Hits[i]->HitMesh->GetRelativeScale3D();
+				float AverageScale = (Scale.X + Scale.Y + Scale.Z) / 3.0f;
+				ABoat->BoatDamage(AverageScale);
+			}
 			Timer = 0;
 		}
 	}

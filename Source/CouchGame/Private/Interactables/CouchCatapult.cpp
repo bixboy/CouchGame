@@ -5,6 +5,9 @@
 #include "CouchStaticCanonBall.h"
 #include "Components/CouchChargePower.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectileEffect/CouchProjectileEffect.h"
+#include "ProjectileEffect/CouchProjectileExecuteTime.h"
+#include "ProjectileEffect/Effects/CouchProjectileEffectTripleBullets.h"
 
 ACouchCatapult::ACouchCatapult()
 {
@@ -22,7 +25,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	{
 		if (WidgetComponent->PowerChargeActor)
 		{
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(false);
@@ -30,7 +33,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 		else
 		{
 			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent);
+			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(false);
@@ -70,34 +73,89 @@ void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
 
 void ACouchCatapult::SpawnBullet()
 {
-	FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
-	FVector SuggestedVelocity;
-	
-	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-		this,
-		SuggestedVelocity,
-		StartLocation,
-		PowerChargeComponent->TargetLocation,
-		0,
-		CurveShoot
-	);
-	
-	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
-	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
-	if (Projectile)
-	{
-		Projectile->InitCanonBall(AmmoActor);
-		Projectile->Initialize(SuggestedVelocity);
-		if (AmmoActor)
-		{
-			CurrentAmmo --;
-			AmmoActor->Destroy();
-			AmmoActor = nullptr;
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
-		}
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(CameraShake, 1.0f);
-	}
+    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
+    FVector SuggestedVelocity;
+    
+    // Calculer la vélocité suggérée pour le projectile principal
+    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+        this,
+        SuggestedVelocity,
+        StartLocation,
+        PowerChargeComponent->TargetLocation,
+        0,
+        CurveShoot
+    );
+    
+    FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
+    ACouchCannonBall* MainProjectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
+    
+    if (MainProjectile)
+    {
+        MainProjectile->InitCanonBall(AmmoActor);
+        MainProjectile->Initialize(SuggestedVelocity);
+    }
+    
+    if (ACouchProjectileEffect* ProjectileEffect = MainProjectile->GetEffectWithExecuteTime(ECouchProjectileExecuteTime::OnLaunch))
+    {
+        if (ACouchProjectileEffectTripleBullets* TripleBulletsEffect = Cast<ACouchProjectileEffectTripleBullets>(ProjectileEffect))
+        {
+            float AngleOffset = TripleBulletsEffect->Degree;
+
+            // Calculer la vélocité pour les projectiles supplémentaires (gauche et droite)
+            FVector LeftVelocity;
+    
+        	// Calculer la vélocité suggérée pour le projectile principal
+        	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+				this,
+				LeftVelocity,
+				StartLocation,
+				PowerChargeComponent->TargetLocation + FVector(-AngleOffset * UE::Geometry::Distance(StartLocation, PowerChargeComponent->TargetLocation), 0, 0),
+				0,
+				CurveShoot
+			);
+            FVector RightVelocity = SuggestedVelocity;
+        	UGameplayStatics::SuggestProjectileVelocity_CustomArc(
+				this,
+				RightVelocity,
+				StartLocation,
+				PowerChargeComponent->TargetLocation + FVector(AngleOffset * UE::Geometry::Distance(StartLocation, PowerChargeComponent->TargetLocation), 0, 0),
+				0,
+				CurveShoot
+			);
+            // Appliquer la rotation spécifique pour chaque projectile
+            FRotator LeftRotation = LeftVelocity.Rotation().Add(0, 0, -AngleOffset);
+            FRotator RightRotation = RightVelocity.Rotation().Add(0, 0, AngleOffset);
+        	
+            // Spawner les projectiles gauche et droit avec leurs nouvelles vélocités
+            FTransform LeftTransform = FTransform(LeftRotation, SkeletalMesh->GetSocketLocation(FName("barrel")));
+            FTransform RightTransform = FTransform(RightRotation, SkeletalMesh->GetSocketLocation(FName("barrel")));
+
+            ACouchCannonBall* LeftProjectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, LeftTransform);
+            ACouchCannonBall* RightProjectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, RightTransform);
+			AmmoActor->ProjectileEffects.Remove(ProjectileEffect->GetClass());
+            if (LeftProjectile)
+            {
+                LeftProjectile->InitCanonBall(AmmoActor);
+                LeftProjectile->Initialize(LeftVelocity); // Utilise la vélocité recalculée
+            }
+            if (RightProjectile)
+            {
+                RightProjectile->InitCanonBall(AmmoActor);
+                RightProjectile->Initialize(RightVelocity); // Utilise la vélocité recalculée
+            }
+        }
+    }
+
+    if (AmmoActor)
+    {
+        CurrentAmmo--;
+        AmmoActor->Destroy();
+        AmmoActor = nullptr;
+        if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
+    }
+    GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(CameraShake, 1.0f);
 }
+
 
 void ACouchCatapult::Reload(ACouchPickableCannonBall* CannonBallReload)
 {

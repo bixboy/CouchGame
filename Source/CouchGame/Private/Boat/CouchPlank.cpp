@@ -35,7 +35,7 @@ void ACouchPlank::Init(ABoatFloor* floor, float RepairingTime, float Scale)
 {
 	Floor = floor;
 	if (RepairingTime > 0) TimeToRepair *= RepairingTime;
-	if (Scale > 0) this->SetActorScale3D(GetActorScale()*Scale);
+	if (Scale > 0) HitMesh->SetRelativeScale3D(HitMesh->GetRelativeScale3D()*Scale);
 }
 
 #pragma region Overlap

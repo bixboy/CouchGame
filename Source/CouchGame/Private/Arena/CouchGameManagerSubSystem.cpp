@@ -2,6 +2,7 @@
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Widget/CouchWidgetTimer.h"
 #include "Widget/CouchWidgetWin.h"
 
 #pragma region Initialize
@@ -33,31 +34,27 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	StartNewRound();
 }
 
+#pragma region Rounds
+
+//Start Round
 void UCouchGameManagerSubSystem::StartNewRound()
 {
 	 if (!LevelName.IsNone())
 	{
-		if (LevelName.ToString() == GetWorld()->GetName())
-		{
-			// Charger un niveau temporaire avant de recharger le niveau actuel
-			UGameplayStatics::OpenLevel(GetWorld(), FName("TempLevel"));
-			GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {
-				UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-			});
-			return;
-		}
-		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+		UGameplayStatics::OpenLevel(this, LevelName, false);
 	}
-	
 	
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	CurrentRound++;
 
 	// Démarre un timer de 3 minutes pour la manche
-	float RoundDurationInSeconds = RoundDurationMinutes * 60.0f;
+	CurrentRoundTimer = RoundDurationMinutes * 60.0f;
 	GetWorld()->GetTimerManager().ClearTimer(RoundTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &UCouchGameManagerSubSystem::OnRoundTimerEnd, RoundDurationInSeconds, false);
+	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &UCouchGameManagerSubSystem::OnRoundTimerEnd, CurrentRoundTimer, false);
+	
+	GetWorld()->GetTimerManager().ClearTimer(UiTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(UiTimerHandle, this, &UCouchGameManagerSubSystem::DecrementTimer, 1.0f, true);
 }
 
 void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
@@ -145,6 +142,7 @@ void UCouchGameManagerSubSystem::ResetRound()
 	TeamBPRoundWin = 0;
 }
 
+// Update Life
 void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float CurrentLife)
 {
 	if (CurrentTeam == 1)
@@ -166,6 +164,27 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 		}
 	}
 }
+
+// Update Timer
+void UCouchGameManagerSubSystem::DecrementTimer()
+{
+	if (CurrentRoundTimer > 0)
+	{
+		CurrentRoundTimer--;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(UiTimerHandle);
+	}
+}
+
+// Get Time
+float UCouchGameManagerSubSystem::GetTime() const
+{
+	return CurrentRoundTimer;
+}
+
+#pragma endregion
 
 #pragma region Local Multiplayer
 void UCouchGameManagerSubSystem::AddPlayer()

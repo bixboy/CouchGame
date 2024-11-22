@@ -7,6 +7,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "CouchGameManagerSubSystem.generated.h"
 
+class UCouchWidgetTimer;
 class UCouchWidgetWin;
 
 UCLASS(Abstract, Blueprintable, BlueprintType)
@@ -51,6 +52,10 @@ protected:
 
 	// Timer de manches
 	FTimerHandle RoundTimerHandle;
+	float CurrentRoundTimer;
+
+	FTimerHandle UiTimerHandle;
+	void DecrementTimer();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
 	float RoundDurationMinutes  = 3.0f;
@@ -68,6 +73,9 @@ public:
 	void CheckRoundWinCondition(int TeamWin);
 	UFUNCTION(BlueprintCallable)
 	void SetupRounds(int RoundsNumber, float RoundDuration, FName Level, TSubclassOf<UCouchWidgetWin> Widget);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetTime() const;
 
 	void ResetRound();
 	void OnRoundTimerEnd();
