@@ -65,9 +65,10 @@ ACouchCraftingTable::ACouchCraftingTable()
 const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible(
 	const TArray<TSubclassOf<ACouchPickableMaster>>& Ingredients)
 {
+	if (Ingredients.IsEmpty()) return nullptr;
 	for (const FCraftRecipe& Recipe : CraftRecipes)
 	{
-		if (AreArraysEqualIgnoringOrder(Recipe.Ingredients, Ingredients))
+		if (AreArraysEqualIgnoringOrder(Recipe.Ingredients, Ingredients) && Recipe.ResultObject)
 		{
 			return &Recipe;
 		}
@@ -86,7 +87,7 @@ void ACouchCraftingTable::BeginPlay()
 void ACouchCraftingTable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveTimeline.TickTimeline(DeltaTime);
+	if (MoveTimeline.IsPlaying()) MoveTimeline.TickTimeline(DeltaTime);
 }
 
 const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible()
@@ -131,9 +132,8 @@ void ACouchCraftingTable::SpawnCraft()
   ); 
    
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), StartLocation);
-	TObjectPtr<ACouchPickableCannonBall> CraftItem = GetWorld()->SpawnActor<ACouchPickableCannonBall>(ItemToCraft, Transform);
 	// ICI LE CRASH DU LA PREZ
-	if (CraftItem)
+	if (TObjectPtr<ACouchPickableCannonBall> CraftItem = GetWorld()->SpawnActor<ACouchPickableCannonBall>(ItemToCraft, Transform))
 	{
 		ItemToCraft = nullptr;
 
@@ -143,6 +143,11 @@ void ACouchCraftingTable::SpawnCraft()
 	
 		CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
 		AnimationManager->IsCooking = false;	
+	}
+	else
+	{
+		if (!ItemToCraft) GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Red, "ItemToCraft");
+		if (!Transform.IsValid()) GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Red, "Transform not valid");
 	}
 }
 
