@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputActionCancel;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionPause;
 };

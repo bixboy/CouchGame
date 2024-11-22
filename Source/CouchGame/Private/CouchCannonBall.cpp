@@ -35,6 +35,7 @@ void ACouchCannonBall::BeginPlay()
 	Super::BeginPlay();
 
 }
+
 ACouchProjectileEffect* ACouchCannonBall::GetEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime)
 {
 	for (auto ProjectileEffect : ProjectileEffects)

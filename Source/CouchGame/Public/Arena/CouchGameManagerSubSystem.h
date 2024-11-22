@@ -74,6 +74,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetupRounds(int RoundsNumber, float RoundDuration, FName Level, TSubclassOf<UCouchWidgetWin> Widget);
 
+	UFUNCTION(BlueprintCallable)
+	void OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FText Text);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTime() const;
 

@@ -9,6 +9,8 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
+class UCouchWidgetPause;
+class UCouchWidgetWin;
 class UBoxComponent;
 class AItemSpawnerManager;
 class ACouchFishingRod;
@@ -203,4 +205,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCouchCharacterAnimationManager* AnimationManager;
 #pragma endregion
+
+#pragma region Widget
+
+private:
+	void BindInputWidget(UEnhancedInputComponent* EnhancedInputComponent);
+
+	void OnInputPause(const FInputActionValue& InputActionValue);
+
+	UPROPERTY(EditAnywhere, Category = Widget)
+	TSubclassOf<UCouchWidgetPause> WidgetPause;
+	UPROPERTY()
+	TObjectPtr<UCouchWidgetPause> WidgetRef;
+	
+#pragma endregion	
 };

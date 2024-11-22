@@ -159,6 +159,11 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
    {
       FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
       FVector LurePosition = LureRef->GetActorLocation();
+
+      // Réduction de la longueur du câble
+      float CurrentCableLength = Cable->CableLength;
+      float NewCableLength = FMath::FInterpConstantTo(CurrentCableLength, 0.0f, DeltaTime, RewindSpeed);
+      Cable->CableLength = NewCableLength;
             
       FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
       FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
