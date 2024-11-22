@@ -132,15 +132,18 @@ void ACouchCraftingTable::SpawnCraft()
    
 	FTransform Transform = FTransform(SuggestedVelocity.Rotation(), StartLocation);
 	TObjectPtr<ACouchPickableCannonBall> CraftItem = GetWorld()->SpawnActor<ACouchPickableCannonBall>(ItemToCraft, Transform);
-	ItemToCraft = nullptr;
+	// ICI LE CRASH DU LA PREZ
+	if (CraftItem)
+	{
+		ItemToCraft = nullptr;
 
-	TArray<TObjectPtr<AActor>> ActorToIgnore;
-	ActorToIgnore.Add(this);
+		TArray<TObjectPtr<AActor>> ActorToIgnore;
+		ActorToIgnore.Add(this);
 	
 	
-	CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Spawn Craft Item");
-	AnimationManager->IsCooking = false;
+		CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
+		AnimationManager->IsCooking = false;	
+	}
 }
 
 void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)

@@ -63,6 +63,11 @@ void ACouchFishingRod::StartChargeActor_Implementation()
    ICouchInteractable::StartChargeActor_Implementation();
    if(!IsInCharge)
    {
+      if (LureRef)
+      {
+         LureRef->DetachAttachedObject();
+         DestroyLureAndCable();
+      }
       WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
       ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
       
@@ -209,7 +214,7 @@ void ACouchFishingRod::StopRewindCable()
 void ACouchFishingRod::SpawnPickableObject()
 {
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
-   FVector TargetLocation = GetRandomPos(200.f, 500.f, 100.f);
+   FVector TargetLocation = GetRandomPos(MinDistanceSpawnObject, MaxDistanceSpawnObject, 100.f);
    FVector SuggestedVelocity;
    
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(

@@ -7,13 +7,14 @@ UCouchProjectile::UCouchProjectile()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore)
+void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore, bool UnableCollision)
 {
 	Velocity = LaunchVelocity;
 	Location = GetOwner()->GetActorLocation();
 	TimeElapsed = 0.0f;
 	CanMove = true;
 
+	CollisionIsActive = UnableCollision;
 	IgnoredActors = ActorsToIgnore;
 }
 
@@ -34,36 +35,44 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		FVector Start = Location;
 		FVector End = NewLocation;
 
-		FCollisionQueryParams CollisionParams;
+		// Collisions
+		if (CollisionIsActive)
+		{
+			FCollisionQueryParams CollisionParams;
 		
-		for (AActor* ActorToIgnore : IgnoredActors)
-			if (ActorToIgnore)
+			for (AActor* ActorToIgnore : IgnoredActors)
+				if (ActorToIgnore)
+				{
+					CollisionParams.AddIgnoredActor(ActorToIgnore);
+					CollisionParams.AddIgnoredActor(GetOwner());	
+				}
+
+			bool bHit = GetWorld()->SweepSingleByChannel(
+				HitResult, 
+				Start, 
+				End, 
+				FQuat::Identity, 
+				ECC_Visibility, 
+				FCollisionShape::MakeSphere(15.f),
+				CollisionParams
+			);
+		
+			if (bHit)
 			{
-				CollisionParams.AddIgnoredActor(ActorToIgnore);
-				CollisionParams.AddIgnoredActor(GetOwner());	
+				NewLocation = HitResult.Location;
+				Velocity = FVector::ZeroVector;
+				SetCanMove(false);
+			
+				FString ActorName = HitResult.GetActor()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Actor hit: %s"), *ActorName));
 			}
 
-		bool bHit = GetWorld()->SweepSingleByChannel(
-			HitResult, 
-			Start, 
-			End, 
-			FQuat::Identity, 
-			ECC_Visibility, 
-			FCollisionShape::MakeSphere(15.f),
-			CollisionParams
-		);
-		
-		if (bHit)
-		{
-			NewLocation = HitResult.Location;
-			Velocity = FVector::ZeroVector;
-			SetCanMove(false);
-			
-			FString ActorName = HitResult.GetActor()->GetName();
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Actor hit: %s"), *ActorName));
+			if (!bHit)
+			{
+				GetOwner()->SetActorLocation(NewLocation);
+			}
 		}
-
-		if (!bHit)
+		else
 		{
 			GetOwner()->SetActorLocation(NewLocation);
 		}

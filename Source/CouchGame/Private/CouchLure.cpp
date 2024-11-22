@@ -33,7 +33,9 @@ void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* Fis
 	TArray<TObjectPtr<AActor>> ActorToIgnore;
 	ActorToIgnore.Add(this);
 	ActorToIgnore.Add(GetOwner());
-	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore);
+	ActorToIgnore.Add(FishingRod);
+	ActorToIgnore.Add(FishingRod->CurrentPlayer);
+	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore, false);
 	CouchFishingRod = FishingRod;
 }
 
@@ -46,12 +48,13 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (CouchProjectile->GetCanMove())
 		{
-			CouchProjectile->SetCanMove(false);
 			SphereComponent->SetSimulatePhysics(true);
-
+			CouchProjectile->SetCanMove(false);
+			
 			const FVector Vel = FVector::ZeroVector;
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
+			
 			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishingRelease = false;
 			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishing = true;
 		}	
