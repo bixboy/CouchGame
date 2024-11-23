@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CouchFishingObject.h"
 #include "Components/CouchProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
