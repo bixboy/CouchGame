@@ -23,12 +23,12 @@ void UCouchCharacterStateIdle::StateEnter(ECouchCharacterStateID PreviousStateID
 {
 	Super::StateEnter(PreviousStateID);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::White,
-		TEXT("Enter StateIdle")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::White,
+	//	TEXT("Enter StateIdle")
+	//);
 	if (!Character) return;
 	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
 
@@ -38,24 +38,24 @@ void UCouchCharacterStateIdle::StateExit(ECouchCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::White,
-		TEXT("Exit StateIdle")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::White,
+	//	TEXT("Exit StateIdle")
+	//);
 	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateIdle::OnInputDash);
 }
 
 void UCouchCharacterStateIdle::StateTick(float DeltaTime)
 {
 	Super::StateTick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		DeltaTime,
-		FColor::White,
-		TEXT("Tick StateIdle")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	DeltaTime,
+	//	FColor::White,
+	//	TEXT("Tick StateIdle")
+	//);
 
 	if (FMath::Abs(Character->GetInputMove().Size()) > CharacterSettings->InputMoveThreshold)
 	{

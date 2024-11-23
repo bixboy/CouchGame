@@ -23,12 +23,12 @@ void UCouchCharacterStateWalk::OnInputDash(FVector2D InputMove)
 void UCouchCharacterStateWalk::StateEnter(ECouchCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Blue,
-		TEXT("Enter StateWalk")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::Blue,
+	//	TEXT("Enter StateWalk")
+	//);
 	Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeedMax;
 	Character->InputDashEvent.AddDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
 	if (!Character->AnimationManager) return;
@@ -39,12 +39,12 @@ void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Blue,
-		TEXT("Exit StateWalk")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::Blue,
+	//	TEXT("Exit StateWalk")
+	//);
 	Character->InputDashEvent.RemoveDynamic(this, &UCouchCharacterStateWalk::OnInputDash);
 	if (!Character->AnimationManager) return;
 	Character->AnimationManager->IsRunning = false;
@@ -53,12 +53,12 @@ void UCouchCharacterStateWalk::StateExit(ECouchCharacterStateID NextStateID)
 void UCouchCharacterStateWalk::StateTick(float DeltaTime)
 {
 	Super::StateTick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		DeltaTime,
-		FColor::Blue,
-		TEXT("Tick StateWalk")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	DeltaTime,
+	//	FColor::Blue,
+	//	TEXT("Tick StateWalk")
+	//);
 	if (FMath::Abs(Character->GetInputMove().Size()) < CharacterSettings->InputMoveThreshold)
 	{
 		StateMachine->ChangeState(ECouchCharacterStateID::Idle);

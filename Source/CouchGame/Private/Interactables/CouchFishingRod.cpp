@@ -63,8 +63,16 @@ void ACouchFishingRod::StartChargeActor_Implementation()
    ICouchInteractable::StartChargeActor_Implementation();
    if(!IsInCharge)
    {
+      // Destroy Lure
+      if (LureRef)
+      {
+         LureRef->DetachAttachObject();
+         DestroyLureAndCable();
+      }
+
+      // Spawn Widget
       WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
-      ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
+      if(WidgetSpawner->GetCurrentWidget()) {ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);}
       
       CurrentPlayer->AnimationManager->IsFishingStart = true;
       IsInCharge = true;
@@ -89,8 +97,10 @@ void ACouchFishingRod::StopChargeActor_Implementation()
 
 #pragma region Spawn & Init Lure
 
+// Spawn Lure
 void ACouchFishingRod::SpawnLure()
 {
+   // Custom Arc
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
    FVector SuggestedVelocity;
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -104,7 +114,7 @@ void ACouchFishingRod::SpawnLure()
 
    if (LureRef)
    {
-      LureRef->DetachAttachedObject();
+      LureRef->DetachAttachObject();
       DestroyLureAndCable();
    }
 
@@ -113,13 +123,14 @@ void ACouchFishingRod::SpawnLure()
    if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
    {
       LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-      InitializeCableAndConstraint();
+      InitializeCable();
       LureRef->Initialize(SuggestedVelocity, this);
       CurrentPlayer->AnimationManager->IsFishingRelease = false;
    }
 }
 
-void ACouchFishingRod::InitializeCableAndConstraint()
+// Init Cable
+void ACouchFishingRod::InitializeCable()
 {
    // Ajoute le composant Cable
    Cable = NewObject<UCableComponent>(this, TEXT("Cable"));
@@ -153,6 +164,7 @@ void ACouchFishingRod::InitializeCableAndConstraint()
 
 #pragma region Rewind
 
+// Rewind
 void ACouchFishingRod::RewindCable(float DeltaTime)
 {
    if (LureRef && !InQte)
@@ -164,12 +176,12 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
       float CurrentCableLength = Cable->CableLength;
       float NewCableLength = FMath::FInterpConstantTo(CurrentCableLength, 0.0f, DeltaTime, RewindSpeed);
       Cable->CableLength = NewCableLength;
-            
+      
       FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
       FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
       LureRef->SetActorLocation(NewPositionXY);
       
-      // Si la position est proche de start position, monter sur l'axe Z
+      // Remonte sur L'axe Z
       if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= StopRewindZ)
       {
          FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
@@ -190,6 +202,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
    }
 }
 
+// Stop Rewind 
 void ACouchFishingRod::StopRewindCable()
 {
    if (LureRef && LureRef->SphereComponent && !InQte)
@@ -206,10 +219,12 @@ void ACouchFishingRod::StopRewindCable()
 
 #pragma region Spawn Pickable Object
 
+// Spawn Object
 void ACouchFishingRod::SpawnPickableObject()
 {
+   // Custom arc
    FVector StartLocation = SkeletalMesh->GetSocketLocation(FName("barrel"));
-   FVector TargetLocation = GetRandomPos(200.f, 500.f, 100.f);
+   FVector TargetLocation = GetRandomPos(MinDistanceSpawnObject, MaxDistanceSpawnObject, 100.f);
    FVector SuggestedVelocity;
    
    UGameplayStatics::SuggestProjectileVelocity_CustomArc(
@@ -220,20 +235,24 @@ void ACouchFishingRod::SpawnPickableObject()
     0.f,
     0.5f
  ); 
-   
+
+   // Spawn Object
    FTransform Transform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
    TObjectPtr<ACouchPickableMaster> PickableActor = GetWorld()->SpawnActor<ACouchPickableMaster>(LureRef->GetFishingObject(), Transform);
-
-   TArray<TObjectPtr<AActor>> ActorToIgnore;
-   ActorToIgnore.Add(this);
-   ActorToIgnore.Add(LureRef);
-   ActorToIgnore.Add(CurrentPlayer);
-   PickableActor->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
-
+   if(PickableActor)
+   {
+      TArray<TObjectPtr<AActor>> ActorToIgnore;
+      ActorToIgnore.Add(this);
+      ActorToIgnore.Add(LureRef);
+      ActorToIgnore.Add(CurrentPlayer);
+      PickableActor->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);  
+   }
+   
    DestroyLureAndCable();
    CurrentPlayer->DestroyFishingRod();
 }
 
+// Get Rdm Pose
 FVector ACouchFishingRod::GetRandomPos(const float MinDistance, const float MaxDistance, const float Width)
 {
    if (!CurrentPlayer)
@@ -261,6 +280,7 @@ FVector ACouchFishingRod::GetRandomPos(const float MinDistance, const float MaxD
 
 #pragma region QTE Rewind
 
+// Start Qte
 void ACouchFishingRod::StartQte()
 {
    if (!InQte)
@@ -269,6 +289,7 @@ void ACouchFishingRod::StartQte()
    }
 }
 
+// Stop Qte
 void ACouchFishingRod::StopQte()
 {
    if (InQte)
@@ -277,8 +298,11 @@ void ACouchFishingRod::StopQte()
    }
 }
 
+// Rewind Qte
 void ACouchFishingRod::RewindQte()
 {
+   if(!LureRef) return;
+   
    if (LureRef->GetFishingObjectActor()->GetQtePercent() <= 1 || LureRef->GetFishingObjectActor()->GetQtePercent() >= 0 )
    {
       if(CurrentTeam == 1 && LureRef)
@@ -324,7 +348,7 @@ void ACouchFishingRod::DestroyFishingRod()
 {
    if (LureRef)
    {
-      LureRef->DetachAttachedObject();
+      LureRef->DetachAttachObject();
       LureRef->Destroy();
       LureRef = nullptr;
    }
