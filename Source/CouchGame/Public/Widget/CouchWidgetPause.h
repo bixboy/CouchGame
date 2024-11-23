@@ -14,18 +14,19 @@ class COUCHGAME_API UCouchWidgetPause : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	bool Initialize() override;
 
 public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> OpenAnimation;
 
-	UFUNCTION()
-	void EndAnimation(bool Pause);
-
 private:
 	UPROPERTY(EditAnywhere,Category = DefaultValue)
 	FName MenuName;
+
+	FTimerHandle RoundTimerHandle;
+	bool bIsResumePending = false;
 
 #pragma region Text
 public:
@@ -54,6 +55,10 @@ private:
 
 	UFUNCTION()
 	void OnMenuPressed();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void Resume();
 
 #pragma endregion	
 };

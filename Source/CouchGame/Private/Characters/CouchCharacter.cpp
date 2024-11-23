@@ -6,6 +6,7 @@
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
@@ -622,29 +623,28 @@ void ACouchCharacter::DestroyFishingRod()
 
 void ACouchCharacter::OnInputPause(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.0f,
-		FColor::Red,
-		"Enter InteractingActor Zone"
-	);
-	if (!WidgetRef)
+	if (!GetFirstWidgetOfClass(WidgetPause))
 	{
-		WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause);
-		if (WidgetRef)
+		if (TObjectPtr<UCouchWidgetPause> WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause))
 		{
 			FInputModeUIOnly InputMode;
 			InputMode.SetWidgetToFocus(WidgetRef->Btn_Resume->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
 			WidgetRef->AddToViewport();
-		}	
+		}		
 	}
-	else if (WidgetRef)
+}
+
+UCouchWidgetPause* ACouchCharacter::GetFirstWidgetOfClass(TSubclassOf<UCouchWidgetPause> WidgetClass)
+{
+	TArray<UUserWidget*> AllWidgets;
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), AllWidgets, WidgetClass, true);
+	if (AllWidgets.Num() > 0)
 	{
-		WidgetRef->RemoveFromParent();
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		return Cast<UCouchWidgetPause>(AllWidgets[0]);
 	}
+	return nullptr;
 }
 
 #pragma endregion
