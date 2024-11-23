@@ -215,8 +215,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Widget)
 	TSubclassOf<UCouchWidgetPause> WidgetPause;
-	UPROPERTY()
-	TObjectPtr<UCouchWidgetPause> WidgetRef;
+
+	UCouchWidgetPause* GetFirstWidgetOfClass(TSubclassOf<UCouchWidgetPause> WidgetClass);
 	
 #pragma endregion	
 };

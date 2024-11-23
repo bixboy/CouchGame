@@ -29,17 +29,23 @@ void UCouchWidgetPause::NativeConstruct()
 	Super::NativeConstruct();
 	if (OpenAnimation)
 	{
-		FTimerHandle RoundTimerHandle;
 		PlayAnimationForward(OpenAnimation);
-		GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(true); }, 2.f, false);	
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
 	}
 }
 
-void UCouchWidgetPause::EndAnimation(bool Pause)
+void UCouchWidgetPause::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	UGameplayStatics::SetGamePaused(GetWorld(), Pause);
-	if (!Pause)
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	if (bIsResumePending && !IsAnimationPlaying(OpenAnimation))
+	{
+		// Reprend le jeu
+		UGameplayStatics::SetGamePaused(GetWorld(), false);
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		RemoveFromParent();
+		bIsResumePending = false;
+	}
 }
 
 void UCouchWidgetPause::OnQuitPressed()
@@ -49,12 +55,16 @@ void UCouchWidgetPause::OnQuitPressed()
 
 void UCouchWidgetPause::OnResumePressed()
 {
-	FTimerHandle RoundTimerHandle;
 	PlayAnimationReverse(OpenAnimation);
-	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(false); }, OpenAnimation->GetEndTime(), false);
+	bIsResumePending = true;
 }
 
 void UCouchWidgetPause::OnMenuPressed()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), MenuName);
+}
+
+void UCouchWidgetPause::Resume()
+{
+	OnResumePressed();
 }
