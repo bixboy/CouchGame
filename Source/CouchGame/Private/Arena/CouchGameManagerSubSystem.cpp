@@ -65,7 +65,10 @@ void UCouchGameManagerSubSystem::StartNewRound()
 	CurrentRound++;
 
 	// Démarre un timer de 3 minutes pour la manche
-	CurrentRoundTimer = RoundDurationMinutes * 60.0f;
+	int Hours = FMath::FloorToInt(RoundDurationMinutes);
+	float DecimalPart = RoundDurationMinutes - Hours;
+	CurrentRoundTimer = (Hours * 60.0f) + (DecimalPart * 100.f);
+	
 	GetWorld()->GetTimerManager().ClearTimer(RoundTimerHandle);
 	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &UCouchGameManagerSubSystem::OnRoundTimerEnd, CurrentRoundTimer, false);
 	
