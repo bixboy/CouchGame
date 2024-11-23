@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "NiagaraSystemWidget.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 #include "CouchWidgetWin.generated.h"
 
 class UImage;

@@ -82,15 +82,16 @@ FVector UCouchChargePower::LineTrace()
 		return FVector::ZeroVector;
 	}
 
+	float ClampedPower = FMath::Clamp(CurrentPower, MinPower, MaxPower);
 	if (UsedMesh)
 	{
 		Start = Mesh->GetSocketLocation(FName("barrel"));
-		End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * CurrentPower;	
+		End = Start + UKismetMathLibrary::GetForwardVector(Mesh->GetSocketRotation(FName("barrel"))) * ClampedPower;	
 	}
 	else if (!UsedMesh)
 	{
 		Start = StartTransform.GetLocation();
-		End = Start + UKismetMathLibrary::GetForwardVector(StartTransform.Rotator()) * CurrentPower;
+		End = Start + UKismetMathLibrary::GetForwardVector(StartTransform.Rotator()) * ClampedPower;
 	}
      
 	TArray<AActor*> ActorsToIgnore;
@@ -105,7 +106,7 @@ FVector UCouchChargePower::LineTrace()
 	   UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
 	   false,
 	   ActorsToIgnore,
-	   EDrawDebugTrace::Persistent,
+	   EDrawDebugTrace::None,
 	   HitResult,
 	   true,
 	   FLinearColor::Red,

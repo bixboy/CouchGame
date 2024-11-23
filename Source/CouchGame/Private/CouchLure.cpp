@@ -28,17 +28,21 @@ void ACouchLure::SetupLure()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ACouchLure::OnLureBeginOverlap);
 }
 
+// Init Lure
 void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* FishingRod)
 {
 	TArray<TObjectPtr<AActor>> ActorToIgnore;
 	ActorToIgnore.Add(this);
 	ActorToIgnore.Add(GetOwner());
-	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore);
+	ActorToIgnore.Add(FishingRod);
+	ActorToIgnore.Add(FishingRod->CurrentPlayer);
+	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore, false);
 	CouchFishingRod = FishingRod;
 }
 
 #pragma endregion
 
+// Overlap Attach
 void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Stop Movement
@@ -46,12 +50,13 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (CouchProjectile->GetCanMove())
 		{
-			CouchProjectile->SetCanMove(false);
 			SphereComponent->SetSimulatePhysics(true);
-
+			CouchProjectile->SetCanMove(false);
+			
 			const FVector Vel = FVector::ZeroVector;
 			SphereComponent->SetPhysicsLinearVelocity(Vel);
 			SphereComponent->SetPhysicsAngularVelocityInDegrees(Vel);
+			
 			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishingRelease = false;
 			CouchFishingRod->CurrentPlayer->AnimationManager->IsFishing = true;
 		}	
@@ -84,7 +89,8 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-void ACouchLure::DetachAttachedObject()
+// Detach Object
+void ACouchLure::DetachAttachObject()
 {
 	if (FishingObject)
 	{
@@ -93,6 +99,7 @@ void ACouchLure::DetachAttachedObject()
 	}
 }
 
+// Destoy Lure
 void ACouchLure::DestroyLure()
 {
 	if (FishingObject)
@@ -103,6 +110,7 @@ void ACouchLure::DestroyLure()
 
 #pragma region Getter
 
+// Get Attached Object class
 TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 {
 	if (FishingObject)
@@ -112,6 +120,7 @@ TSubclassOf<ACouchPickableMaster> ACouchLure::GetFishingObject() const
 	return nullptr;
 }
 
+// Get Attached Object Actor
 ACouchPickableMaster* ACouchLure::GetFishingObjectActor() const
 {
 	if (FishingObject)

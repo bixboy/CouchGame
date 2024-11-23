@@ -85,7 +85,7 @@ private:
 	TObjectPtr<UMaterial> CableMaterial;
 
 	UFUNCTION()
-	void InitializeCableAndConstraint();
+	void InitializeCable();
 
 #pragma endregion
 
@@ -100,6 +100,11 @@ private:
 	float StopRewindDistance = 100.f;
 	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
 	float StopRewindZ = 2.f;
+
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float MinDistanceSpawnObject = 200.f;
+	UPROPERTY(EditAnywhere, Category = DefaultRewindValue)
+	float MaxDistanceSpawnObject = 400.f;
 
 	void RewindCable(float DeltaTime);
 	
