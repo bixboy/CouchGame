@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/OutputDeviceNull.h"
+#include "Widget/CouchWidgetSpawn.h"
 
 
 // Sets default values
