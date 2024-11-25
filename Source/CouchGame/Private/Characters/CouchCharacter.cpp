@@ -88,13 +88,14 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputWidget(EnhancedInputComponent);
 }
 
-void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+ACouchPlank* ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	CanMove = false;
 	
 	FTimerHandle RoundTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
+	return nullptr;
 }
 
 void ACouchCharacter::OnTimerStunEnd()
@@ -384,7 +385,7 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 			InputData->InputActionInteract,
 			ETriggerEvent::Completed,
 			this,
-			&ACouchCharacter::OnInputUnHold
+			&ACouchCharacter::OnInputInteract
 		);
 	}
 	if (InputData->InputActionFire)
@@ -414,10 +415,18 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 // Interact
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
-	if(IsHoldingItem) return;
+	float ActionValue = InputActionValue.Get<float>();
 	if (isFishing && FishingRod)
 	{
-		FishingRod->isPlayerFishing = true;
+		if (ActionValue > 0)
+		{
+			FishingRod->isPlayerFishing = true;
+		}
+		else
+		{
+			FishingRod->isPlayerFishing = false;
+			FishingRod->StopRewindCable();
+		}
 		return;
 	}
 	
@@ -437,30 +446,50 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
 	
-	if (!IsInteracting && !bAlreadyUsed)
+	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
 	{
 		IsInteracting = true;
-		if (InteractingActor->Implements<UCouchPickable>())
+		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		else
+		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
 	}
-	else if (IsInteracting)
+	else if (IsInteracting && ActionValue < 0.1f)
 	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		if (IsHoldingItem)
+		{
+			if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
+			{
+				TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
+					PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
+				if (ItemToInteractWith)
+				{
+					ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
+				}
+			}
+			ICouchInteractable::Execute_Interact(InteractingActor, this);
+			IsHoldingItem = false;
+			AnimationManager->IsCarryingItem = false;
+		}
+		else
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		}
 		IsInteracting = false;
 		InteractingActor = nullptr;
 		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
+
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
 	}
-	else if (bAlreadyUsed)
+	else if (ActionValue > 0.1f && bAlreadyUsed)
 	{
-		// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
 	}
 	else
 	{
@@ -468,35 +497,6 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 }
 
-void ACouchCharacter::OnInputUnHold(const FInputActionValue& InputActionValue)
-{
-	if (isFishing && FishingRod)
-	{
-		FishingRod->isPlayerFishing = false;
-		FishingRod->StopRewindCable();
-		return;
-	}
-	if (!InteractingActor || !IsInteracting|| !IsHoldingItem) return;
-	if (IsInteracting && IsHoldingItem)
-	{
-		if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
-		{
-			TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
-				PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
-			if (ItemToInteractWith)
-			{
-				ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
-			}
-		}
-		ICouchInteractable::Execute_Interact(InteractingActor, this);
-		IsHoldingItem = false;
-		AnimationManager->IsCarryingItem = false;
-		
-		IsInteracting = false;
-		InteractingActor = nullptr;
-		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
-	}
-}
 
 // Fire
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)

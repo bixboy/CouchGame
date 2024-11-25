@@ -46,7 +46,7 @@ public:
 #pragma endregion
 #pragma region Move And Orient
 public:
-	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
 	
 	FVector2D GetOrient() const;
 
@@ -165,8 +165,6 @@ private :
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputInteract(const FInputActionValue& InputActionValue);
-
-	void OnInputUnHold(const FInputActionValue& InputActionValue);
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
