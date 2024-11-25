@@ -1,6 +1,5 @@
 #include "Widget/CouchWidgetTimer.h"
 #include "Components/TextBlock.h"
-#include "Kismet/KismetStringLibrary.h"
 
 FText UCouchWidgetTimer::UpdateTimer(float time)
 {

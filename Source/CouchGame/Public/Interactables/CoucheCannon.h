@@ -4,10 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CouchPickableCannonBall.h"
-#include "InputAction.h"
 #include "Components/CouchMovement.h"
-#include "Widget/CouchWidgetSpawn.h"
-#include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/CouchInteractable.h"

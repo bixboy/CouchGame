@@ -1,4 +1,6 @@
 #include "Crafting/CouchCraftingValidateItem.h"
+
+#include "Characters/CouchCharactersStateID.h"
 #include "Components/BoxComponent.h"
 #include "Crafting/CouchCraftingTable.h"
 #include "Widget/CouchWidget3D.h"
@@ -46,7 +48,17 @@ void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player
 	Super::Interact_Implementation(Player);
 	if (!CraftingTable) return;
 	CraftingTable->CraftItem();
-	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = !CurrentPlayer->AnimationManager->IsCheckingChef;
+	if (CurrentPlayer)
+	{
+		CurrentPlayer->AnimationManager->IsCheckingChef = !CurrentPlayer->AnimationManager->IsCheckingChef;
+		if(CurrentPlayer->AnimationManager->IsCheckingChef)
+		{
+			CurrentPlayer->ChangeState(ECouchCharacterStateID::Idle);
+			CurrentPlayer->IsInteracting = false;
+			CurrentPlayer->InteractingActor = nullptr;
+			if (CurrentPlayer->InteractingActors.Num() == 0) CurrentPlayer->IsInInteractingRange = false;
+		}
+	}
 }
 
 

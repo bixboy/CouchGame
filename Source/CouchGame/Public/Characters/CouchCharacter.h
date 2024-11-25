@@ -9,6 +9,7 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
+enum class ECouchCharacterStateID : uint8;
 class UCouchWidgetPause;
 class UCouchWidgetWin;
 class UBoxComponent;
@@ -45,7 +46,7 @@ public:
 #pragma endregion
 #pragma region Move And Orient
 public:
-	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
 	
 	FVector2D GetOrient() const;
 
@@ -74,6 +75,8 @@ public:
 	void InitStateMachine();
 
 	void TickStateMachine(float DeltaTime) const;
+
+	void ChangeState(ECouchCharacterStateID StateID) const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -158,10 +161,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
 private :
+	
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputInteract(const FInputActionValue& InputActionValue);
-
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
@@ -215,8 +218,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Widget)
 	TSubclassOf<UCouchWidgetPause> WidgetPause;
-	UPROPERTY()
-	TObjectPtr<UCouchWidgetPause> WidgetRef;
+
+	UCouchWidgetPause* GetFirstWidgetOfClass(TSubclassOf<UCouchWidgetPause> WidgetClass);
 	
 #pragma endregion	
 };

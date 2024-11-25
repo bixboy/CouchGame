@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "CouchDamageable.generated.h"
 
+class ACouchPlank;
 // This class does not need to be modified.
 UINTERFACE()
 class UCouchDamageable : public UInterface
@@ -22,7 +23,7 @@ class COUCHGAME_API ICouchDamageable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Hit(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f);
+	ACouchPlank* Hit(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	float GetPercentRepair();
 };
