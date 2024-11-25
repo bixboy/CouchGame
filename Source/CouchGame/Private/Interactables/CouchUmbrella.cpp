@@ -1,12 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Interactables/CouchUmbrella.h"
+
+#include "Kismet/GameplayStatics.h"
 
 ACouchUmbrella::ACouchUmbrella()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	ShieldBox = CreateDefaultSubobject<UBoxComponent>("ShieldBox");
 	ShieldBox->SetupAttachment(RootComponent);
+
+	DamageSound = CreateDefaultSubobject<USoundBase>(TEXT("DamageSound"));
+	BrokeSound = CreateDefaultSubobject<USoundBase>(TEXT("BrokeSound"));
 }
 
 void ACouchUmbrella::Tick(float DeltaTime)
@@ -64,6 +67,7 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 void ACouchUmbrella::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
+	PlayFx();
 	DecreasePv();
 }
 
@@ -75,6 +79,7 @@ void ACouchUmbrella::DecreasePv()
 	
 	if (CurrentPv == 0)
 	{
+		PlayFx();
 		SetCanUse(false);
 		ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 		SkeletalMesh->SetSkeletalMeshAsset(DestroyedMesh);

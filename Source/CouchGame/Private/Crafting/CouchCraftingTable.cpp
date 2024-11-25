@@ -142,7 +142,8 @@ void ACouchCraftingTable::SpawnCraft()
 	
 	
 		CraftItem->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);
-		AnimationManager->IsCooking = false;	
+		AnimationManager->IsCooking = false;
+		AnimationManager->HasObjectOnTheTable = false;	
 	}
 	else
 	{
@@ -176,7 +177,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 
 void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
 {
-	if (!Plate1 && !Plate2){AnimationManager->HasObjectOnTheTable = false; return;}
+	if (!Plate1 && !Plate2) return;
 	if (Plate1.Get() != Ingredient && Plate2.Get() != Ingredient) return;
 	if (Plate1.Get() == Ingredient)
 	{
@@ -186,6 +187,12 @@ void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
 	{
 		Plate2 = nullptr;
 	}
+	
+	if (!Plate1 && !Plate2)
+	{
+		AnimationManager->HasObjectOnTheTable = false;
+	}
+	
 	UpdateCraftSuggestion();
 }
 
