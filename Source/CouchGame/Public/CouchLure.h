@@ -60,6 +60,6 @@ public:
 	UFUNCTION()
 	void DestroyLure();
 	UFUNCTION()
-	void DetachAttachedObject();
+	void DetachAttachObject();
 	
 };

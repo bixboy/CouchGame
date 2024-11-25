@@ -572,7 +572,7 @@ void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* Ov
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	CanFish = true;
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
+	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
 }
 
 void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -580,7 +580,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 {
 	CanFish = false;
 	DestroyFishingRod();
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
+	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
 TObjectPtr<ACouchFishingRod> ACouchCharacter::GetFishingRod() const

@@ -25,12 +25,12 @@ void UCouchCharacterState::StateInit(UCouchCharacterStateMachine* InStateMachine
 	StateMachine = InStateMachine;
 	Character = InStateMachine->GetCharacter();
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Magenta,
-		FString::Printf(TEXT("Init State %d"), GetStateID())
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::Magenta,
+	//	FString::Printf(TEXT("Init State %d"), GetStateID())
+	//);
 	
 }
 
