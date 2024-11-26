@@ -93,7 +93,7 @@ void ACouchCatapult::SpawnBullet()
     if (MainProjectile)
     {
         MainProjectile->InitCanonBall(AmmoActor);
-        MainProjectile->Initialize(SuggestedVelocity);
+        MainProjectile->Initialize(SuggestedVelocity, GetCurrentPlayer());
     }
     
     if (ACouchProjectileEffect* ProjectileEffect = MainProjectile->GetEffectWithExecuteTime(ECouchProjectileExecuteTime::OnLaunch))
@@ -137,12 +137,12 @@ void ACouchCatapult::SpawnBullet()
             if (LeftProjectile)
             {
                 LeftProjectile->InitCanonBall(AmmoActor);
-                LeftProjectile->Initialize(LeftVelocity); // Utilise la vélocité recalculée
+                LeftProjectile->Initialize(LeftVelocity, GetCurrentPlayer()); // Utilise la vélocité recalculée
             }
             if (RightProjectile)
             {
                 RightProjectile->InitCanonBall(AmmoActor);
-                RightProjectile->Initialize(RightVelocity); // Utilise la vélocité recalculée
+                RightProjectile->Initialize(RightVelocity, GetCurrentPlayer()); // Utilise la vélocité recalculée
             }
         }
     }
