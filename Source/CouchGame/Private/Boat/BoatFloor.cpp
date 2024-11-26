@@ -71,6 +71,11 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult, float RepairingTime, f
 	}
 }
 
+int ABoatFloor::GetBoatTeam_Implementation()
+{
+	return CurrentTeam;
+}
+
 void ABoatFloor::RemoveHitFromArray(ACouchPlank* Plank)
 {
 	Hits.Remove(Plank);

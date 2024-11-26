@@ -29,6 +29,11 @@ ACouchCannonBall::ACouchCannonBall()
 	Sphere->OnComponentHit.AddDynamic(this, &ACouchCannonBall::OnCannonBallHit);
 }
 
+ACouchCharacter* ACouchCannonBall::GetCurrentPlayer()
+{
+	return CurrentPlayer;
+}
+
 
 void ACouchCannonBall::BeginPlay()
 {
@@ -97,8 +102,9 @@ void ACouchCannonBall::InitEffectWithExecuteTime(ECouchProjectileExecuteTime Exe
 	}
 }
 
-void ACouchCannonBall::Initialize(const FVector& LaunchVelocity)
+void ACouchCannonBall::Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player)
 {
+	CurrentPlayer = Player;
 	Velocity = LaunchVelocity;  // Définir la vélocité initiale
 	Location = GetActorLocation(); // Obtenir la position initiale
 	TimeElapsed = 0.0f; // Réinitialiser le temps écoulé
@@ -185,7 +191,9 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 		UFunction* Function = this->FindFunction(FunctionName);
 		if (Function)
 		{
-			this->ProcessEvent(Function, nullptr); // Exécute la fonction.
+			this->ProcessEvent(Function, nullptr); // Exécute la fonction
+			
+			PlayVibration(ICouchDamageable::Execute_GetBoatTeam(OtherActor));
 		}
 		else
 		{

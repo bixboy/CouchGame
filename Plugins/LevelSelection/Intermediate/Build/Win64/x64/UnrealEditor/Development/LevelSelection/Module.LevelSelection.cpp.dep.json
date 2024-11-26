@@ -30,7 +30,17 @@
             "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\objectlibrary.generated.h",
             "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\private\\levelselectioncommands.cpp",
             "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\public\\levelselectioncommands.h",
-            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\public\\levelselectionstyle.h"
+            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\public\\levelselectionstyle.h",
+            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\private\\levelselectionstyle.cpp",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\slatecore\\public\\styling\\slatestyleregistry.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\interfaces\\ipluginmanager.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\plugindescriptor.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\custombuildsteps.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\localizationdescriptor.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\moduledescriptor.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\pluginreferencedescriptor.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\versescope.h",
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\slatecore\\public\\styling\\slatestylemacros.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []
