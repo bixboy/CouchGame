@@ -124,7 +124,7 @@ void ACoucheCannon::SpawnBullet()
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
 	if (Projectile)
 	{
-		Projectile->Initialize(SuggestedVelocity);
+		Projectile->Initialize(SuggestedVelocity, CurrentPlayer);
 		if (AmmoActor)
 		{
 			CurrentAmmo --;

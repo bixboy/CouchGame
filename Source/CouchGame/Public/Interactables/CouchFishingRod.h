@@ -58,6 +58,8 @@ private:
 	
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"), Category = DefaultValue)
 	int CurrentTeam = 1;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "1"), Category = DefaultValue)
+	float ArcParam = 0.5f;
 	
 	bool IsInCharge = false;
 
@@ -74,6 +76,8 @@ private:
 	TObjectPtr<UClass> Lure;
 	UPROPERTY()
 	TObjectPtr<ACouchLure> LureRef;
+
+	FVector GetWaterVector(FVector StartPosition);
 	
 #pragma endregion	
 	
