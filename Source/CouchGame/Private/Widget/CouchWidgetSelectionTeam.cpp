@@ -10,12 +10,12 @@ bool UCouchWidgetSelectionTeam::Initialize()
 	
 	if (Btn_Play)
 	{
-		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetSelectionTeam::OnplayPressed);	
+		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetSelectionTeam::OnButtonPlayPressed);	
 	}
 	return true;
 }
 
-void UCouchWidgetSelectionTeam::OnplayPressed()
+void UCouchWidgetSelectionTeam::OnButtonPlayPressed()
 {
 }
 
@@ -30,6 +30,7 @@ void UCouchWidgetSelectionTeam::SetArrowVisibility(ESlateVisibility NewVisibilit
 	Img_RightArrowPlayer1_2->SetVisibility(NewVisibility);
 	Img_RightArrowPlayer1_3->SetVisibility(NewVisibility);
 }
+
 
 void UCouchWidgetSelectionTeam::ChangeImage(UImage* TargetImage, UTexture2D* NewTexture)
 {
