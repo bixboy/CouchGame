@@ -23,6 +23,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 
 	if(GetCanUse() && CurrentAmmo >= 1 && !IsInCharge)
 	{
+		PlayFx();
 		if (WidgetComponent->PowerChargeActor)
 		{
 			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);

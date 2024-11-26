@@ -307,11 +307,13 @@ void ACouchFishingRod::RewindQte()
    {
       if(CurrentTeam == 1 && LureRef)
       {
-         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
+         PlayVibration();
+         LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
       }
       else if(CurrentTeam == 2 && LureRef)
       {
-         LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
+         PlayVibration();
+         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
       }  
    }
 }
@@ -323,7 +325,7 @@ void ACouchFishingRod::RewindQte()
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
 // Get Player
-TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
+ACouchCharacter* ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
 // Get Team
 int ACouchFishingRod::GetTeam() const {return CurrentTeam;}

@@ -54,6 +54,8 @@ void ACouchCharacter::BeginPlay()
 	AnimationManager = NewObject<UCouchCharacterAnimationManager>();
 	InitStateMachine();
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
+
+	PlayerController = Cast<APlayerController>(this->GetController());
 }
 
 void ACouchCharacter::Tick(float DeltaTime)
@@ -71,6 +73,11 @@ void ACouchCharacter::Tick(float DeltaTime)
 			AnimationManager->IsDashCooldown = false;
 		}
 	}
+}
+
+APlayerController* ACouchCharacter::GetPlayerController()
+{
+	return PlayerController;
 }
 
 // Called to bind functionality to input
@@ -173,7 +180,7 @@ void ACouchCharacter::ChangeState(ECouchCharacterStateID StateID) const
 #pragma region InputData / MappingContext
 void ACouchCharacter::SetupMappingContextIntoController() const
 {
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	
 	if (!PlayerController) return;
 
 	ULocalPlayer* Player = PlayerController->GetLocalPlayer();
