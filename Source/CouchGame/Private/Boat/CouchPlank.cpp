@@ -58,17 +58,6 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-		if (IsPlayerRepairing && APlayer)
-		{
-			APlayer->AnimationManager->IsRepairing = false;
-			APlayer->ChangeState(ECouchCharacterStateID::Idle);
-			APlayer->IsInteracting = false;
-			APlayer->InteractingActor = nullptr;
-			if (APlayer->InteractingActors.Num() == 0) APlayer->IsInInteractingRange = false;
-			APlayer = nullptr;
-			IsPlayerRepairing = false;
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player stopped interacting");
-		}
 	}
 }
 
