@@ -44,7 +44,7 @@ void ABoatFloor::Init(ACouchBoat* Boat)
 	ABoat = Boat;
 }
 
-void ABoatFloor::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+ACouchPlank* ABoatFloor::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	FString HitLocationString = FString::Printf(TEXT("Boat Hit at Location: X=%.2f, Y=%.2f, Z=%.2f"), 
@@ -63,12 +63,19 @@ void ABoatFloor::Hit_Implementation(FHitResult HitResult, float RepairingTime, f
 			ACouchPlank* NewHit =  GetWorld()->SpawnActor<ACouchPlank>(FloorHit, SpawnTransform);
 			NewHit->Init(this, RepairingTime, Scale);
 			Hits.Add(NewHit);
+			return NewHit;
 		}
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("FloorHit class is null."));
 	}
+	return nullptr;
+}
+
+int ABoatFloor::GetBoatTeam_Implementation()
+{
+	return CurrentTeam;
 }
 
 void ABoatFloor::RemoveHitFromArray(ACouchPlank* Plank)

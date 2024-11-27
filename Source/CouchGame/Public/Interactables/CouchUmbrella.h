@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -18,6 +16,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* ShieldBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TObjectPtr<USoundBase> DamageSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
+	TObjectPtr<USoundBase> BrokeSound;	
 	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
@@ -29,9 +32,9 @@ private:
 	
 #pragma region Life
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentPv() const;
-	virtual void Hit_Implementation(FHitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 	
 private:	
 	UPROPERTY(EditAnywhere, Category = DefaultValues)

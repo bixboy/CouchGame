@@ -17,12 +17,12 @@ ECouchCharacterStateID UCouchCharacterStateInteract::GetStateID()
 void UCouchCharacterStateInteract::StateEnter(ECouchCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Green,
-		TEXT("Enter StateInteract")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::Green,
+	//	TEXT("Enter StateInteract")
+	//);
 	
 	ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
 }
@@ -30,12 +30,12 @@ void UCouchCharacterStateInteract::StateEnter(ECouchCharacterStateID PreviousSta
 void UCouchCharacterStateInteract::StateExit(ECouchCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Green,
-		TEXT("Exit StateInteract")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	3.f,
+	//	FColor::Green,
+	//	TEXT("Exit StateInteract")
+	//);
 	if (Character->InteractingActor && Character->IsInteracting /*&& Character->IsInInteractingRange*/ ) ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
 }
 
@@ -43,12 +43,12 @@ void UCouchCharacterStateInteract::StateTick(float DeltaTime)
 {
 	Super::StateTick(DeltaTime);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		DeltaTime,
-		FColor::Green,
-		TEXT("Tick StateInteract")
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	DeltaTime,
+	//	FColor::Green,
+	//	TEXT("Tick StateInteract")
+	//);
 	if (!Character->InteractingActor && !Character->IsInteracting && !Character->IsInInteractingRange)
 	{
 		StateMachine->ChangeState(ECouchCharacterStateID::Idle);

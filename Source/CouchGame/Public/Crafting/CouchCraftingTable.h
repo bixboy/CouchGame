@@ -6,6 +6,7 @@
 #include "CouchCraftingTable.generated.h"
 
 
+class UCouchOctopusAnimationManager;
 struct FTimeline;
 class UTimelineComponent;
 class ACouchPickableCannonBall;
@@ -25,6 +26,8 @@ public:
 	ACouchCraftingTable();
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCouchOctopusAnimationManager* AnimationManager;
 
 private:
 	UPROPERTY(EditAnywhere)

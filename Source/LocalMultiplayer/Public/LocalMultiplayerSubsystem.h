@@ -8,6 +8,8 @@
 #include "LocalMultiplayerSubsystem.generated.h"
 
 
+class ACouchCharacter;
+
 UCLASS()
 class LOCALMULTIPLAYER_API ULocalMultiplayerSubsystem : public UGameInstanceSubsystem
 {
@@ -16,6 +18,11 @@ class LOCALMULTIPLAYER_API ULocalMultiplayerSubsystem : public UGameInstanceSubs
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreateAndInitPlayers(ELocalMultiplayerInputMappingType MappingType);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<ACouchCharacter*> GetAllPlayers();
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerToList(ACouchCharacter* Player);
 
 	int GetAssignedPlayerIndexFromKeyboardProfileIndex(int KeyboardProfileIndex);
 	
@@ -55,6 +62,8 @@ protected:
 	TMap<int, int> PlayerIndexFromGamepadProfileIndex;
 
 private:
+	TArray<ACouchCharacter*> Players;
+	
 	int UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex);
 	
 	void UnassignKeyboardMapping(int PlayerIndex) const;

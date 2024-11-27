@@ -6,6 +6,8 @@
 #include "Widget/CouchWidgetSpawn.h"
 #include "CouchChargePower.generated.h"
 
+class ACouchCharacter;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class COUCHGAME_API UCouchChargePower : public UActorComponent
 {
@@ -26,7 +28,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner = nullptr, bool UseMesh = true,  AActor* Actor = nullptr);
+	void StartCharging(USkeletalMeshComponent* MeshComp, UCouchWidgetSpawn* WidgetSpawner = nullptr, bool UseMesh = true,  ACouchCharacter* Actor = nullptr);
 	UFUNCTION(BlueprintCallable)
 	void StopCharging();
 
