@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetBoatLife() const;
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateBoatRotation(float Value);
+
 private:
 	UPROPERTY(EditAnywhere)
 	ABoatFloor* BoatFloor;
@@ -53,5 +56,12 @@ private:
 	EBoatTeam Team;
 
 	bool IsDestroyed = false;
+
+	UPROPERTY(EditAnywhere)
+	float ForceStrength = 10.f;
+	UPROPERTY(EditAnywhere)
+	float MaxRotationOffset = 10.f;
+	
+	FRotator InitialRotation;
 };
 

@@ -22,7 +22,9 @@ ACouchBoat::ACouchBoat()
 // Called when the game starts or when spawned
 void ACouchBoat::BeginPlay()
 {
+	InitialRotation = GetActorRotation();
 	Super::BeginPlay();
+	
 	BoatLife = BoatStartLife;
 	if (BoatFloor)
 	{
@@ -32,8 +34,19 @@ void ACouchBoat::BeginPlay()
 	{
 		
 	}
-	
 }
+
+void ACouchBoat::UpdateBoatRotation(float Value)
+{
+
+	// Calcul de la nouvelle rotation
+	FRotator NewRotation = InitialRotation;
+	NewRotation.Pitch += (Value * ForceStrength) * 0.3f;
+	NewRotation.Roll += Value * ForceStrength * 0.3f;
+	
+	SetActorRotation(NewRotation);
+}
+
 void ACouchBoat::BoatDamage(float DamageAmount)
 {
 	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);
