@@ -124,14 +124,13 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputWidget(EnhancedInputComponent);
 }
 
-ACouchPlank* ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	CanMove = false;
 	
 	FTimerHandle RoundTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
-	return nullptr;
 }
 
 void ACouchCharacter::OnTimerStunEnd()
@@ -198,11 +197,6 @@ void ACouchCharacter::TickStateMachine(float DeltaTime) const
 {
 	if (!StateMachine) return;
 	StateMachine->Tick(DeltaTime);
-}
-
-void ACouchCharacter::ChangeState(ECouchCharacterStateID StateID) const
-{
-	StateMachine->ChangeState(StateID);
 }
 #pragma endregion
 
@@ -532,7 +526,6 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
 	}
 }
-
 
 // Fire
 void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)

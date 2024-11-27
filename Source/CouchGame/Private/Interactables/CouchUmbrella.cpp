@@ -44,7 +44,7 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	{
 		Super::Interact_Implementation(Player);	
 	}
-	
+
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{
@@ -64,12 +64,11 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 
 #pragma region Life
 
-ACouchPlank* ACouchUmbrella::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+void ACouchUmbrella::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	PlayFx();
 	DecreasePv();
-	return nullptr;
 }
 
 void ACouchUmbrella::DecreasePv()

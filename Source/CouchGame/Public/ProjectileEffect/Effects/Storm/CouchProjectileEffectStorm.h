@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
 #include "CouchProjectileEffectStorm.generated.h"
 
-class ACouchPlank;
 class AStorm;
 
 UCLASS()
@@ -22,9 +22,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void ExecuteEffect() override;
-	
-	UPROPERTY()
-	TObjectPtr<ACouchPlank> HitPlankPtr;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -32,7 +29,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<AStorm> StormPtr;
-
 	
 	UPROPERTY(EditAnywhere)
 	float DelayToExecute = 5.0;

@@ -17,12 +17,8 @@ void UCouchCameraMove::BeginPlay()
 
 	MoveTimeline.AddInterpFloat(MoveCurve, TimelineCallback);
 	MoveTimeline.SetLooping(false);
-
-	FOnTimelineEvent OnTimelineFinishEvent;
-	OnTimelineFinishEvent.BindUFunction(this, FName("EndCameraMove"));
-	MoveTimeline.SetTimelineFinishedFunc(OnTimelineFinishEvent);
-	PointA = GetOwner()->GetActorLocation();
-	// StartCameraMove();
+	
+	StartCameraMove();
 }
 
 void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
@@ -32,17 +28,11 @@ void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	MoveTimeline.TickTimeline(DeltaTime);
 }
 
-void UCouchCameraMove::StartCameraMove(bool Forward)
+void UCouchCameraMove::StartCameraMove()
 {
+	PointA = GetOwner()->GetActorLocation();
 	bIsMoving = true;
-	isPlayingForward = Forward;
-	if (Forward) MoveTimeline.PlayFromStart();
-	else MoveTimeline.ReverseFromEnd();
-}
-
-void UCouchCameraMove::EndCameraMove()
-{
-	if (isPlayingForward) TravelingEnd.Broadcast(isPlayingForward);
+	MoveTimeline.PlayFromStart();
 }
 
 void UCouchCameraMove::MoveCamera(float Alpha)
