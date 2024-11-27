@@ -34,7 +34,7 @@ private:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentPv() const;
-	virtual void Hit_Implementation(FHitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 	
 private:	
 	UPROPERTY(EditAnywhere, Category = DefaultValues)

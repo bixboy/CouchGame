@@ -23,7 +23,7 @@ public:
 
 	void Init(ACouchBoat* Boat);
 
-	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 
 	virtual int GetBoatTeam_Implementation() override;
 
@@ -42,6 +42,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACouchPlank> FloorHit;
 
+	UPROPERTY()
 	TArray<ACouchPlank*> Hits;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))

@@ -8,6 +8,7 @@
 #include "Components/SceneComponent.h"
 #include "Widget/CouchWidgetSpawn.h"
 #include "Characters/CouchCharacter.h"
+#include "Characters/CouchCharactersStateID.h"
 #include "Widget/CouchWidget3D.h"
 
 ACouchPlank::ACouchPlank()
