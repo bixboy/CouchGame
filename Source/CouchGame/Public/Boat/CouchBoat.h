@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateBoatRotation(float Value);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ForceStrength = 10.f;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -56,11 +58,6 @@ private:
 	EBoatTeam Team;
 
 	bool IsDestroyed = false;
-
-	UPROPERTY(EditAnywhere)
-	float ForceStrength = 10.f;
-	UPROPERTY(EditAnywhere)
-	float MaxRotationOffset = 10.f;
 	
 	FRotator InitialRotation;
 };
