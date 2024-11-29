@@ -43,4 +43,6 @@ private:
 
 	UFUNCTION()
 	void MoveCamera(float DeltaTime);
+	UFUNCTION()
+	void ReversMoveCamera();
 };

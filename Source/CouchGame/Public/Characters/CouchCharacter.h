@@ -54,7 +54,7 @@ private:
 #pragma endregion
 #pragma region Move And Orient
 public:
-	virtual void Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
+	virtual ACouchPlank* Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale ) override;
 	
 	FVector2D GetOrient() const;
 

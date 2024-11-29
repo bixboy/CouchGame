@@ -135,6 +135,7 @@ void UCouchGameManagerSubSystem::OnRoundTimerEnd()
 	else
 	{
 		// Match null
+		CheckRoundWinCondition(0);
 	}
 }
 

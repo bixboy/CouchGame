@@ -1,7 +1,6 @@
 #include "Components/CouchCameraMove.h"
 #include "Kismet/KismetMathLibrary.h"
 
-
 UCouchCameraMove::UCouchCameraMove()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -60,5 +59,12 @@ void UCouchCameraMove::MoveCamera(float Alpha)
 			bIsMoving = false;
 		}
 	}
+}
+
+void UCouchCameraMove::ReversMoveCamera()
+{
+	bIsMoving = true;
+	MoveTimeline.Stop();
+	MoveTimeline.Reverse();
 }
 

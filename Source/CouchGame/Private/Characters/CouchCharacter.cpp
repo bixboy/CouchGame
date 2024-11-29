@@ -124,13 +124,14 @@ void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputWidget(EnhancedInputComponent);
 }
 
-void ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
+ACouchPlank* ACouchCharacter::Hit_Implementation(FHitResult HitResult, float RepairingTime, float Scale)
 {
 	ICouchDamageable::Hit_Implementation(HitResult, RepairingTime, Scale);
 	CanMove = false;
 	
 	FTimerHandle RoundTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, this, &ACouchCharacter::OnTimerStunEnd, StunDelay, false);
+	return nullptr; 
 }
 
 void ACouchCharacter::OnTimerStunEnd()
