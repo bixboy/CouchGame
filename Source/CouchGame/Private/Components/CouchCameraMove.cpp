@@ -17,6 +17,7 @@ void UCouchCameraMove::BeginPlay()
 	MoveTimeline.AddInterpFloat(MoveCurve, TimelineCallback);
 	MoveTimeline.SetLooping(false);
 	
+	PointA = GetOwner()->GetActorLocation();
 	StartCameraMove();
 }
 
@@ -29,7 +30,6 @@ void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 void UCouchCameraMove::StartCameraMove()
 {
-	PointA = GetOwner()->GetActorLocation();
 	bIsMoving = true;
 	MoveTimeline.PlayFromStart();
 }
@@ -52,19 +52,12 @@ void UCouchCameraMove::MoveCamera(float Alpha)
 		FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
 		GetOwner()->SetActorRotation(LookAtRotation);
-
-		// Si la Timeline est terminée, arrêter le mouvement
-		if (Alpha >= 1.0f)
-		{
-			bIsMoving = false;
-		}
 	}
 }
 
 void UCouchCameraMove::ReversMoveCamera()
 {
 	bIsMoving = true;
-	MoveTimeline.Stop();
 	MoveTimeline.Reverse();
 }
 
