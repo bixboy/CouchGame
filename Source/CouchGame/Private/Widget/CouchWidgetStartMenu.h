@@ -16,8 +16,7 @@ public:
 	virtual void NativeConstruct() override;
 	UFUNCTION()
 	void OnCameraTransitionEnd(bool Forward);
-
-
+	
   
 	void InitializeStartMenu();
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPlayTransitionFinished"))
@@ -39,22 +38,30 @@ public:
   
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> Btn_Quit;
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnPlayPressed"))
+	void Receive_OnPlayPressed(bool Forward);
 
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnSettingsPressed"))
+	void Receive_OnSettingsPressed();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnCreditsPressed"))
+	void Receive_OnCreditsPressed();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnQuitPressed"))
+	void Receive_OnQuitPressed();
 
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnPlayPressed();
-  
-	UFUNCTION()
+	
+	UFUNCTION(BlueprintCallable)
 	void OnSettingsPressed();
   
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnCreditsPressed();
   
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnQuitPressed();
-  
-
 
 #pragma endregion
 #pragma region Camera
