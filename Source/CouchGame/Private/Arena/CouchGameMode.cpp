@@ -58,7 +58,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	for	(int i = 0; i < GameManager->NbPlayers; i++)
+	for	(int i = 0; i < GameManager->NbPlayersTeam1; i++)
 	{
 		ACouchPlayerStart * SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
 		if (!SpawnPoint) return ;
