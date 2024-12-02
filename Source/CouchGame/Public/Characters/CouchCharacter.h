@@ -29,20 +29,31 @@ class COUCHGAME_API ACouchCharacter : public ACharacter, public ICouchDamageable
 {
 	GENERATED_BODY()
 #pragma region Unreal Default
-public:
-	// Sets default values for this character's properties
-	ACouchCharacter();
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
+	ACouchCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	APlayerController* GetPlayerController();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetPlayerIndex();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetCurrentTeam();
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentTeam(int NewTeam);
+	
+private:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
 	int CurrentTeam = 1;
+
+	UPROPERTY()
+	APlayerController* PlayerController;
+	int PlayerIndex;
 #pragma endregion
 #pragma region Move And Orient
 public:

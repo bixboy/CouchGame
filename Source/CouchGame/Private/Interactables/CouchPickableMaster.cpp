@@ -179,20 +179,25 @@ float ACouchPickableMaster::GetQtePercent() const
 
 void ACouchPickableMaster::StopQte()
 {
-	if(WidgetSpawner->GetCurrentWidget())
+	if (WidgetSpawner->GetCurrentWidget())
 	{
 		WidgetSpawner->DestroyWidget();
-		for (TObjectPtr<ACouchLure> LuresAttached : CurrentLuresAttached)
+
+		TArray<TObjectPtr<ACouchLure>> LuresToProcess = CurrentLuresAttached;
+
+		for (TObjectPtr<ACouchLure> LuresAttached : LuresToProcess)
 		{
+			if (!LuresAttached || !LuresAttached->CouchFishingRod) continue;
+
 			LuresAttached->CouchFishingRod->StopQte();
 
-			// Si Team 1 Gagne
+			// Si Team 1 gagne
 			if (LuresAttached->CouchFishingRod->GetTeam() == 2 && CurrentPercentQte >= 1)
 			{
 				LuresAttached->CouchFishingRod->DestroyFishingRod();
 			}
 
-			// Si Team 2 Gagne
+			// Si Team 2 gagne
 			if (LuresAttached->CouchFishingRod->GetTeam() == 1 && CurrentPercentQte <= 0)
 			{
 				LuresAttached->CouchFishingRod->DestroyFishingRod();

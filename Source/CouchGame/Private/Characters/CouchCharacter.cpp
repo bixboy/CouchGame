@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CouchGame/Public/Characters/CouchCharacter.h"
+
+#include "EngineUtils.h"
 #include "CouchGame/Public/Characters/CouchCharacterStateMachine.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
@@ -54,6 +56,19 @@ void ACouchCharacter::BeginPlay()
 	AnimationManager = NewObject<UCouchCharacterAnimationManager>();
 	InitStateMachine();
 	CharacterSettings = GetDefault<UCouchCharacterSettings>();
+
+	PlayerController = Cast<APlayerController>(this->GetController());
+
+	int32 CurrentPlayerCount = 0;
+	for (TActorIterator<ACouchCharacter> It(GetWorld()); It; ++It)
+	{
+		ACouchCharacter* ExistingCharacter = *It;
+		if (ExistingCharacter != this)
+		{
+			CurrentPlayerCount++;
+		}
+	}
+	PlayerIndex = CurrentPlayerCount + 1;
 }
 
 void ACouchCharacter::Tick(float DeltaTime)
@@ -72,6 +87,27 @@ void ACouchCharacter::Tick(float DeltaTime)
 		}
 	}
 }
+
+#pragma region Teams & Controller
+
+APlayerController* ACouchCharacter::GetPlayerController()
+{
+	return PlayerController;
+}
+
+int ACouchCharacter::GetPlayerIndex() {return PlayerIndex;}
+
+int ACouchCharacter::GetCurrentTeam()
+{
+	return CurrentTeam;
+}
+
+void ACouchCharacter::SetCurrentTeam(int NewTeam)
+{
+	CurrentTeam = NewTeam;
+}
+
+#pragma endregion
 
 // Called to bind functionality to input
 void ACouchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -173,7 +209,7 @@ void ACouchCharacter::ChangeState(ECouchCharacterStateID StateID) const
 #pragma region InputData / MappingContext
 void ACouchCharacter::SetupMappingContextIntoController() const
 {
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	
 	if (!PlayerController) return;
 
 	ULocalPlayer* Player = PlayerController->GetLocalPlayer();

@@ -25,6 +25,8 @@ public:
 
 	virtual ACouchPlank* Hit_Implementation(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f) override;
 
+	virtual int GetBoatTeam_Implementation() override;
+
 	void RemoveHitFromArray(ACouchPlank* Plank);
 protected:
 	// Called when the game starts or when spawned
@@ -52,5 +54,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	FVector PlankLocationOffset;
-	
+
+	UPROPERTY(EditAnywhere)
+	int CurrentTeam;
 };
