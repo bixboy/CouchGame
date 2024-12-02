@@ -5,7 +5,7 @@
 #include "Components/TimelineComponent.h"
 #include "CouchCameraMove.generated.h"
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class COUCHGAME_API UCouchCameraMove : public UActorComponent
 {
 	GENERATED_BODY()
@@ -16,7 +16,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void StartCameraMove();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Move Camera"))
+	void StartCameraMove(bool Forward = true);
+
+	UFUNCTION()
+	void EndCameraMove();
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTravelingEndEvent, bool, Forward);
+	
+	FTravelingEndEvent TravelingEnd;
 
 private:
 	UPROPERTY()
@@ -40,6 +47,7 @@ private:
 	TObjectPtr<AActor> Boat2;
 
 	bool bIsMoving;
+	bool isPlayingForward;
 
 	UFUNCTION()
 	void MoveCamera(float DeltaTime);
