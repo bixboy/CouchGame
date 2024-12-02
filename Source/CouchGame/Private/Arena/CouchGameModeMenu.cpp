@@ -12,6 +12,7 @@
 #include "LocalMultiplayerSubsystem.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Characters/CouchCharacterSettings.h"
+#include "MenuCharacters/CouchCharacterMenu.h"
 
 
 void ACouchGameModeMenu::BeginPlay()
@@ -61,15 +62,14 @@ void ACouchGameModeMenu::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnP
 	{
 		ACouchPlayerStart* SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
 		if (!SpawnPoint) return ;
-		ACouchCharacter* NewCharacter = GetWorld()->SpawnActor<ACouchCharacter>();
+		ACouchCharacterMenu* NewCharacter = GetWorld()->SpawnActor<ACouchCharacterMenu>();
 		if (!NewCharacter) continue;
 		NewCharacter->InputData = InputData;
 		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 
-		CharactersInGame.Add(NewCharacter);
+		CharactersInMenu.Add(NewCharacter);
 	}
 	
 }

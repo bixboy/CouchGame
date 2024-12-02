@@ -36,8 +36,8 @@ void UCouchCameraMove::StartCameraMove(bool Forward)
 {
 	bIsMoving = true;
 	isPlayingForward = Forward;
-	if (Forward) MoveTimeline.PlayFromStart();
-	else MoveTimeline.ReverseFromEnd();
+	if (Forward) MoveTimeline.Play();
+	else MoveTimeline.Reverse();
 }
 
 void UCouchCameraMove::EndCameraMove()
