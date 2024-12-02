@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Arena/CouchGameMode.h"
+#include "Arena/CouchGameModeMenu.h"
 
 #include "Arena/ArenaSettings.h"
 #include "CouchGame/Public/Arena//CouchPlayerStart.h"
@@ -10,12 +10,11 @@
 #include "Characters/CouchCharacterInputData.h"
 #include "InputMappingContext.h"
 #include "LocalMultiplayerSubsystem.h"
-#include "SkeletalMeshTypes.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Characters/CouchCharacterSettings.h"
 
 
-void ACouchGameMode::BeginPlay()
+void ACouchGameModeMenu::BeginPlay()
 {
 	Super::BeginPlay();
 	CreateAndInitPlayers();
@@ -24,21 +23,21 @@ void ACouchGameMode::BeginPlay()
 	SpawnCharacter(PlayerStartsPoints);
 }
 
-UCouchCharacterInputData* ACouchGameMode::LoadInputDataFromConfig()
+UCouchCharacterInputData* ACouchGameModeMenu::LoadInputDataFromConfig()
 {
 	const UCouchCharacterSettings* CharacterSettings = GetDefault<UCouchCharacterSettings>();
 	if (!CharacterSettings) return nullptr;
 	return CharacterSettings->InputData.LoadSynchronous();
 }
 
-UInputMappingContext* ACouchGameMode::LoadInputMappingContextFromConfig()
+UInputMappingContext* ACouchGameModeMenu::LoadInputMappingContextFromConfig()
 {
 	const UCouchCharacterSettings* CharacterSettings = GetDefault<UCouchCharacterSettings>();
 	if (!CharacterSettings) return nullptr;
 	return CharacterSettings->InputMappingContext.LoadSynchronous();
 }
 
-void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors)
+void ACouchGameModeMenu::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors)
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), FoundActors);
@@ -52,41 +51,18 @@ void ACouchGameMode::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& Re
 	}
 }
 
-void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
+void ACouchGameModeMenu::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
 	if (SpawnPoints.Num() == 0) return;
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
-	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	for	(int i = 0; i < GameManager->NbPlayersTeam1; i++)
+	// UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	for	(int i = 0; i < 4; i++)
 	{
-		ACouchPlayerStart * SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
+		ACouchPlayerStart* SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
 		if (!SpawnPoint) return ;
-		EAutoReceiveInput::Type InputType = SpawnPoint->AutoReceiveInput.GetValue();
-		TSubclassOf<ACouchCharacter> CouchCharacterClass = GetCouchCharacterClassFromInputType(InputType);
-		if (!CouchCharacterClass) continue;
-
-		ACouchCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ACouchCharacter>(
-			CouchCharacterClass,
-			SpawnPoint->GetTransform()
-		);
-
+		ACouchCharacter* NewCharacter = GetWorld()->SpawnActor<ACouchCharacter>();
 		if (!NewCharacter) continue;
-		switch (SpawnPoint->Team)
-		{
-			case EBoatTeam::Team1:
-			{
-				NewCharacter->SetCurrentTeam(1);
-				break;
-			}
-			case EBoatTeam::Team2:
-			{
-				NewCharacter->SetCurrentTeam(2);
-				break;
-			}
-			default:
-				break;
-		}
 		NewCharacter->InputData = InputData;
 		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
@@ -98,31 +74,7 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 	
 }
 
-TSubclassOf<ACouchCharacter> ACouchGameMode::GetCouchCharacterClassFromInputType(
-	EAutoReceiveInput::Type InputType) const
-{
-	const UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	if (!GameManager) return nullptr;
-	switch (InputType)
-	{
-		case EAutoReceiveInput::Player0 :
-			return GameManager->CouchCharacterClassPO;
-		
-		case EAutoReceiveInput::Player1 :
-			return GameManager->CouchCharacterClassP1;
-		
-		case EAutoReceiveInput::Player2 :
-			return GameManager->CouchCharacterClassP2;
-		
-		case EAutoReceiveInput::Player3 :
-			return GameManager->CouchCharacterClassP3;
-
-		default:
-			return nullptr;
-	}
-}
-
-void ACouchGameMode::CreateAndInitPlayers() const
+void ACouchGameModeMenu::CreateAndInitPlayers() const
 {
 	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
 	if (!GameInstance) return;
