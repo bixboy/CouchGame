@@ -3,6 +3,7 @@
 
 #include "Boat/BoatFloor.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Boat/CouchBoat.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
