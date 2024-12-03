@@ -188,6 +188,12 @@ float UCouchGameManagerSubSystem::GetTime() const
 	return CurrentRoundTimer;
 }
 
+// Get Current Round
+int UCouchGameManagerSubSystem::GetCurrentRound()
+{
+	return CurrentRound;
+}
+
 #pragma endregion
 
 #pragma region Local Multiplayer
