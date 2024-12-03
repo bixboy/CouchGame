@@ -60,21 +60,25 @@ void UCouchWidgetStartMenu::InitializeStartMenu()
 void UCouchWidgetStartMenu::OnPlayPressed()
 {
 	if (!CameraMove) return;
+	Receive_OnPlayPressed(true);
 	CameraMove->StartCameraMove(true);
 }
 
 
 void UCouchWidgetStartMenu::OnSettingsPressed()
 {
+	Receive_OnSettingsPressed();
 }
 
 
 void UCouchWidgetStartMenu::OnCreditsPressed()
 {
+	Receive_OnCreditsPressed();
 }
 
 
 void UCouchWidgetStartMenu::OnQuitPressed()
 {
+	Receive_OnQuitPressed();
 	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr, EQuitPreference::Quit, false);
 }

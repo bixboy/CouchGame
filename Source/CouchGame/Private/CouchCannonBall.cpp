@@ -72,7 +72,7 @@ void ACouchCannonBall::ExecuteEffectWithExecuteTime(ECouchProjectileExecuteTime 
 		if (ProjectileEffect && ProjectileEffect->ExecuteTime == ExecuteTime)
 		{
 			ProjectileEffect->ExecuteEffect();
-			if (ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnLaunch) return true; // Supprime l'élément
+			if (ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnLaunch && ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnDelay) return true; // Supprime l'élément
 		}
 		return false; // Conserve l'élément
 	});

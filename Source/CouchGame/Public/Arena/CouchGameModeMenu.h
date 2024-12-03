@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "MenuCharacters/CouchCharacterMenu.h"
 #include "CouchGameModeMenu.generated.h"
 
+class ACouchCharacterMenu;
 class ACouchPlayerStart;
 class UInputMappingContext;
 class UCouchCharacterInputData;
@@ -26,6 +26,8 @@ protected:
 	TArray<ACouchCharacterMenu*> CharactersInMenu;
 
 private:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchCharacterMenu> MenuCharacter;
 	UCouchCharacterInputData* LoadInputDataFromConfig();
 
 	UInputMappingContext* LoadInputMappingContextFromConfig();

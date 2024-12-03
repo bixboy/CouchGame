@@ -51,6 +51,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	int GetLastAssignedPlayerIndex() const;
+	UFUNCTION(BlueprintCallable)
+	int GetNbOfAssignedPlayer() const;
+
+	TArray<APlayerController*> GetAllPlayerControllers();
 
 protected:
 	TArray<int> AssignedPlayerIndexInOrder;
@@ -62,7 +66,12 @@ protected:
 	TMap<int, int> PlayerIndexFromGamepadProfileIndex;
 
 private:
+	UPROPERTY()
+	TArray<TObjectPtr<APlayerController>> PlayerControllers;
+	UPROPERTY()
 	TArray<ACouchCharacter*> Players;
+
+	
 	
 	int UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex);
 	

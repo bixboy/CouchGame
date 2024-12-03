@@ -130,7 +130,7 @@ void ACouchGameMode::CreateAndInitPlayers() const
 	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance
 	->GetSubsystem<ULocalMultiplayerSubsystem>();
 	if (!LocalMultiplayerSubsystem) return;
-	const UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	const UCouchGameManagerSubSystem* GameManager = GameInstance->GetSubsystem<UCouchGameManagerSubSystem>();
 	if (!GameManager) return;
 	LocalMultiplayerSubsystem->CreateAndInitPlayers(GameManager->MappingType);
 }
