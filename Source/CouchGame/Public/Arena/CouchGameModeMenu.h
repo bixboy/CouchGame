@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "CouchGameModeMenu.generated.h"
 
+class ACouchCharacterMenu;
 class ACouchPlayerStart;
 class UInputMappingContext;
 class UCouchCharacterInputData;
@@ -22,9 +23,11 @@ class COUCHGAME_API ACouchGameModeMenu : public AGameModeBase
 
 protected:
 	UPROPERTY()
-	TArray<ACouchCharacter*> CharactersInGame;
+	TArray<ACouchCharacterMenu*> CharactersInMenu;
 
 private:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchCharacterMenu> MenuCharacter;
 	UCouchCharacterInputData* LoadInputDataFromConfig();
 
 	UInputMappingContext* LoadInputMappingContextFromConfig();

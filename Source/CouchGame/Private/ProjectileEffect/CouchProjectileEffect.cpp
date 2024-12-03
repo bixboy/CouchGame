@@ -15,7 +15,7 @@ ACouchProjectileEffect::ACouchProjectileEffect()
 
 void ACouchProjectileEffect::ExecuteEffect()
 {
-	if (!CouchCannonBall) return;
+	if (!CouchCannonBall || HasExecutedEffect) return;
 	SetActorTransform(CouchCannonBall->GetActorTransform());
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Projectile Effect");
 	HasExecutedEffect = true;

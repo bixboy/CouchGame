@@ -77,6 +77,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetQtePercent() const;
 
+	UFUNCTION(meta = (MapParam))
+	bool GetTeamAttached(int Team);
+
 private:
 	UPROPERTY()
 	TObjectPtr<USceneComponent> QteWidgetPose;

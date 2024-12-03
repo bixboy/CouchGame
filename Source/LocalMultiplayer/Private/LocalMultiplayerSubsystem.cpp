@@ -15,7 +15,7 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 	{
 		if (!GetWorld()->GetGameInstance()->GetLocalPlayerByIndex(i))
 		{
-			UGameplayStatics::CreatePlayer(GetWorld(), i);
+			PlayerControllers.Add(UGameplayStatics::CreatePlayer(GetWorld(), i));
 		}
 
 	}
@@ -51,6 +51,11 @@ int ULocalMultiplayerSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardPro
 	}
 	return -1;
 	
+}
+
+TArray<APlayerController*> ULocalMultiplayerSubsystem::GetAllPlayerControllers()
+{
+	return PlayerControllers;
 }
 
 int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex)
@@ -259,6 +264,11 @@ int ULocalMultiplayerSubsystem::GetLastAssignedPlayerIndex() const
 		return AssignedPlayerIndexInOrder.Last();
 	}
 	return -1; 
+}
+
+int ULocalMultiplayerSubsystem::GetNbOfAssignedPlayer() const
+{
+	return PlayerIndexFromGamepadProfileIndex.Num() + PlayerIndexFromKeyboardProfileIndex.Num();
 }
 
 int ULocalMultiplayerSubsystem::GetProfileIndexFromPlayerIndex(int PlayerIndex)

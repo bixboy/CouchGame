@@ -3,7 +3,6 @@
 
 #include "ProjectileEffect/Effects/Storm/CouchProjectileEffectStorm.h"
 #include "CouchCannonBall.h"
-#include "PhysicsEngine/RadialForceComponent.h"
 #include "ProjectileEffect/Effects/Storm/Storm.h"
 
 
@@ -34,10 +33,6 @@ void ACouchProjectileEffectStorm::Tick(float DeltaTime)
 void ACouchProjectileEffectStorm::ExecuteEffect()
 {
 	Super::ExecuteEffect();
-	// if (ActorToInterractWith && HitResult.IsValidBlockingHit())
-	// {
-	// 	HitPlankPtr = ICouchDamageable::Execute_Hit(ActorToInterractWith, HitResult, 0, 0);
-	// }
 	FTransform Transform = FTransform(FRotator::ZeroRotator, CouchCannonBall->GetActorLocation(), FVector(1.0f));
 	StormPtr = GetWorld()->SpawnActor<AStorm>(Storm, Transform);
 	if (StormPtr)

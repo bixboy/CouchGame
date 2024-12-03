@@ -72,7 +72,7 @@ void ACouchCannonBall::ExecuteEffectWithExecuteTime(ECouchProjectileExecuteTime 
 		if (ProjectileEffect && ProjectileEffect->ExecuteTime == ExecuteTime)
 		{
 			ProjectileEffect->ExecuteEffect();
-			if (ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnLaunch) return true; // Supprime l'élément
+			if (ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnLaunch && ProjectileEffect->ExecuteTime != ECouchProjectileExecuteTime::OnDelay) return true; // Supprime l'élément
 		}
 		return false; // Conserve l'élément
 	});
@@ -167,25 +167,24 @@ void ACouchCannonBall::CopyMeshData(UStaticMeshComponent* Target, UStaticMeshCom
 void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!Sphere->IsSimulatingPhysics())
-	{
-		Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
-		Sphere->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-		Sphere->SetSimulatePhysics(true);
 
-		// Pour éviter que le bullet de cannon ne soit bloqué dans les collisions si jamais il touche le rebord avant
-		// Calcule la direction opposée à la collision
-		FVector RepulsionDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
+	if (Sphere->IsSimulatingPhysics()) return;
+	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
+	Sphere->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
+	Sphere->SetSimulatePhysics(true);
 
-		// Calculer une nouvelle position en se déplaçant légèrement hors de la collision
-		float RepulsionDistance = 20.0f;
-		FVector NewLocation = GetActorLocation() + RepulsionDirection * RepulsionDistance;
+	// Pour éviter que le bullet de cannon ne soit bloqué dans les collisions si jamais il touche le rebord avant
+	// Calcule la direction opposée à la collision
+	FVector RepulsionDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
+
+	// Calculer une nouvelle position en se déplaçant légèrement hors de la collision
+	float RepulsionDistance = 20.0f;
+	FVector NewLocation = GetActorLocation() + RepulsionDirection * RepulsionDistance;
         
-		// Déplacer l'Actor vers la nouvelle position
-		SetActorLocation(NewLocation);
-	};
-
+	// Déplacer l'Actor vers la nouvelle position
+	SetActorLocation(NewLocation);
 	
+
 	if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ABoatFloor::StaticClass()))
 	{
 		FName FunctionName = "PlaySound";

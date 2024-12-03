@@ -44,7 +44,7 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	{
 		Super::Interact_Implementation(Player);	
 	}
-	
+
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{
@@ -101,7 +101,8 @@ void ACouchUmbrella::FinishRepairing()
 {
 	SetInteractWidget();
 	if (WidgetComponent->GetCurrentWidget()){ WidgetComponent->DestroyWidget();}
-	
+
+	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
 }

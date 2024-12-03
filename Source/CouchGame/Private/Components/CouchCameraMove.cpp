@@ -1,7 +1,6 @@
 #include "Components/CouchCameraMove.h"
 #include "Kismet/KismetMathLibrary.h"
 
-
 UCouchCameraMove::UCouchCameraMove()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -10,13 +9,15 @@ UCouchCameraMove::UCouchCameraMove()
 void UCouchCameraMove::BeginPlay()
 {
 	Super::BeginPlay();
-	
+  
 	MoveTimeline.SetPlayRate(1.f/Speed);
 	FOnTimelineFloat TimelineCallback;
 	TimelineCallback.BindUFunction(this, FName("MoveCamera"));
 
+
 	MoveTimeline.AddInterpFloat(MoveCurve, TimelineCallback);
 	MoveTimeline.SetLooping(false);
+
 
 	FOnTimelineEvent OnTimelineFinishEvent;
 	OnTimelineFinishEvent.BindUFunction(this, FName("EndCameraMove"));
@@ -24,6 +25,7 @@ void UCouchCameraMove::BeginPlay()
 	PointA = GetOwner()->GetActorLocation();
 	// StartCameraMove();
 }
+
 
 void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
@@ -36,13 +38,8 @@ void UCouchCameraMove::StartCameraMove(bool Forward)
 {
 	bIsMoving = true;
 	isPlayingForward = Forward;
-	if (Forward) MoveTimeline.PlayFromStart();
-	else MoveTimeline.ReverseFromEnd();
-}
-
-void UCouchCameraMove::EndCameraMove()
-{
-	if (isPlayingForward) TravelingEnd.Broadcast(isPlayingForward);
+	if (Forward) MoveTimeline.Play();
+	else MoveTimeline.Reverse();
 }
 
 void UCouchCameraMove::MoveCamera(float Alpha)
@@ -63,12 +60,18 @@ void UCouchCameraMove::MoveCamera(float Alpha)
 		FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
 		GetOwner()->SetActorRotation(LookAtRotation);
-
-		// Si la Timeline est terminée, arrêter le mouvement
-		if (Alpha >= 1.0f)
-		{
-			bIsMoving = false;
-		}
 	}
 }
+
+void UCouchCameraMove::ReversMoveCamera()
+{
+	bIsMoving = true;
+	MoveTimeline.Reverse();
+}
+
+void UCouchCameraMove::EndCameraMove()
+{
+	if (isPlayingForward) TravelingEnd.Broadcast(isPlayingForward);
+}
+
 

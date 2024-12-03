@@ -31,6 +31,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetBoatLife() const;
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateBoatRotation(float Value);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ForceStrength = 10.f;
+
 private:
 	UPROPERTY(EditAnywhere)
 	ABoatFloor* BoatFloor;
@@ -53,5 +58,7 @@ private:
 	EBoatTeam Team;
 
 	bool IsDestroyed = false;
+	
+	FRotator InitialRotation;
 };
 
