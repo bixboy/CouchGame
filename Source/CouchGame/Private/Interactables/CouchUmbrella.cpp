@@ -44,7 +44,7 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	{
 		Super::Interact_Implementation(Player);	
 	}
-	
+
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{

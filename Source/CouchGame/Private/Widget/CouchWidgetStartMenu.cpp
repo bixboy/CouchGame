@@ -1,13 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Widget/CouchWidgetStartMenu.h"
 
 #include "Camera/CameraActor.h"
 #include "Components/Button.h"
 #include "Components/CouchCameraMove.h"
-#include "Kismet/BlueprintTypeConversions.h"
 #include "Kismet/GameplayStatics.h"
+
 
 void UCouchWidgetStartMenu::NativeConstruct()
 {
@@ -28,10 +25,12 @@ void UCouchWidgetStartMenu::NativeConstruct()
 	InitializeStartMenu();
 }
 
+
 void UCouchWidgetStartMenu::OnCameraTransitionEnd(bool Forward)
 {
 	Receive_OnPlayTransitionFinished(Forward);
 }
+
 
 void UCouchWidgetStartMenu::InitializeStartMenu()
 {
@@ -57,19 +56,23 @@ void UCouchWidgetStartMenu::InitializeStartMenu()
 	}
 }
 
+
 void UCouchWidgetStartMenu::OnPlayPressed()
 {
 	if (!CameraMove) return;
 	CameraMove->StartCameraMove(true);
 }
 
+
 void UCouchWidgetStartMenu::OnSettingsPressed()
 {
 }
 
+
 void UCouchWidgetStartMenu::OnCreditsPressed()
 {
 }
+
 
 void UCouchWidgetStartMenu::OnQuitPressed()
 {

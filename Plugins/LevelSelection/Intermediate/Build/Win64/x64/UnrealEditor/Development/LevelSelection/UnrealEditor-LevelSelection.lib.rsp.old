@@ -8,6 +8,6 @@
 /NODEFAULTLIB
 "C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\Development\UnrealEd\SharedPCH.UnrealEd.Cpp20.h.obj"
 "C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Module.LevelSelection.cpp.obj"
-"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\LevelSelectionStyle.cpp.obj"
+"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\LevelSelection.cpp.obj"
 "C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Default.rc2.res"
 /OUT:"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\UnrealEditor-LevelSelection.lib"

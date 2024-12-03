@@ -4,6 +4,8 @@
 #include "UObject/Interface.h"
 #include "CouchDamageable.generated.h"
 
+class ACouchPlank;
+
 UINTERFACE()
 class UCouchDamageable : public UInterface
 {

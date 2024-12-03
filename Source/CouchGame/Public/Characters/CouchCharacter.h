@@ -7,7 +7,6 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
-enum class ECouchCharacterStateID : uint8;
 class UCouchWidgetPause;
 class UCouchWidgetWin;
 class UBoxComponent;
@@ -84,8 +83,6 @@ public:
 	void InitStateMachine();
 
 	void TickStateMachine(float DeltaTime) const;
-
-	void ChangeState(ECouchCharacterStateID StateID) const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -170,10 +167,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
 private :
-	
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputInteract(const FInputActionValue& InputActionValue);
+
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
