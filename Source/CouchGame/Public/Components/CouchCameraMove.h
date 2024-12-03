@@ -18,14 +18,14 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Move Camera"))
 	void StartCameraMove(bool Forward = true);
+
 	UFUNCTION()
 	void EndCameraMove();
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTravelingEndEvent, bool, Forward);
-
+	
 	FTravelingEndEvent TravelingEnd;
 
 private:
-	bool isPlayingForward;
 	UPROPERTY()
 	FVector PointA;
 	UPROPERTY(EditAnywhere, Category = "Camera Movement")
@@ -47,7 +47,10 @@ private:
 	TObjectPtr<AActor> Boat2;
 
 	bool bIsMoving;
+	bool isPlayingForward;
 
 	UFUNCTION()
 	void MoveCamera(float DeltaTime);
+	UFUNCTION()
+	void ReversMoveCamera();
 };

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,9 +6,7 @@
 
 class UCouchCameraMove;
 class UButton;
-/**
- * 
- */
+
 UCLASS()
 class COUCHGAME_API UCouchWidgetStartMenu : public UUserWidget
 {
@@ -20,39 +16,52 @@ public:
 	virtual void NativeConstruct() override;
 	UFUNCTION()
 	void OnCameraTransitionEnd(bool Forward);
-
 	
+  
 	void InitializeStartMenu();
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPlayTransitionFinished"))
 	void Receive_OnPlayTransitionFinished(bool Forward);
+
 
 #pragma region Buttons
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> Btn_Play;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> Btn_Settings;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> Btn_Credits;
-	
+  
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> Btn_Quit;
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnPlayPressed"))
+	void Receive_OnPlayPressed(bool Forward);
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnSettingsPressed"))
+	void Receive_OnSettingsPressed();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnCreditsPressed"))
+	void Receive_OnCreditsPressed();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName = "OnQuitPressed"))
+	void Receive_OnQuitPressed();
 
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnPlayPressed();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnSettingsPressed();
-	
-	UFUNCTION()
+  
+	UFUNCTION(BlueprintCallable)
 	void OnCreditsPressed();
-	
-	UFUNCTION()
+  
+	UFUNCTION(BlueprintCallable)
 	void OnQuitPressed();
-	
 
 #pragma endregion
 #pragma region Camera
@@ -60,8 +69,10 @@ public:
 	TObjectPtr<ACameraActor> Camera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCouchCameraMove* CameraMove;
-	
+  
 
-	
+
+  
 #pragma endregion
+
 };

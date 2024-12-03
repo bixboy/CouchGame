@@ -177,6 +177,20 @@ float ACouchPickableMaster::GetQtePercent() const
 	return CurrentPercentQte;
 }
 
+bool ACouchPickableMaster::GetTeamAttached(int Team)
+{
+	Team = FMath::Clamp(Team, 1, 2);
+	for (TObjectPtr<ACouchLure> LuresAttached : CurrentLuresAttached)
+	{
+		if (!LuresAttached || !LuresAttached->CouchFishingRod) continue;
+		if (LuresAttached->CouchFishingRod->GetTeam() == Team)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void ACouchPickableMaster::StopQte()
 {
 	if (WidgetSpawner->GetCurrentWidget())

@@ -22,7 +22,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
-	void PlayVibration();
+	void PlayVibration(UForceFeedbackEffect* Vibration);
 	
 public:
 	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int Team);
@@ -150,6 +150,16 @@ public:
 	int GetTeam() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ACouchCharacter* GetCharacter() const;
+
+#pragma endregion
+
+#pragma region Vibration
+
+private:
+	UPROPERTY(editAnywhere, Category = DefaultVibrationValue)
+	UForceFeedbackEffect* QTEVibrationEffect;
+	UPROPERTY(editAnywhere, Category = DefaultVibrationValue)
+	UForceFeedbackEffect* RewindVibrationEffect;
 
 #pragma endregion	
 };
