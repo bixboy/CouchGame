@@ -52,12 +52,6 @@ int ULocalMultiplayerSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardPro
 	return -1;
 	
 }
-
-TArray<APlayerController*> ULocalMultiplayerSubsystem::GetAllPlayerControllers()
-{
-	return PlayerControllers;
-}
-
 int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex)
 {
 	if (PlayerIndexFromKeyboardProfileIndex.Contains(KeyboardProfileIndex))
@@ -69,6 +63,13 @@ int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProf
 	}
 	return -1;
 }
+
+TArray<APlayerController*> ULocalMultiplayerSubsystem::GetAllPlayerControllers()
+{
+	return PlayerControllers;
+}
+
+
 
 
 void ULocalMultiplayerSubsystem::AssignKeyboardMapping(int PlayerIndex, int KeyboardProfileIndex,

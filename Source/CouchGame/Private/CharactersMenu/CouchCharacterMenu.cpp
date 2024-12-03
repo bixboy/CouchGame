@@ -98,7 +98,7 @@ int ACouchCharacterMenu::GetPlayerIndex() const
 {
 	if (!PlayerController) return -1;
 
-	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	if (!LocalPlayer) return -1;
 
 	return LocalPlayer->GetControllerId();

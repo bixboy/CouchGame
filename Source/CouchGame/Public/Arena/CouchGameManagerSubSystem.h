@@ -10,6 +10,24 @@
 class UCouchWidgetTimer;
 class UCouchWidgetWin;
 
+USTRUCT(Blueprintable, BlueprintType)
+struct FCouchPlayerData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
+	int PlayerIndex;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
+	TEnumAsByte<EAutoReceiveInput::Type> InputType = EAutoReceiveInput::Type::Disabled;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
+	int TeamIndex;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
+	int CardIndex;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
+	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
+};
+
+
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class COUCHGAME_API UCouchGameManagerSubSystem : public UGameInstanceSubsystem
 {
@@ -89,23 +107,13 @@ public:
 #pragma region Local Multiplayer
 public:
 	UPROPERTY(EditAnywhere, Category = "Characters")
-	TSubclassOf<ACouchCharacter> CouchCharacterClassPO;
-
-	UPROPERTY(EditAnywhere, Category = "Characters")
-	TSubclassOf<ACouchCharacter> CouchCharacterClassP1;
-
-	UPROPERTY(EditAnywhere, Category = "Characters")
-	TSubclassOf<ACouchCharacter> CouchCharacterClassP2;
-
-	UPROPERTY(EditAnywhere, Category = "Characters")
-	TSubclassOf<ACouchCharacter> CouchCharacterClassP3;
+	TSubclassOf<ACouchCharacter> CouchCharacterClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
-	int NbPlayersTeam1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
-	int NbPlayersTeam2;
-	void AddPlayer();
-	void RemovePlayer();
+	TArray<FCouchPlayerData> Players;
+	UFUNCTION(BlueprintCallable)
+	void AddPlayer(FCouchPlayerData Data);
+	// void RemovePlayer();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
 	ELocalMultiplayerInputMappingType MappingType = ELocalMultiplayerInputMappingType::Menu;
 
