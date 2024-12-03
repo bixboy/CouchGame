@@ -355,6 +355,16 @@ ACouchCharacter* ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 // Get Team
 int ACouchFishingRod::GetTeam() const {return CurrentTeam;}
 
+// Get Lure
+ACouchLure* ACouchFishingRod::GetLure()
+{
+   if (LureRef)
+   {
+      return LureRef;
+   }
+   return nullptr;
+}
+
 #pragma endregion
 
 void ACouchFishingRod::DestroyLureAndCable()
