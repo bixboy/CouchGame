@@ -2,16 +2,15 @@
 
 
 #include "Arena/CouchGameModeMenu.h"
-
-#include "Arena/ArenaSettings.h"
 #include "CouchGame/Public/Arena//CouchPlayerStart.h"
-#include "CouchGame/Public/Characters/CouchCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "InputMappingContext.h"
 #include "LocalMultiplayerSubsystem.h"
 #include "Arena/CouchGameManagerSubSystem.h"
 #include "Characters/CouchCharacterSettings.h"
+#include "CharactersMenu/CouchCharacterMenu.h"
+
 
 
 void ACouchGameModeMenu::BeginPlay()
@@ -21,7 +20,7 @@ void ACouchGameModeMenu::BeginPlay()
 	TArray<ACouchPlayerStart*> PlayerStartsPoints;
 	FindPlayerStartActorsInArena(PlayerStartsPoints);
 	SpawnCharacter(PlayerStartsPoints);
-}
+	}
 
 UCouchCharacterInputData* ACouchGameModeMenu::LoadInputDataFromConfig()
 {
@@ -56,33 +55,32 @@ void ACouchGameModeMenu::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnP
 	if (SpawnPoints.Num() == 0) return;
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
+	
 	// UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	for	(int i = 0; i < 4; i++)
+	for	(ACouchPlayerStart* SpawnPoint : SpawnPoints)
 	{
-		ACouchPlayerStart* SpawnPoint = Cast<ACouchPlayerStart>(SpawnPoints[i]);
-		if (!SpawnPoint) return ;
-		ACouchCharacter* NewCharacter = GetWorld()->SpawnActor<ACouchCharacter>();
+		if (!SpawnPoint) return;
+		ACouchCharacterMenu* NewCharacter = GetWorld()->SpawnActorDeferred<ACouchCharacterMenu>(MenuCharacter,
+			SpawnPoint->GetTransform());
 		if (!NewCharacter) continue;
 		NewCharacter->InputData = InputData;
 		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		NewCharacter->SetOrient(FVector2D(SpawnPoint->GetStartOrientX(),0));
+		NewCharacter->AutoReceiveInput = SpawnPoint->AutoReceiveInput;
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
-
-		CharactersInGame.Add(NewCharacter);
+		
+		CharactersInMenu.Add(NewCharacter);
 	}
-	
 }
 
 void ACouchGameModeMenu::CreateAndInitPlayers() const
 {
-	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+	const UGameInstance* GameInstance = GetWorld()->GetGameInstance();
 	if (!GameInstance) return;
 
-	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance
-	->GetSubsystem<ULocalMultiplayerSubsystem>();
+	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance->GetSubsystem<ULocalMultiplayerSubsystem>();
 	if (!LocalMultiplayerSubsystem) return;
-	const UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	const UCouchGameManagerSubSystem* GameManager = GameInstance->GetSubsystem<UCouchGameManagerSubSystem>();
 	if (!GameManager) return;
 	LocalMultiplayerSubsystem->CreateAndInitPlayers(GameManager->MappingType);
 }

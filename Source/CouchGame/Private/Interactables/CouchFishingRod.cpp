@@ -219,6 +219,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
       {
          if (LureRef->GetFishingObject())
          {
+            PlayVibration(RewindVibrationEffect);
             SpawnPickableObject();  
          }
          DestroyLureAndCable();
@@ -331,12 +332,12 @@ void ACouchFishingRod::RewindQte()
    {
       if(CurrentTeam == 1 && LureRef)
       {
-         PlayVibration();
+         PlayVibration(QTEVibrationEffect);
          LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
       }
       else if(CurrentTeam == 2 && LureRef)
       {
-         PlayVibration();
+         PlayVibration(QTEVibrationEffect);
          LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
       }  
    }
@@ -353,6 +354,16 @@ ACouchCharacter* ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
 // Get Team
 int ACouchFishingRod::GetTeam() const {return CurrentTeam;}
+
+// Get Lure
+ACouchLure* ACouchFishingRod::GetLure()
+{
+   if (LureRef)
+   {
+      return LureRef;
+   }
+   return nullptr;
+}
 
 #pragma endregion
 
