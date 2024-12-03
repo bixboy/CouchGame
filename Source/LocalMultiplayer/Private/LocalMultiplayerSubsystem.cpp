@@ -56,6 +56,7 @@ int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProf
 {
 	if (PlayerIndexFromKeyboardProfileIndex.Contains(KeyboardProfileIndex))
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Unassigned Player To Keyboard Profile");
 		int RemovedPlayerIndex = PlayerIndexFromKeyboardProfileIndex[KeyboardProfileIndex];
 		PlayerIndexFromKeyboardProfileIndex.Remove(KeyboardProfileIndex);
 		AssignedPlayerIndexInOrder.Remove(RemovedPlayerIndex);
@@ -108,6 +109,7 @@ void ULocalMultiplayerSubsystem::UnassignKeyboardMapping(int PlayerIndex) const
 
 void ULocalMultiplayerSubsystem::UnassignKeyboardProfile(int PlayerIndex, int KeyboardProfileIndex)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Unassigned Keyboard Profile");
 	UnassignKeyboardMapping(PlayerIndex);
 	UnassignPlayerToKeyboardProfile(KeyboardProfileIndex);
 }
@@ -152,6 +154,7 @@ int ULocalMultiplayerSubsystem::UnassignPlayerToGamepadDeviceID(int DeviceID)
 {
 	if (PlayerIndexFromGamepadProfileIndex.Contains(DeviceID))
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Unassigned Player To Gamepad Device");
 		int RemovedPlayerIndex = PlayerIndexFromGamepadProfileIndex[DeviceID];
 		PlayerIndexFromGamepadProfileIndex.Remove(DeviceID);
 		AssignedPlayerIndexInOrder.Remove(RemovedPlayerIndex);
@@ -191,6 +194,7 @@ void ULocalMultiplayerSubsystem::UnassignGamepadInputMapping(int PlayerIndex) co
 
 void ULocalMultiplayerSubsystem::UnassignGamepadProfile(int PlayerIndex, int DeviceID)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Unassigned Gamepad Profile");
 	UnassignGamepadInputMapping(PlayerIndex);
 	UnassignPlayerToGamepadDeviceID(DeviceID);
 }
@@ -213,14 +217,20 @@ ELocalMultiplayerInputMappingType MappingType) const
 void ULocalMultiplayerSubsystem::UnassignProfile(int PlayerIndex)
 {
 	if (PlayerIndex == -1) return;
+	
 	if (const int ProfileIndex = GetProfileIndexFromPlayerIndex(PlayerIndex); ProfileIndex != -1)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f,FColor::Red, FString::Printf(TEXT("Unassigned Profile Index: %d"), ProfileIndex)
+);
+
 		if (GetAssignedPlayerIndexFromGamepadDeviceID(ProfileIndex) == PlayerIndex)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, "A");
 			UnassignGamepadProfile(PlayerIndex,ProfileIndex);
 		}
 		else if (GetAssignedPlayerIndexFromKeyboardProfileIndex(ProfileIndex) == PlayerIndex)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, "B");
 			UnassignKeyboardProfile(PlayerIndex, ProfileIndex);
 		}
 	}
@@ -269,6 +279,7 @@ int ULocalMultiplayerSubsystem::GetLastAssignedPlayerIndex() const
 
 int ULocalMultiplayerSubsystem::GetNbOfAssignedPlayer() const
 {
+	//return AssignedPlayerIndexInOrder.Num();
 	return PlayerIndexFromGamepadProfileIndex.Num() + PlayerIndexFromKeyboardProfileIndex.Num();
 }
 

@@ -5,12 +5,14 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "LocalMultiplayerSubsystem.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchCharacterLobby.h"
 
 
+class ULocalMultiplayerSubsystem;
 // Sets default values
 ACouchCharacterMenu::ACouchCharacterMenu()
 {
@@ -101,8 +103,14 @@ int ACouchCharacterMenu::GetPlayerIndex() const
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	if (!LocalPlayer) return -1;
 
-	return LocalPlayer->GetControllerId();
+	return LocalPlayer->GetLocalPlayerIndex();
+	// if (!PlayerController) return -1;
+	//
+	// // Récupérer l'identifiant de l'appareil utilisé par le joueur
+	// const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	// return LocalPlayer->GetLocalPlayerIndex();
 }
+
 
 void ACouchCharacterMenu::OnInputNavigate(const FInputActionValue& InputActionValue)
 {
