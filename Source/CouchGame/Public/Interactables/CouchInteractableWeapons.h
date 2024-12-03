@@ -17,6 +17,8 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFx"))
 	void PlayFx();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
+	void PlayVibration(UForceFeedbackEffect* Vibration);
 
 public:
 	ACouchInteractableWeapons();
@@ -85,5 +87,13 @@ private:
 	UPROPERTY()
 	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
 
-#pragma endregion	
+#pragma endregion
+
+#pragma region Vibration
+
+private:
+	UPROPERTY(editAnywhere, Category = DefaultVibrationValue)
+	UForceFeedbackEffect* MoveVibrationEffect;
+
+#pragma endregion
 };

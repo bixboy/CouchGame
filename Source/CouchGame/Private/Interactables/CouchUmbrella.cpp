@@ -101,7 +101,8 @@ void ACouchUmbrella::FinishRepairing()
 {
 	SetInteractWidget();
 	if (WidgetComponent->GetCurrentWidget()){ WidgetComponent->DestroyWidget();}
-	
+
+	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
 }
