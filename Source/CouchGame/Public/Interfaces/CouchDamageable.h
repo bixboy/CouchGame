@@ -18,7 +18,7 @@ class COUCHGAME_API ICouchDamageable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	ACouchPlank* Hit(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f);
+	void Hit(FHitResult HitResult, float RepairingTime = 0.f, float Scale = 0.f);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int GetBoatTeam();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
