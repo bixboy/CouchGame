@@ -79,6 +79,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTime() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetCurrentRound();
 
 	void ResetRound();
 	void OnRoundTimerEnd();

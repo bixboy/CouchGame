@@ -71,7 +71,7 @@ void ACouchFishingRod::StartChargeActor_Implementation()
       }
 
       // Spawn Widget
-      WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
+      WidgetSpawner->SpawnWidget(PowerChargeWidget, CurrentPlayer->WidgetPose, false);
       if(WidgetSpawner->GetCurrentWidget()) {ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);}
       
       CurrentPlayer->AnimationManager->IsFishingStart = true;
