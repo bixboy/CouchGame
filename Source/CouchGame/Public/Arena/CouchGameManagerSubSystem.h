@@ -101,11 +101,13 @@ public:
 	TSubclassOf<ACouchCharacter> CouchCharacterClassP3;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
-	int NbPlayers;
+	int NbPlayersTeam1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
+	int NbPlayersTeam2;
 	void AddPlayer();
 	void RemovePlayer();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
-	ELocalMultiplayerInputMappingType MappingType = ELocalMultiplayerInputMappingType::InGame;
+	ELocalMultiplayerInputMappingType MappingType = ELocalMultiplayerInputMappingType::Menu;
 
 	UFUNCTION(BlueprintCallable)
 	void SwitchMappingType();

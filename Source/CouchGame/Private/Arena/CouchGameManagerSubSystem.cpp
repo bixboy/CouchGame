@@ -192,12 +192,12 @@ float UCouchGameManagerSubSystem::GetTime() const
 #pragma region Local Multiplayer
 void UCouchGameManagerSubSystem::AddPlayer()
 {
-	NbPlayers = FMath::Clamp( NbPlayers+1, 0, 4);
+	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1+1, 0, 4);
 }
 
 void UCouchGameManagerSubSystem::RemovePlayer()
 {
-	NbPlayers = FMath::Clamp( NbPlayers-1, 0, 4);
+	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1-1, 0, 4);
 }
 
 void UCouchGameManagerSubSystem::SwitchMappingType()

@@ -152,7 +152,11 @@ void ACouchCatapult::SpawnBullet()
         CurrentAmmo--;
         AmmoActor->Destroy();
         AmmoActor = nullptr;
-        if (CurrentPlayer) CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
+        if (CurrentPlayer)
+        {
+        	CurrentPlayer->AnimationManager->IsChargingCatapult= false;
+	        CurrentPlayer->AnimationManager->IsReleasingCatapult = false;
+        }
     }
     GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(CameraShake, 1.0f);
 }
