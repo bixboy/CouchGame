@@ -39,6 +39,10 @@ ACouchCharacter::ACouchCharacter()
 
 	FishingZoneDetectionBox->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlapFishingZone);
 	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
+
+	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgerSpawner"));
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
+	WidgetPose->SetupAttachment(GetMesh());
 	
 	
 	//Récupère le SpawnerManager et le mets dans un TObjectPtr
@@ -565,6 +569,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				WidgetSpawner->DestroyWidget();
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 			else
@@ -573,6 +578,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				WidgetSpawner->DestroyWidget();
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 		}
@@ -625,12 +631,14 @@ void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* Ov
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	CanFish = true;
+	WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
 }
 
 void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	WidgetSpawner->DestroyWidget();
 	CanFish = false;
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");

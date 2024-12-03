@@ -7,6 +7,8 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
+class ACouchWidget3D;
+class UCouchWidgetSpawn;
 class UCouchWidgetPause;
 class UCouchWidgetWin;
 class UBoxComponent;
@@ -43,6 +45,11 @@ public:
 	int GetCurrentTeam();
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentTeam(int NewTeam);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn>WidgetSpawner;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
 	
 private:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
@@ -51,6 +58,9 @@ private:
 	UPROPERTY()
 	APlayerController* PlayerController;
 	int PlayerIndex;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> FishingWidget;
 #pragma endregion
 #pragma region Move And Orient
 public:
