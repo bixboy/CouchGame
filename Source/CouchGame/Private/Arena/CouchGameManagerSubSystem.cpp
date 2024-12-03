@@ -191,7 +191,7 @@ float UCouchGameManagerSubSystem::GetTime() const
 // Get Current Round
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
-	return CurrentRound;
+	return MaxRounds;
 }
 
 #pragma endregion
