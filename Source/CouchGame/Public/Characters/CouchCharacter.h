@@ -166,10 +166,11 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
-private :
-	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputInteract(const FInputActionValue& InputActionValue);
+	
+private :
+	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;

@@ -26,11 +26,14 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
-	
+
 	UFUNCTION()
 	bool GetCanUse() const;
 	UFUNCTION()
 	void SetCanUse(bool Value);
+
+	UFUNCTION()
+	void DetachPlayer(ACouchCharacter* Player);
 	
 private:
 	UFUNCTION()
@@ -79,10 +82,11 @@ private:
 public:
 	UFUNCTION()
 	void SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget = nullptr);
+
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
+	TSubclassOf<ACouchWidget3D> InteractWidget;
 	
 private:
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	TSubclassOf<ACouchWidget3D> InteractWidget;
 
 	UPROPERTY()
 	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
