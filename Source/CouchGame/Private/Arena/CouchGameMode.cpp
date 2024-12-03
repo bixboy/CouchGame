@@ -76,12 +76,12 @@ void ACouchGameMode::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoint
 		{
 			case EBoatTeam::Team1:
 			{
-				NewCharacter->CurrentTeam = 1;
+				NewCharacter->SetCurrentTeam(1);
 				break;
 			}
 			case EBoatTeam::Team2:
 			{
-				NewCharacter->CurrentTeam = 2;
+				NewCharacter->SetCurrentTeam(2);
 				break;
 			}
 			default:

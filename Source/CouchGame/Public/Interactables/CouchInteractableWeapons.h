@@ -14,6 +14,10 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 {
 	GENERATED_BODY()
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFx"))
+	void PlayFx();
+
 public:
 	ACouchInteractableWeapons();
 

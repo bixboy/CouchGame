@@ -21,6 +21,16 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 	}
 }
 
+TArray<ACouchCharacter*> ULocalMultiplayerSubsystem::GetAllPlayers()
+{
+	return Players;
+}
+
+void ULocalMultiplayerSubsystem::AddPlayerToList(ACouchCharacter* Player)
+{
+	if (!Players.Contains(Player)) Players.Add(Player);
+}
+
 #pragma region keyboard
 int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromKeyboardProfileIndex(int KeyboardProfileIndex)
 {

@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/OutputDeviceNull.h"
+#include "Widget/CouchWidgetSpawn.h"
 
 
 // Sets default values
@@ -123,7 +124,7 @@ void ACoucheCannon::SpawnBullet()
 	ACouchCannonBall* Projectile = GetWorld()->SpawnActor<ACouchCannonBall>(Bullet, Transform);
 	if (Projectile)
 	{
-		Projectile->Initialize(SuggestedVelocity);
+		Projectile->Initialize(SuggestedVelocity, CurrentPlayer);
 		if (AmmoActor)
 		{
 			CurrentAmmo --;

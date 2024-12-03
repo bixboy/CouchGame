@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -21,7 +19,10 @@ public:
 	ACouchCannonBall();
 
 	virtual void Tick(float DeltaTime) override;
-	void Initialize(const FVector& LaunchVelocity);
+	void Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player);
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
+	void PlayVibration(int TeamVibration);
 
 	void InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCannonBall);
 	void CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source);
@@ -30,10 +31,15 @@ public:
 	void OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	ACouchProjectileEffect* GetEffectWithExecuteTime(ECouchProjectileExecuteTime ExecuteTime);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ACouchCharacter* GetCurrentPlayer();
+
 protected:
 	virtual void BeginPlay() override;
 	
 private:
+	UPROPERTY()
+	ACouchCharacter* CurrentPlayer;
 	UPROPERTY()
 	FVector Velocity;      // Vélocité du projectile
 	UPROPERTY()

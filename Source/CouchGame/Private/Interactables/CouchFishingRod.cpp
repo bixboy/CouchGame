@@ -107,9 +107,9 @@ void ACouchFishingRod::SpawnLure()
       this,
       SuggestedVelocity,
       StartLocation,
-      ChargePower->TargetLocation,
+      GetWaterVector(ChargePower->TargetLocation),
       0,
-      0.5
+      ArcParam
    );
 
    if (LureRef)
@@ -127,6 +127,30 @@ void ACouchFishingRod::SpawnLure()
       LureRef->Initialize(SuggestedVelocity, this);
       CurrentPlayer->AnimationManager->IsFishingRelease = false;
    }
+}
+
+FVector ACouchFishingRod::GetWaterVector(FVector StartPosition)
+{
+   TArray<AActor*> ActorsToIgnore;
+   ActorsToIgnore.Add(GetOwner());
+   FHitResult HitResult;
+    
+   // Line Trace*
+   UKismetSystemLibrary::LineTraceSingle(
+      GetWorld(),
+      StartPosition,
+      StartPosition + FVector(0, 0.f, -10000.f),
+      UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel8),
+      false,
+      ActorsToIgnore,
+      EDrawDebugTrace::None,
+      HitResult,
+      true,
+      FLinearColor::Red,
+      FLinearColor::Blue,
+      0.5f
+   );
+   return HitResult.ImpactPoint;
 }
 
 // Init Cable
@@ -307,11 +331,13 @@ void ACouchFishingRod::RewindQte()
    {
       if(CurrentTeam == 1 && LureRef)
       {
-         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
+         PlayVibration();
+         LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
       }
       else if(CurrentTeam == 2 && LureRef)
       {
-         LureRef->GetFishingObjectActor()->UpdatePercent(QtePercent);
+         PlayVibration();
+         LureRef->GetFishingObjectActor()->UpdatePercent(-QtePercent);
       }  
    }
 }
@@ -323,7 +349,7 @@ void ACouchFishingRod::RewindQte()
 bool ACouchFishingRod::IsUsedByPlayer_Implementation() {return ICouchInteractable::IsUsedByPlayer_Implementation();}
 
 // Get Player
-TObjectPtr<ACouchCharacter> ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
+ACouchCharacter* ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
 // Get Team
 int ACouchFishingRod::GetTeam() const {return CurrentTeam;}

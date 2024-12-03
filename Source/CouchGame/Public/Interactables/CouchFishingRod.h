@@ -20,6 +20,9 @@ class COUCHGAME_API ACouchFishingRod : public AActor, public ICouchInteractable
 protected:	
 	ACouchFishingRod();
 	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
+	void PlayVibration();
 	
 public:
 	void SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int Team);
@@ -55,6 +58,8 @@ private:
 	
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"), Category = DefaultValue)
 	int CurrentTeam = 1;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "1"), Category = DefaultValue)
+	float ArcParam = 0.5f;
 	
 	bool IsInCharge = false;
 
@@ -71,6 +76,8 @@ private:
 	TObjectPtr<UClass> Lure;
 	UPROPERTY()
 	TObjectPtr<ACouchLure> LureRef;
+
+	FVector GetWaterVector(FVector StartPosition);
 	
 #pragma endregion	
 	
@@ -139,9 +146,10 @@ private:
 
 #pragma region Getter
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetTeam() const;
-	TObjectPtr<ACouchCharacter> GetCharacter() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ACouchCharacter* GetCharacter() const;
 
 #pragma endregion	
 };
