@@ -41,6 +41,7 @@ ACouchCharacter::ACouchCharacter()
 	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
 	
 	
+	
 	//Récupère le SpawnerManager et le mets dans un TObjectPtr
 	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
 	if (!SpawnerManagerActor) return;

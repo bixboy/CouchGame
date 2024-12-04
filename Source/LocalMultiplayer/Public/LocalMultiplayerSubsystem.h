@@ -86,6 +86,7 @@ private:
 	void UnassignGamepadProfile(int PlayerIndex, int GamepadID);
 	
 	int GetProfileIndexFromPlayerIndex(int PlayerIndex);
-	
+
+	UFUNCTION(BlueprintCallable)
 	int GetFirstAvailablePlayerIndex() const;
 };
