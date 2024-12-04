@@ -40,6 +40,11 @@ void ACouchBoat::UpdateBoatRotation(float Value)
 	SetActorRotation(NewRotation);
 }
 
+EBoatTeam ACouchBoat::GetBoatTeam()
+{
+	return Team;
+}
+
 void ACouchBoat::BoatDamage(float DamageAmount)
 {
 	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);

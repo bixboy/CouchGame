@@ -1,5 +1,7 @@
 
 #include "Arena/CouchGameManagerSubSystem.h"
+
+#include "Arena/CouchPlayerStart.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -141,7 +143,7 @@ void UCouchGameManagerSubSystem::OnRoundTimerEnd()
 
 void UCouchGameManagerSubSystem::ResetRound()
 {
-	CurrentRound = 1;
+	CurrentRound = 0;
 	TeamAPRoundWin = 0;
 	TeamBPRoundWin = 0;
 }
@@ -169,6 +171,12 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 	}
 }
 
+void UCouchGameManagerSubSystem::ReturnToMenu()
+{
+	ResetRound();
+	UGameplayStatics::OpenLevel(this, "LevelLobby", false);
+}
+
 // Update Timer
 void UCouchGameManagerSubSystem::DecrementTimer()
 {
@@ -188,6 +196,12 @@ float UCouchGameManagerSubSystem::GetTime() const
 	return CurrentRoundTimer;
 }
 
+// Get Max Round
+int UCouchGameManagerSubSystem::GetMaxRound()
+{
+	return MaxRounds;
+}
+
 // Get Current Round
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
@@ -197,15 +211,21 @@ int UCouchGameManagerSubSystem::GetCurrentRound()
 #pragma endregion
 
 #pragma region Local Multiplayer
-void UCouchGameManagerSubSystem::AddPlayer()
+void UCouchGameManagerSubSystem::AddPlayer(FCouchPlayerData Data)
 {
-	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1+1, 0, 4);
+	Players.Add(Data);
 }
+// void UCouchGameManagerSubSystem::AddPlayer()
+// {
+// 	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1+1, 0, 4);
+// }
+//
+// void UCouchGameManagerSubSystem::RemovePlayer()
+// {
+// 	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1-1, 0, 4);
+// }
 
-void UCouchGameManagerSubSystem::RemovePlayer()
-{
-	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1-1, 0, 4);
-}
+
 
 void UCouchGameManagerSubSystem::SwitchMappingType()
 {

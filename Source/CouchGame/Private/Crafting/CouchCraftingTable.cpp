@@ -152,6 +152,13 @@ void ACouchCraftingTable::SpawnCraft()
 	}
 }
 
+bool ACouchCraftingTable::IsAutoCookPossible()
+{
+	if (!AutoCookWhen2IngredientsSet) return false;
+	if (Plate1 && Plate2) return true;
+	return false;
+}
+
 void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 {
 	if (Plate1 && Plate2) return;
@@ -204,9 +211,14 @@ bool ACouchCraftingTable::IsCraftingTableFull() const
 void ACouchCraftingTable::CraftItem()
 {
 	if (!ItemToCraft) return;
-	MoveTimeline.PlayFromStart();
-	AnimationManager->IsCooking = true;
-	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
+	if (Plate1) ICouchPickable::Execute_SetIsPickable(Plate1, false);
+	if (Plate2) ICouchPickable::Execute_SetIsPickable(Plate2, false);
+	if (!MoveTimeline.IsPlaying())
+	{
+		MoveTimeline.PlayFromStart();
+		AnimationManager->IsCooking = true;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
+	} 
 }
 
 void ACouchCraftingTable::InitializeMoveTimeline()
@@ -227,6 +239,8 @@ void ACouchCraftingTable::InitializeMoveTimeline()
 void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
+	if (IsUpdating) return;
+	IsUpdating = true;
 	FVector TargetLocation = FinalDishSpawnPosition->GetComponentLocation();
 	if (Plate1)
 	{
@@ -246,6 +260,7 @@ void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 		Plate2->SetActorLocation(NewLocation);
 		Plate2->SetActorScale3D(NewScale);
 	}
+	IsUpdating = false;
 }
 
 void ACouchCraftingTable::OnMoveCompleted()
@@ -279,6 +294,12 @@ void ACouchCraftingTable::UpdateCraftSuggestion()
 {
 	if (const FCraftRecipe* Recipe = IsCraftingPossible())
 	{
+		if (IsAutoCookPossible())
+		{
+			CraftItem();
+			return;
+		}
+		
 		if (Recipe->ResultWidget)
 		{
 			WidgetSpawn->SpawnWidget(Recipe->ResultWidget, PlateSuggestionPos);

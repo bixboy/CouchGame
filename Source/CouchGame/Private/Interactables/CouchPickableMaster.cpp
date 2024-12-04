@@ -94,6 +94,18 @@ void ACouchPickableMaster::InteractWithObject_Implementation(ACouchInteractableM
 	}
 }
 
+bool ACouchPickableMaster::IsPickable_Implementation()
+{
+	ICouchPickable::IsPickable_Implementation();
+	return IsPickable;
+}
+
+void ACouchPickableMaster::SetIsPickable_Implementation(bool isPickable)
+{
+	ICouchPickable::SetIsPickable_Implementation(isPickable);
+	IsPickable = isPickable;
+}
+
 bool ACouchPickableMaster::CanInteractWith(TObjectPtr<ACouchInteractableMaster> Interactable) const
 {
 	if (ClassesPickableItemCanInteractWith.Contains(Interactable.GetClass())) return true;
