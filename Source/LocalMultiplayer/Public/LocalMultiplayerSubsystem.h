@@ -34,6 +34,7 @@ public:
 	void SwitchKeyboardMappingType(int PlayerIndex, int KeyboardProfileIndex,
 	ELocalMultiplayerInputMappingType MappingType) const;
 
+	UFUNCTION(BlueprintCallable)
 	int GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID);
 
 	int AssignNewPlayerToGamepadDeviceID(int DeviceID);

@@ -71,7 +71,7 @@ void ACouchFishingRod::StartChargeActor_Implementation()
       }
 
       // Spawn Widget
-      WidgetSpawner->SpawnWidget(PowerChargeWidget, WidgetPose, false);
+      WidgetSpawner->SpawnWidget(PowerChargeWidget, CurrentPlayer->WidgetPose, false);
       if(WidgetSpawner->GetCurrentWidget()) {ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);}
       
       CurrentPlayer->AnimationManager->IsFishingStart = true;
@@ -354,6 +354,16 @@ ACouchCharacter* ACouchFishingRod::GetCharacter() const {return CurrentPlayer;}
 
 // Get Team
 int ACouchFishingRod::GetTeam() const {return CurrentTeam;}
+
+// Get Lure
+ACouchLure* ACouchFishingRod::GetLure()
+{
+   if (LureRef)
+   {
+      return LureRef;
+   }
+   return nullptr;
+}
 
 #pragma endregion
 
