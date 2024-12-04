@@ -25,11 +25,15 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
             {
                 int GamepadDeviceID = EventArgs.InputDevice.GetId();
             	PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(GamepadDeviceID);
-                if (PlayerIndex < 0)
+                if (PlayerIndex < 0 && EventArgs.Event == IE_Pressed)
                 {
                     PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToGamepadDeviceID(GamepadDeviceID);
                     LocalMultiplayerSubsystem->AssignGamepadInputMapping(PlayerIndex, GameManagerSubSystem->MappingType);
                 }
+            	else if (PlayerIndex < 0 && EventArgs.Event != IE_Pressed)
+            	{
+            		return false;
+            	}
                 else
                 {
                     PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromGamepadDeviceID(GamepadDeviceID);
@@ -51,11 +55,15 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
             {
                 if (int KeyboardProfileIndex = LocalMultiplayerSettings->FindKeyboardProfileIndexFromKey(EventArgs.Key, GameManagerSubSystem->MappingType); KeyboardProfileIndex != -1)
                 {
-                    if (LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex) < 0)
+                    if (LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex) < 0 && EventArgs.Event == IE_Pressed)
                     {
                         PlayerIndex = LocalMultiplayerSubsystem->AssignNewPlayerToKeyboardProfile(KeyboardProfileIndex);
                         LocalMultiplayerSubsystem->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, GameManagerSubSystem->MappingType);
                     }
+                	else if (LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex) < 0 && EventArgs.Event != IE_Pressed)
+                	{
+                		return false;
+                	}
                     else
                     {
                         PlayerIndex = LocalMultiplayerSubsystem->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex);
