@@ -45,6 +45,7 @@ ACouchCharacter::ACouchCharacter()
 	WidgetPose->SetupAttachment(GetMesh());
 	
 	
+	
 	//Récupère le SpawnerManager et le mets dans un TObjectPtr
 	AActor* SpawnerManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), AItemSpawnerManager::StaticClass());
 	if (!SpawnerManagerActor) return;
