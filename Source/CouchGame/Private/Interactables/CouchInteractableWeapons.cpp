@@ -43,11 +43,11 @@ void ACouchInteractableWeapons::SetCanUse(bool Value) {CanUse = Value;}
 
 void ACouchInteractableWeapons::SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget)
 {
-	if (InteractingWidget != nullptr)
+	if (InteractingWidget)
 	{
 		CurrentInteractWidget = InteractingWidget;	
 	}
-	else if (InteractingWidget == nullptr)
+	else if (!InteractingWidget)
 	{
 		CurrentInteractWidget = InteractWidget;
 	}
@@ -74,18 +74,27 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		else
 		{
 			WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);
-
 			WidgetComponent->SpawnWidget(InteractWidget, WidgetPose);
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = false;
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = false;
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;
-			RemoveCurrentPlayer();
-			CanUse = false;
-			SetPlayerIsIn(false);
-			Execute_StopMoveActor(this);
-			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			
+			DetachPlayer(Player);
 		}	
 	}
+}
+
+void ACouchInteractableWeapons::DetachPlayer(ACouchCharacter* Player)
+{
+	if (Player)
+	{
+		Player->AnimationManager->IsDragging = false;
+		Player->AnimationManager->IsDraggingForward = false;
+		Player->AnimationManager->IsDraggingBackward = false;
+		Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	}
+			
+	RemoveCurrentPlayer();
+	CanUse = false;
+	SetPlayerIsIn(false);
+	Execute_StopMoveActor(this);
 }
 
 #pragma region MovementComponent
@@ -95,6 +104,7 @@ void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection
 	Super::StartMoveActor_Implementation(InputDirection);
 	if (Execute_IsUsedByPlayer(this) && MovementComponent->GetCanMove())
 	{
+		PlayVibration(MoveVibrationEffect);
 		CanUse = true;
 		MovementComponent->StartMovement(InputDirection);
 		if (InputDirection == 1)

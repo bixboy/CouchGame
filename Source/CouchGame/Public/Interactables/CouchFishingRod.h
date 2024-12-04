@@ -69,7 +69,9 @@ private:
 #pragma region Lure Actor
 public:
 	UFUNCTION()
-	void SpawnLure();	
+	void SpawnLure();
+	UFUNCTION()
+	ACouchLure* GetLure();
 	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
