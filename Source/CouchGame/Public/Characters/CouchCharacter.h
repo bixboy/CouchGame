@@ -177,7 +177,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
 
-	void OnInputInteract(const FInputActionValue& InputActionValue);
+	void OnInputInteract();
 	
 private :
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
@@ -191,6 +191,8 @@ private :
 
 public:
 	bool GetIsHoldingItem() const;
+
+	void OnInputHold(const FInputActionValue& InputActionValue);
 private:
 	bool IsHoldingItem;
 #pragma endregion
