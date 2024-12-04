@@ -46,9 +46,13 @@ void UCouchWidgetWin::ChangeWinnerText(FText Winner)
 void UCouchWidgetWin::OnNewRoundPressed()
 {
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	if (GameManager)
+	if (GameManager && GameManager->GetCurrentRound() != GameManager->GetMaxRound())
 	{
 		GameManager->StartNewRound();
+	}
+	else if (GameManager && GameManager->GetCurrentRound() >= GameManager->GetMaxRound())
+	{
+		GameManager->ReturnToMenu();
 	}
 }
 
@@ -60,7 +64,7 @@ void UCouchWidgetWin::CheckLight()
 	UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
 	if (GameManager)
 	{
-		int RoundNumber = GameManager->GetCurrentRound();
+		int RoundNumber = GameManager->GetMaxRound();
 		
 		if(RoundNumber == 3)
 		{
