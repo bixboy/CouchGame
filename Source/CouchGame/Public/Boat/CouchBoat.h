@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ForceStrength = 10.f;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	EBoatTeam GetBoatTeam();
+
 private:
 	UPROPERTY(EditAnywhere)
 	ABoatFloor* BoatFloor;

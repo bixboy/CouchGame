@@ -17,6 +17,8 @@ class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFx"))
 	void PlayFx();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
+	void PlayVibration(UForceFeedbackEffect* Vibration);
 
 public:
 	ACouchInteractableWeapons();
@@ -24,11 +26,14 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
-	
+
 	UFUNCTION()
 	bool GetCanUse() const;
 	UFUNCTION()
 	void SetCanUse(bool Value);
+
+	UFUNCTION()
+	void DetachPlayer(ACouchCharacter* Player);
 	
 private:
 	UFUNCTION()
@@ -77,13 +82,22 @@ private:
 public:
 	UFUNCTION()
 	void SetInteractWidget(TSubclassOf<ACouchWidget3D> InteractingWidget = nullptr);
+
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
+	TSubclassOf<ACouchWidget3D> InteractWidget;
 	
 private:
-	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	TSubclassOf<ACouchWidget3D> InteractWidget;
 
 	UPROPERTY()
 	TSubclassOf<ACouchWidget3D> CurrentInteractWidget;
 
-#pragma endregion	
+#pragma endregion
+
+#pragma region Vibration
+
+private:
+	UPROPERTY(editAnywhere, Category = DefaultVibrationValue)
+	UForceFeedbackEffect* MoveVibrationEffect;
+
+#pragma endregion
 };

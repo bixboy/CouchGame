@@ -190,6 +190,12 @@ float UCouchGameManagerSubSystem::GetTime() const
 	return CurrentRoundTimer;
 }
 
+// Get Current Round
+int UCouchGameManagerSubSystem::GetCurrentRound()
+{
+	return MaxRounds;
+}
+
 #pragma endregion
 
 #pragma region Local Multiplayer

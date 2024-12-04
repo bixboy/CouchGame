@@ -44,6 +44,11 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	{
 		Super::Interact_Implementation(Player);	
 	}
+	else if (CurrentPlayer && CurrentPv == 0)
+	{
+		DetachPlayer(Player);
+		return;
+	}
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
@@ -81,10 +86,16 @@ void ACouchUmbrella::DecreasePv()
 	if (CurrentPv == 0)
 	{
 		PlayFx();
-		SetCanUse(false);
 		ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 		SkeletalMesh->SetSkeletalMeshAsset(DestroyedMesh);
 		SetInteractWidget(RepairingWidget);
+		SetCanUse(false);
+		
+		Timer = 0.f;
+		if(CurrentPlayer)
+		{
+			CurrentPlayer->OnInputInteract(0);	
+		}
 	}
 }
 
@@ -99,9 +110,13 @@ int ACouchUmbrella::GetCurrentPv() const
 
 void ACouchUmbrella::FinishRepairing()
 {
-	SetInteractWidget();
-	if (WidgetComponent->GetCurrentWidget()){ WidgetComponent->DestroyWidget();}
-	
+	SetInteractWidget(InteractWidget);
+	if (WidgetComponent->GetCurrentWidget())
+	{
+		WidgetComponent->DestroyWidget();
+	}
+
+	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
 }
