@@ -143,7 +143,7 @@ void UCouchGameManagerSubSystem::OnRoundTimerEnd()
 
 void UCouchGameManagerSubSystem::ResetRound()
 {
-	CurrentRound = 1;
+	CurrentRound = 0;
 	TeamAPRoundWin = 0;
 	TeamBPRoundWin = 0;
 }
@@ -171,6 +171,12 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 	}
 }
 
+void UCouchGameManagerSubSystem::ReturnToMenu()
+{
+	ResetRound();
+	UGameplayStatics::OpenLevel(this, "LevelLobby", false);
+}
+
 // Update Timer
 void UCouchGameManagerSubSystem::DecrementTimer()
 {
@@ -190,10 +196,16 @@ float UCouchGameManagerSubSystem::GetTime() const
 	return CurrentRoundTimer;
 }
 
+// Get Max Round
+int UCouchGameManagerSubSystem::GetMaxRound()
+{
+	return MaxRounds;
+}
+
 // Get Current Round
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
-	return MaxRounds;
+	return CurrentRound;
 }
 
 #pragma endregion

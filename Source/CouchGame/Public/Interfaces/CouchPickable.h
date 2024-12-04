@@ -31,6 +31,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void InteractWithObject(ACouchInteractableMaster* interactable);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool IsPickable();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetIsPickable(bool isPickable);
 	
 	
 };

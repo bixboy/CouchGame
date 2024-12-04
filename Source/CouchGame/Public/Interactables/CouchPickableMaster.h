@@ -49,9 +49,15 @@ public:
 	virtual void Drop_Implementation() override;
 
 	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	virtual bool IsPickable_Implementation() override;
+
+	virtual void SetIsPickable_Implementation(bool isPickable) override;
 	
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> PhysicsCollider;
+
+	bool IsPickable = true;
 #pragma endregion
 #pragma region Interact with other Class
 public:

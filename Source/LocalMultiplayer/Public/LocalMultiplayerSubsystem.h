@@ -85,7 +85,8 @@ private:
 	void UnassignGamepadInputMapping(int PlayerIndex) const;
 	
 	void UnassignGamepadProfile(int PlayerIndex, int GamepadID);
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetProfileIndexFromPlayerIndex(int PlayerIndex);
 
 	UFUNCTION(BlueprintCallable)

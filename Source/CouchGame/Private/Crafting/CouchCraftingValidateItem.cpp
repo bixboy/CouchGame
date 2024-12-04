@@ -43,8 +43,9 @@ void ACouchCraftingValidateItem::Tick(float DeltaTime)
 
 void ACouchCraftingValidateItem::Interact_Implementation(ACouchCharacter* Player)
 {
-	Super::Interact_Implementation(Player);
 	if (!CraftingTable) return;
+	if (!CraftingTable->IsCraftingPossible()) return;
+	Super::Interact_Implementation(Player);
 	CraftingTable->CraftItem();
 	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = !CurrentPlayer->AnimationManager->IsCheckingChef;
 }

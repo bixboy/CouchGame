@@ -26,7 +26,6 @@ private:
 	
 	void AddMenuEntry(FMenuBarBuilder& MenuBuilder);
 	void FillSubmenu(FMenuBuilder& MenuBuilder);
-	TArray<FString> GetAllMapNames();
 	void OnOpenLevelClicked(const FString& LevelPath);
 
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
@@ -35,5 +34,18 @@ private:
 	TSharedPtr<class FUICommandList> PluginCommands;
 
 	bool bIsTabRegistered = false;
+
+#pragma region Find Path
+private:
+	TArray<FString> GetAllMapNames();
+
+#pragma endregion
+
+#pragma region Copy Name
+private:
+	void OnCopyLevelNameClicked(const FString& LevelName);
+
+#pragma endregion
+	
 };
 #endif
