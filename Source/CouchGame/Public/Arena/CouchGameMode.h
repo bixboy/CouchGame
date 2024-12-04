@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CouchGameManagerSubSystem.h"
 #include "GameFramework/GameModeBase.h"
 #include "CouchGameMode.generated.h"
 
@@ -31,10 +32,12 @@ private:
 	UInputMappingContext* LoadInputMappingContextFromConfig();
 	
 	void FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>& ResultsActors);
+	void SortPlayerStartsByAutoReceiveInput(TArray<ACouchPlayerStart*>& PlayerStarts);
+	int GetSpawnPointIndex(FCouchPlayerData PlayerData);
 
 	void SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints);
 
-	TSubclassOf<ACouchCharacter> GetCouchCharacterClassFromInputType(EAutoReceiveInput::Type InputType) const;
+	// TSubclassOf<ACouchCharacter> GetCouchCharacterClassFromInputType(EAutoReceiveInput::Type InputType) const;
 
 	void CreateAndInitPlayers() const;
 	
