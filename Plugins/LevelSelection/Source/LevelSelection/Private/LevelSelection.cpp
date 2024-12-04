@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-#include "Windows/WindowsPlatformApplicationMisc.h"
 #if WITH_EDITOR
+
 #include "LevelSelection.h"
 #include "FileHelpers.h"
 #include "LevelEditor.h"
@@ -9,6 +9,9 @@
 #include "Widgets/Text/STextBlock.h"
 #include "ToolMenus.h"
 #include "Engine/ObjectLibrary.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
+#include "Windows/WindowsPlatformApplicationMisc.h"
 
 static const FName LevelSelectionTabName("LevelSelection");
 #define LOCTEXT_NAMESPACE "FLevelSelectionModule"
@@ -32,7 +35,6 @@ void FLevelSelectionModule::StartupModule()
 			nullptr, // Aucune commande supplémentaire
 			FMenuBarExtensionDelegate::CreateRaw(this, &FLevelSelectionModule::AddMenuEntry)
 		);
-		bIsTabRegistered = true;
 		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
 	}	
 }
@@ -116,25 +118,34 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 		for (const FString& LevelName : Levels)
 		{
 			FSlateIcon LevelIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.GameSettings");
-			
-			MenuBuilder.AddMenuEntry(
+			MenuBuilder.AddSubMenu(
 				FText::FromString(FPaths::GetBaseFilename(LevelName)),
-				FText::FromString(FString::Printf(TEXT("Open level %s"), *FPaths::GetBaseFilename(LevelName))),
-				LevelIcon,
-				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+				FText::FromString(FString::Printf(TEXT("Options for level %s"), *FPaths::GetBaseFilename(LevelName))),
+				FNewMenuDelegate::CreateLambda([this, LevelName](FMenuBuilder& SubMenuBuilder)
 				{
-					OnOpenLevelClicked(LevelName);
-				}))
-			);
+					// Option 1: Ouvrir le niveau
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("OpenLevel", "Open Level"),
+						LOCTEXT("OpenLevelTooltip", "Open this level in the editor."),
+						FSlateIcon(),
+						FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+						{
+							OnOpenLevelClicked(LevelName);
+						}))
+					);
 
-			MenuBuilder.AddMenuEntry(
-				LOCTEXT("CopyLevelName", "Copy Level Name"),
-				LOCTEXT("CopyLevelNameTooltip", "Copy the name of this level to clipboard."),
-				FSlateIcon(),
-				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
-				{
-					OnCopyLevelNameClicked(LevelName);
-				}))
+					// Option 2: Copier le nom
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("CopyLevelName", "Copy Level Name"),
+						LOCTEXT("CopyLevelNameTooltip", "Copy the name of this level to clipboard."),
+						FSlateIcon(),
+						FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+						{
+							OnCopyLevelNameClicked(LevelName);
+						}))
+					);
+				})
+				
 			);
 		}
 	}
@@ -184,19 +195,27 @@ void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 
 void FLevelSelectionModule::OnCopyLevelNameClicked(const FString& LevelName)
 {
-	// Copie le nom dans le presse-papiers
+	// Copy Name
 	FPlatformApplicationMisc::ClipboardCopy(*FPaths::GetBaseFilename(LevelName));
-    
-	// Log pour débogage
 	UE_LOG(LogTemp, Log, TEXT("Copied Level Name: %s"), *FPaths::GetBaseFilename(LevelName));
 
-	// Afficher un message temporaire
+	// Afficher un message
 	ShowTemporaryNotification(FText::Format(
 		LOCTEXT("CopiedNotification", "Level Name '{0}' Copied!"),
 		FText::FromString(FPaths::GetBaseFilename(LevelName))
 	));
 }
 
+
+void FLevelSelectionModule::ShowTemporaryNotification(const FText& NotificationText)
+{
+	FNotificationInfo Info(NotificationText);
+	Info.ExpireDuration = 2.0f; // Durée d'affichage (en secondes)
+	Info.bUseLargeFont = true;
+
+	// Affiche la notification
+	FSlateNotificationManager::Get().AddNotification(Info)->SetCompletionState(SNotificationItem::CS_Success);
+}
 #pragma endregion
 
 

@@ -43,7 +43,8 @@ public class LevelSelection : ModuleRules
 			"ToolMenus",
 			"PropertyEditor",
 			"AssetRegistry",
-			"EditorSubsystem"
+			"EditorSubsystem",
+			"ApplicationCore"
 		});
 		
 		
