@@ -152,6 +152,13 @@ void ACouchCraftingTable::SpawnCraft()
 	}
 }
 
+bool ACouchCraftingTable::IsAutoCookPossible()
+{
+	if (!AutoCookWhen2IngredientsSet) return false;
+	if (Plate1 && Plate2) return true;
+	return false;
+}
+
 void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 {
 	if (Plate1 && Plate2) return;
@@ -204,6 +211,8 @@ bool ACouchCraftingTable::IsCraftingTableFull() const
 void ACouchCraftingTable::CraftItem()
 {
 	if (!ItemToCraft) return;
+	if (Plate1) ICouchPickable::Execute_SetIsPickable(Plate1, false);
+	if (Plate2) ICouchPickable::Execute_SetIsPickable(Plate2, false);
 	MoveTimeline.PlayFromStart();
 	AnimationManager->IsCooking = true;
 	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
@@ -279,6 +288,12 @@ void ACouchCraftingTable::UpdateCraftSuggestion()
 {
 	if (const FCraftRecipe* Recipe = IsCraftingPossible())
 	{
+		if (IsAutoCookPossible())
+		{
+			CraftItem();
+			return;
+		}
+		
 		if (Recipe->ResultWidget)
 		{
 			WidgetSpawn->SpawnWidget(Recipe->ResultWidget, PlateSuggestionPos);

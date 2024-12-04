@@ -79,6 +79,11 @@ private:
 
 	void SpawnCraft();
 
+	UPROPERTY(EditAnywhere)
+	bool AutoCookWhen2IngredientsSet = true;
+
+	bool IsAutoCookPossible();
+
 public:
 	void AddIngredient(ACouchPickableMaster* Ingredient);
 

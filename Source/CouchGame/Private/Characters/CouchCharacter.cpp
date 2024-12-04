@@ -481,7 +481,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	if (!IsInteracting && ActionValue > 0.1f && !bAlreadyUsed)
 	{
 		IsInteracting = true;
-		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
+		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem && ICouchPickable::Execute_IsPickable(InteractingActor))
 		{
 			IsHoldingItem = true;
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
