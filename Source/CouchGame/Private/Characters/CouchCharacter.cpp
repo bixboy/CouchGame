@@ -531,7 +531,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			}
 		}
 	}
-	else if (CanFish)
+	else if (CanFish && !DontFish)
 	{
 		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
@@ -636,17 +636,28 @@ void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* Ov
 {
 	if (Cast<ACouchInteractableMaster>(OtherActor))
 	{
+		DontFish = true;
+		WidgetSpawner->DestroyWidget();
 		return;
 	}
-	
-	CanFish = true;
-	WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
-	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
+
+	if (!DontFish)
+	{
+		CanFish = true;
+		WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");	
+	}
 }
 
 void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (Cast<ACouchInteractableMaster>(OtherActor))
+	{
+		DontFish = false;
+		return;
+	}
+	
 	WidgetSpawner->DestroyWidget();
 	CanFish = false;
 	DestroyFishingRod();

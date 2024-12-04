@@ -204,6 +204,7 @@ private:
 	TSubclassOf<ACouchFishingRod> FishingRodSpawn;
 	bool isFishing = false;
 	bool CanFish = false;
+	bool DontFish = false;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> FishingZoneDetectionBox;
