@@ -634,6 +634,11 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (Cast<ACouchInteractableMaster>(OtherActor))
+	{
+		return;
+	}
+	
 	CanFish = true;
 	WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
