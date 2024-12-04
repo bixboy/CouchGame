@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+#include "Windows/WindowsPlatformApplicationMisc.h"
 #if WITH_EDITOR
 #include "LevelSelection.h"
 #include "FileHelpers.h"
@@ -115,6 +116,7 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 		for (const FString& LevelName : Levels)
 		{
 			FSlateIcon LevelIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.GameSettings");
+			
 			MenuBuilder.AddMenuEntry(
 				FText::FromString(FPaths::GetBaseFilename(LevelName)),
 				FText::FromString(FString::Printf(TEXT("Open level %s"), *FPaths::GetBaseFilename(LevelName))),
@@ -122,6 +124,16 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
 				{
 					OnOpenLevelClicked(LevelName);
+				}))
+			);
+
+			MenuBuilder.AddMenuEntry(
+				LOCTEXT("CopyLevelName", "Copy Level Name"),
+				LOCTEXT("CopyLevelNameTooltip", "Copy the name of this level to clipboard."),
+				FSlateIcon(),
+				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+				{
+					OnCopyLevelNameClicked(LevelName);
 				}))
 			);
 		}
@@ -164,6 +176,25 @@ void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 		FEditorFileUtils::LoadMap(LevelPath, false);
 	}
 
+}
+
+#pragma endregion
+
+#pragma region Copy Name
+
+void FLevelSelectionModule::OnCopyLevelNameClicked(const FString& LevelName)
+{
+	// Copie le nom dans le presse-papiers
+	FPlatformApplicationMisc::ClipboardCopy(*FPaths::GetBaseFilename(LevelName));
+    
+	// Log pour débogage
+	UE_LOG(LogTemp, Log, TEXT("Copied Level Name: %s"), *FPaths::GetBaseFilename(LevelName));
+
+	// Afficher un message temporaire
+	ShowTemporaryNotification(FText::Format(
+		LOCTEXT("CopiedNotification", "Level Name '{0}' Copied!"),
+		FText::FromString(FPaths::GetBaseFilename(LevelName))
+	));
 }
 
 #pragma endregion

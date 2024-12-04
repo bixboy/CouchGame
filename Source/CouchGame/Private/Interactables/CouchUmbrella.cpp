@@ -94,7 +94,7 @@ void ACouchUmbrella::DecreasePv()
 		Timer = 0.f;
 		if(CurrentPlayer)
 		{
-			CurrentPlayer->OnInputInteract(0);	
+			CurrentPlayer->OnInputInteract();	
 		}
 	}
 }

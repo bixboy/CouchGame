@@ -98,10 +98,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTime() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetMaxRound();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentRound();
 
 	void ResetRound();
 	void OnRoundTimerEnd();
+
+	void ReturnToMenu();
 	
 #pragma endregion
 
