@@ -39,6 +39,10 @@ ACouchCharacter::ACouchCharacter()
 
 	FishingZoneDetectionBox->OnComponentBeginOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterBeginOverlapFishingZone);
 	FishingZoneDetectionBox->OnComponentEndOverlap.AddDynamic(this, &ACouchCharacter::OnCharacterEndOverlapFishingZone);
+
+	WidgetSpawner = CreateDefaultSubobject<UCouchWidgetSpawn>(TEXT("WidgerSpawner"));
+	WidgetPose = CreateDefaultSubobject<USceneComponent>(TEXT("WidgetPose"));
+	WidgetPose->SetupAttachment(GetMesh());
 	
 	
 	
@@ -96,7 +100,15 @@ APlayerController* ACouchCharacter::GetPlayerController()
 	return PlayerController;
 }
 
-int ACouchCharacter::GetPlayerIndex() {return PlayerIndex;}
+int ACouchCharacter::GetPlayerIndex()
+{
+	if (!PlayerController) return -1;
+
+	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	if (!LocalPlayer) return -1;
+
+	return LocalPlayer->GetControllerId();
+}
 
 int ACouchCharacter::GetCurrentTeam()
 {
@@ -448,19 +460,6 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
 	float ActionValue = InputActionValue.Get<float>();
-	if (isFishing && FishingRod)
-	{
-		if (ActionValue > 0)
-		{
-			FishingRod->isPlayerFishing = true;
-		}
-		else
-		{
-			FishingRod->isPlayerFishing = false;
-			FishingRod->StopRewindCable();
-		}
-		return;
-	}
 	
 	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
@@ -554,6 +553,15 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 	{
 		if (FMath::Abs(InputActionValue.Get<float>()) >= CharacterSettings->InputFireThreshold)
 		{
+			if (isFishing && FishingRod)
+			{
+				if (FishingRod->GetLure())
+				{
+					FishingRod->isPlayerFishing = true;
+					return;	
+				}
+			}
+			
 			if (!FishingRod)
 			{
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
@@ -562,6 +570,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				WidgetSpawner->DestroyWidget();
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 			else
@@ -570,6 +579,7 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+				WidgetSpawner->DestroyWidget();
 				ICouchInteractable::Execute_StartChargeActor(FishingRod);
 			}
 		}
@@ -577,9 +587,20 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 		{
 			if (FishingRod)
 			{
-				ICouchInteractable::Execute_StopChargeActor(FishingRod);
+				if(!FishingRod->isPlayerFishing)
+				{
+					if (FishingRod)
+					{
+						ICouchInteractable::Execute_StopChargeActor(FishingRod);
+					}
+					CanMove = true;	
+				}
+				else if (FishingRod && FishingRod->isPlayerFishing)
+				{
+					FishingRod->isPlayerFishing = false;
+					FishingRod->StopRewindCable();
+				}	
 			}
-			CanMove = true;
 		}
 	}
 }
@@ -611,12 +632,14 @@ void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* Ov
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	CanFish = true;
+	WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Fishing");
 }
 
 void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	WidgetSpawner->DestroyWidget();
 	CanFish = false;
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
