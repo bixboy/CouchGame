@@ -34,6 +34,7 @@ public:
 	void SwitchKeyboardMappingType(int PlayerIndex, int KeyboardProfileIndex,
 	ELocalMultiplayerInputMappingType MappingType) const;
 
+	UFUNCTION(BlueprintCallable)
 	int GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID);
 
 	int AssignNewPlayerToGamepadDeviceID(int DeviceID);
@@ -51,6 +52,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	int GetLastAssignedPlayerIndex() const;
+	UFUNCTION(BlueprintCallable)
+	int GetNbOfAssignedPlayer() const;
+
+	TArray<APlayerController*> GetAllPlayerControllers();
 
 protected:
 	TArray<int> AssignedPlayerIndexInOrder;
@@ -62,7 +67,12 @@ protected:
 	TMap<int, int> PlayerIndexFromGamepadProfileIndex;
 
 private:
+	UPROPERTY()
+	TArray<TObjectPtr<APlayerController>> PlayerControllers;
+	UPROPERTY()
 	TArray<ACouchCharacter*> Players;
+
+	
 	
 	int UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex);
 	
@@ -77,6 +87,7 @@ private:
 	void UnassignGamepadProfile(int PlayerIndex, int GamepadID);
 	
 	int GetProfileIndexFromPlayerIndex(int PlayerIndex);
-	
+
+	UFUNCTION(BlueprintCallable)
 	int GetFirstAvailablePlayerIndex() const;
 };

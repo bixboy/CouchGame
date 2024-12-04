@@ -10,10 +10,9 @@
 void UCouchWidgetWin::NativeConstruct()
 {
 	Super::NativeConstruct();
+	CheckLight();
 	if (OpenAnimation)
 	{
-		CheckLight();
-		
 		if (ConstructAnim)
 		{
 			FTimerHandle RoundTimerHandle;
@@ -58,41 +57,46 @@ void UCouchWidgetWin::OnNewRoundPressed()
 
 void UCouchWidgetWin::CheckLight()
 {
-	int RoundNumber = 3;
-	if(RoundNumber == 3)
+	UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (GameManager)
 	{
-		Img_Light1->SetVisibility(ESlateVisibility::Hidden);
-		Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+		int RoundNumber = GameManager->GetCurrentRound();
 		
-		Img_Light2->SetVisibility(ESlateVisibility::Visible);
-		Img_Light3->SetVisibility(ESlateVisibility::Visible);
-		Img_Light4->SetVisibility(ESlateVisibility::Visible);
-	}
-	else if(RoundNumber == 2)
-	{
-		Img_Light1->SetVisibility(ESlateVisibility::Hidden);
-		Img_Light3->SetVisibility(ESlateVisibility::Hidden);
-		Img_Light5->SetVisibility(ESlateVisibility::Hidden);
-		
-		Img_Light2->SetVisibility(ESlateVisibility::Visible);
-		Img_Light4->SetVisibility(ESlateVisibility::Visible);
-	}
-	else if(RoundNumber == 4)
-	{
-		Img_Light3->SetVisibility(ESlateVisibility::Hidden);
-
-		Img_Light1->SetVisibility(ESlateVisibility::Visible);
-		Img_Light2->SetVisibility(ESlateVisibility::Visible);
-		Img_Light4->SetVisibility(ESlateVisibility::Visible);
-		Img_Light5->SetVisibility(ESlateVisibility::Visible);
-	}
-	else if(RoundNumber == 5)
-	{
-		Img_Light1->SetVisibility(ESlateVisibility::Visible);
-		Img_Light2->SetVisibility(ESlateVisibility::Visible);
-		Img_Light3->SetVisibility(ESlateVisibility::Visible);
-		Img_Light4->SetVisibility(ESlateVisibility::Visible);
-		Img_Light5->SetVisibility(ESlateVisibility::Visible);
+		if(RoundNumber == 3)
+		{
+			Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+			Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			
+			Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			Img_Light3->SetVisibility(ESlateVisibility::Visible);
+			Img_Light4->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if(RoundNumber == 2)
+		{
+			Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+			Img_Light3->SetVisibility(ESlateVisibility::Hidden);
+			Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			
+			Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			Img_Light4->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if(RoundNumber == 4)
+		{
+			Img_Light3->SetVisibility(ESlateVisibility::Hidden);
+	
+			Img_Light1->SetVisibility(ESlateVisibility::Visible);
+			Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			Img_Light4->SetVisibility(ESlateVisibility::Visible);
+			Img_Light5->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if(RoundNumber == 5)
+		{
+			Img_Light1->SetVisibility(ESlateVisibility::Visible);
+			Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			Img_Light3->SetVisibility(ESlateVisibility::Visible);
+			Img_Light4->SetVisibility(ESlateVisibility::Visible);
+			Img_Light5->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }
 

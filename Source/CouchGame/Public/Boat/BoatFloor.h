@@ -42,7 +42,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ACouchPlank> FloorHit;
 
-	UPROPERTY()
 	TArray<ACouchPlank*> Hits;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))

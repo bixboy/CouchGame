@@ -11,7 +11,7 @@ class UInputMappingContext;
 /**
  * 
  */
-UENUM()
+UENUM(Blueprintable)
 enum class ELocalMultiplayerInputMappingType
 {
 	InGame,

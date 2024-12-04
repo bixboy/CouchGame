@@ -39,17 +39,8 @@ void FLevelSelectionModule::StartupModule()
 //Close Module
 void FLevelSelectionModule::ShutdownModule()
 {
-	// if (bIsTabRegistered)
-	// {
-	// 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(LevelSelectionTabName);
-	// 	bIsTabRegistered = false;
-	// }
-
-	//UToolMenus::UnRegisterStartupCallback(this);
-	//UToolMenus::UnregisterOwner(this);
-
-	//FLevelSelectionStyle::Shutdown();
-	//FLevelSelectionCommands::Unregister();
+	UToolMenus::UnRegisterStartupCallback(this);
+	UToolMenus::UnregisterOwner(this);
 }
 
 TSharedRef<SDockTab> FLevelSelectionModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)

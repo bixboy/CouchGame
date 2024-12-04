@@ -227,7 +227,6 @@ void ACouchCraftingTable::InitializeMoveTimeline()
 void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
-	if (!FinalDishSpawnPosition) return;
 	FVector TargetLocation = FinalDishSpawnPosition->GetComponentLocation();
 	if (Plate1)
 	{

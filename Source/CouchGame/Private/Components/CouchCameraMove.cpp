@@ -1,7 +1,6 @@
 #include "Components/CouchCameraMove.h"
 #include "Kismet/KismetMathLibrary.h"
 
-
 UCouchCameraMove::UCouchCameraMove()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -10,16 +9,23 @@ UCouchCameraMove::UCouchCameraMove()
 void UCouchCameraMove::BeginPlay()
 {
 	Super::BeginPlay();
-	
+  
 	MoveTimeline.SetPlayRate(1.f/Speed);
 	FOnTimelineFloat TimelineCallback;
 	TimelineCallback.BindUFunction(this, FName("MoveCamera"));
 
+
 	MoveTimeline.AddInterpFloat(MoveCurve, TimelineCallback);
 	MoveTimeline.SetLooping(false);
-	
-	StartCameraMove();
+
+
+	FOnTimelineEvent OnTimelineFinishEvent;
+	OnTimelineFinishEvent.BindUFunction(this, FName("EndCameraMove"));
+	MoveTimeline.SetTimelineFinishedFunc(OnTimelineFinishEvent);
+	PointA = GetOwner()->GetActorLocation();
+	// StartCameraMove();
 }
+
 
 void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
@@ -28,11 +34,12 @@ void UCouchCameraMove::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	MoveTimeline.TickTimeline(DeltaTime);
 }
 
-void UCouchCameraMove::StartCameraMove()
+void UCouchCameraMove::StartCameraMove(bool Forward)
 {
-	PointA = GetOwner()->GetActorLocation();
 	bIsMoving = true;
-	MoveTimeline.PlayFromStart();
+	isPlayingForward = Forward;
+	if (Forward) MoveTimeline.Play();
+	else MoveTimeline.Reverse();
 }
 
 void UCouchCameraMove::MoveCamera(float Alpha)
@@ -53,12 +60,18 @@ void UCouchCameraMove::MoveCamera(float Alpha)
 		FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
 		GetOwner()->SetActorRotation(LookAtRotation);
-
-		// Si la Timeline est terminée, arrêter le mouvement
-		if (Alpha >= 1.0f)
-		{
-			bIsMoving = false;
-		}
 	}
 }
+
+void UCouchCameraMove::ReversMoveCamera()
+{
+	bIsMoving = true;
+	MoveTimeline.Reverse();
+}
+
+void UCouchCameraMove::EndCameraMove()
+{
+	if (isPlayingForward) TravelingEnd.Broadcast(isPlayingForward);
+}
+
 

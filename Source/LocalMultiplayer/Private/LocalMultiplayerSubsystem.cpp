@@ -15,9 +15,8 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 	{
 		if (!GetWorld()->GetGameInstance()->GetLocalPlayerByIndex(i))
 		{
-			UGameplayStatics::CreatePlayer(GetWorld(), i);
+			PlayerControllers.Add(UGameplayStatics::CreatePlayer(GetWorld(), i));
 		}
-
 	}
 }
 
@@ -52,7 +51,6 @@ int ULocalMultiplayerSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardPro
 	return -1;
 	
 }
-
 int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProfileIndex)
 {
 	if (PlayerIndexFromKeyboardProfileIndex.Contains(KeyboardProfileIndex))
@@ -64,6 +62,13 @@ int ULocalMultiplayerSubsystem::UnassignPlayerToKeyboardProfile(int KeyboardProf
 	}
 	return -1;
 }
+
+TArray<APlayerController*> ULocalMultiplayerSubsystem::GetAllPlayerControllers()
+{
+	return PlayerControllers;
+}
+
+
 
 
 void ULocalMultiplayerSubsystem::AssignKeyboardMapping(int PlayerIndex, int KeyboardProfileIndex,
@@ -207,8 +212,10 @@ ELocalMultiplayerInputMappingType MappingType) const
 void ULocalMultiplayerSubsystem::UnassignProfile(int PlayerIndex)
 {
 	if (PlayerIndex == -1) return;
+	
 	if (const int ProfileIndex = GetProfileIndexFromPlayerIndex(PlayerIndex); ProfileIndex != -1)
 	{
+
 		if (GetAssignedPlayerIndexFromGamepadDeviceID(ProfileIndex) == PlayerIndex)
 		{
 			UnassignGamepadProfile(PlayerIndex,ProfileIndex);
@@ -259,6 +266,12 @@ int ULocalMultiplayerSubsystem::GetLastAssignedPlayerIndex() const
 		return AssignedPlayerIndexInOrder.Last();
 	}
 	return -1; 
+}
+
+int ULocalMultiplayerSubsystem::GetNbOfAssignedPlayer() const
+{
+	//return AssignedPlayerIndexInOrder.Num();
+	return PlayerIndexFromGamepadProfileIndex.Num() + PlayerIndexFromKeyboardProfileIndex.Num();
 }
 
 int ULocalMultiplayerSubsystem::GetProfileIndexFromPlayerIndex(int PlayerIndex)

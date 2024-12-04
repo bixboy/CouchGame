@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,7 +7,8 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
-enum class ECouchCharacterStateID : uint8;
+class ACouchWidget3D;
+class UCouchWidgetSpawn;
 class UCouchWidgetPause;
 class UCouchWidgetWin;
 class UBoxComponent;
@@ -46,6 +45,11 @@ public:
 	int GetCurrentTeam();
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentTeam(int NewTeam);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCouchWidgetSpawn>WidgetSpawner;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> WidgetPose;
 	
 private:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
@@ -54,6 +58,9 @@ private:
 	UPROPERTY()
 	APlayerController* PlayerController;
 	int PlayerIndex;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> FishingWidget;
 #pragma endregion
 #pragma region Move And Orient
 public:
@@ -86,8 +93,6 @@ public:
 	void InitStateMachine();
 
 	void TickStateMachine(float DeltaTime) const;
-
-	void ChangeState(ECouchCharacterStateID StateID) const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -171,11 +176,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
-private :
-	
-	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 
 	void OnInputInteract(const FInputActionValue& InputActionValue);
+	
+private :
+	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+
 	void OnInputFire(const FInputActionValue& InputActionValue);
 	float InputFireValue = 0.f;
 
