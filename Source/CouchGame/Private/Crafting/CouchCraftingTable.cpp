@@ -213,9 +213,12 @@ void ACouchCraftingTable::CraftItem()
 	if (!ItemToCraft) return;
 	if (Plate1) ICouchPickable::Execute_SetIsPickable(Plate1, false);
 	if (Plate2) ICouchPickable::Execute_SetIsPickable(Plate2, false);
-	MoveTimeline.PlayFromStart();
-	AnimationManager->IsCooking = true;
-	if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
+	if (!MoveTimeline.IsPlaying())
+	{
+		MoveTimeline.PlayFromStart();
+		AnimationManager->IsCooking = true;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
+	} 
 }
 
 void ACouchCraftingTable::InitializeMoveTimeline()
@@ -236,6 +239,8 @@ void ACouchCraftingTable::InitializeMoveTimeline()
 void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "TimelineTick");
+	if (IsUpdating) return;
+	IsUpdating = true;
 	FVector TargetLocation = FinalDishSpawnPosition->GetComponentLocation();
 	if (Plate1)
 	{
@@ -255,6 +260,7 @@ void ACouchCraftingTable::UpdateItemPosition(float Alpha)
 		Plate2->SetActorLocation(NewLocation);
 		Plate2->SetActorScale3D(NewScale);
 	}
+	IsUpdating = false;
 }
 
 void ACouchCraftingTable::OnMoveCompleted()

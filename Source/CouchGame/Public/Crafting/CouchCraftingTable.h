@@ -114,6 +114,8 @@ public:
 
 	UFUNCTION()
 	void OnMoveCompleted();
+
+	bool IsUpdating;
 #pragma endregion
 };
 
