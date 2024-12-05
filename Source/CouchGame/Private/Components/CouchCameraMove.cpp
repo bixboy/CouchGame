@@ -58,8 +58,15 @@ void UCouchCameraMove::MoveCamera(float Alpha)
 
 		// Regarde vers le point médian entre les deux bateaux
 		FVector MidPoint = (Boat1->GetActorLocation() + Boat2->GetActorLocation()) * 0.5f;
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
-		GetOwner()->SetActorRotation(LookAtRotation);
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(NewLocation, MidPoint);
+
+		// Rendre la rotation plus rapide près de la fin
+		float DynamicSpeed = FMath::Lerp(1.f, 1.f * 10.0f, Alpha);
+
+		// Interpolation fluide de la rotation
+		FRotator CurrentRotation = GetOwner()->GetActorRotation();
+		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), DynamicSpeed);
+		GetOwner()->SetActorRotation(SmoothRotation);
 	}
 }
 
