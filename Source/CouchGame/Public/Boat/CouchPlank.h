@@ -6,6 +6,7 @@
 #include "Widget/CouchWidgetSpawn.h"
 #include "Interactables/CouchInteractableMaster.h"
 #include "Interfaces/CouchInteractable.h"
+#include "Interfaces/CouchPickable.h"
 #include "CouchPlank.generated.h"
 
 class ACouchWidget3D;
@@ -18,7 +19,7 @@ class USceneComponent;
 class UNiagaraComponent;
 
 UCLASS()
-class COUCHGAME_API ACouchPlank : public ACouchInteractableMaster
+class COUCHGAME_API ACouchPlank : public ACouchInteractableMaster, public ICouchPickable
 {
 	GENERATED_BODY()
 
@@ -27,7 +28,16 @@ public:
 
 	void Init(ABoatFloor* floor, float RepairingTime = 0.f, float Scale = 0.f);
 
-	virtual bool IsUsedByPlayer_Implementation() override;
+	virtual void PickUp_Implementation(ACouchCharacter* player) override;
+
+	virtual void Drop_Implementation() override;
+
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	virtual bool IsPickable_Implementation() override;
+
+	virtual void SetIsPickable_Implementation(bool isPickable) override;
+	
 
 	// Overlap
 	UFUNCTION()

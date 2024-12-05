@@ -257,7 +257,6 @@
 /I "..\Intermediate\Build\Win64\UnrealEditor\Inc\MaterialUtilities\UHT"
 /I "Developer\MaterialUtilities\Public"
 /I "Editor\KismetCompiler\Public"
-/I "C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\UnrealEditor\Inc\LevelSelection\UHT"
 /I "C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Source"
 /I "C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Source\LevelSelection\Public"
 /external:W0

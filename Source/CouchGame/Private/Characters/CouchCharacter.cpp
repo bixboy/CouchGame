@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Boat/CouchPlank.h"
 #include "Characters/CouchCharacterAnimationManager.h"
 #include "Characters/CouchCharacterSettings.h"
 #include "Characters/CouchCharactersStateID.h"
@@ -482,14 +483,16 @@ void ACouchCharacter::OnInputInteract()
 		if (InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem && ICouchPickable::Execute_IsPickable(InteractingActor))
 		{
 			IsHoldingItem = true;
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
 		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
 			if (InteractingActor->IsA(ACouchCraftingValidateItem::StaticClass())) OnInputInteract();
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
+		
 	}
 	else if (IsInteracting)
 	{
@@ -619,6 +622,7 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 		}
 	}
 	ICouchInteractable::Execute_Interact(InteractingActor, this);
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
 	
