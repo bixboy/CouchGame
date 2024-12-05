@@ -296,6 +296,7 @@ void ACouchCraftingTable::UpdateCraftSuggestion()
 	{
 		if (IsAutoCookPossible())
 		{
+			ItemToCraft = Recipe->ResultObject;
 			CraftItem();
 			return;
 		}

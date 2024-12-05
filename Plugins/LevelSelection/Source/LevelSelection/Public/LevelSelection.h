@@ -1,6 +1,5 @@
 #pragma once
 #if WITH_EDITOR
-#pragma once
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
@@ -11,29 +10,51 @@ class FMenuBuilder;
 
 DECLARE_LOG_CATEGORY_EXTERN(MyMenuLog, Log, All);
 
-class FLevelSelectionModule : public IModuleInterface
+class LEVELSELECTION_API FLevelSelectionModule : public IModuleInterface
 {
+// Setup	
+#pragma region Setup	
 public:
-
-	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
-	/** This function will be bound to Command (by default it will bring up plugin window) */
 	void PluginButtonClicked();
 	
 private:
+	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 	
 	void AddMenuEntry(FMenuBarBuilder& MenuBuilder);
 	void FillSubmenu(FMenuBuilder& MenuBuilder);
-	TArray<FString> GetAllMapNames();
-	void OnOpenLevelClicked(const FString& LevelPath);
+void AddLevelToMenu(const FString& LevelName, FMenuBuilder& MenuBuilder);
+void OnOpenLevelClicked(const FString& LevelPath);
 
-	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
+#pragma endregion	
 
+// Find Level Path	
+#pragma region Find Path
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
+	TArray<FString> GetAllMapNames();
 
-	bool bIsTabRegistered = false;
+#pragma endregion
+
+// Copy Level Name	
+#pragma region Copy Name
+private:
+	void OnCopyLevelNameClicked(const FString& LevelName);
+	void ShowTemporaryNotification(const FText& NotificationText);
+void SaveCategoriesToConfig();
+void LoadCategoriesFromConfig();
+
+#pragma endregion
+
+// Categories	
+#pragma region Categories
+private:
+	TMap<FString, TArray<FString>> LevelCategories;
+
+	void MoveLevelToCategory(const FString& LevelName, const FString& TargetCategory);
+	void OnDeleteCategory(const FString& CategoryName);
+	void OnCreateNewCategory();
+
+#pragma endregion	
 };
 #endif
