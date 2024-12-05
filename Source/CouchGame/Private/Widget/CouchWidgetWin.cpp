@@ -65,41 +65,32 @@ void UCouchWidgetWin::CheckLight()
 	if (GameManager)
 	{
 		int RoundNumber = GameManager->GetMaxRound();
-		
-		if(RoundNumber == 3)
+		if (RoundNumber == 1)
 		{
-			Img_Light1->SetVisibility(ESlateVisibility::Hidden);
-			Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light1) Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light5) Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light2) Img_Light2->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light4) Img_Light4->SetVisibility(ESlateVisibility::Hidden);
 			
-			Img_Light2->SetVisibility(ESlateVisibility::Visible);
-			Img_Light3->SetVisibility(ESlateVisibility::Visible);
-			Img_Light4->SetVisibility(ESlateVisibility::Visible);
-		}
-		else if(RoundNumber == 2)
-		{
-			Img_Light1->SetVisibility(ESlateVisibility::Hidden);
-			Img_Light3->SetVisibility(ESlateVisibility::Hidden);
-			Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light3) Img_Light3->SetVisibility(ESlateVisibility::Visible);
 			
-			Img_Light2->SetVisibility(ESlateVisibility::Visible);
-			Img_Light4->SetVisibility(ESlateVisibility::Visible);
 		}
-		else if(RoundNumber == 4)
+		else if(RoundNumber == 3)
 		{
-			Img_Light3->SetVisibility(ESlateVisibility::Hidden);
-	
-			Img_Light1->SetVisibility(ESlateVisibility::Visible);
-			Img_Light2->SetVisibility(ESlateVisibility::Visible);
-			Img_Light4->SetVisibility(ESlateVisibility::Visible);
-			Img_Light5->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light1) Img_Light1->SetVisibility(ESlateVisibility::Hidden);
+			if (Img_Light5) Img_Light5->SetVisibility(ESlateVisibility::Hidden);
+			
+			if (Img_Light2) Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light3) Img_Light3->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light4) Img_Light4->SetVisibility(ESlateVisibility::Visible);
 		}
 		else if(RoundNumber == 5)
 		{
-			Img_Light1->SetVisibility(ESlateVisibility::Visible);
-			Img_Light2->SetVisibility(ESlateVisibility::Visible);
-			Img_Light3->SetVisibility(ESlateVisibility::Visible);
-			Img_Light4->SetVisibility(ESlateVisibility::Visible);
-			Img_Light5->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light1) Img_Light1->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light2) Img_Light2->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light3) Img_Light3->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light4) Img_Light4->SetVisibility(ESlateVisibility::Visible);
+			if (Img_Light5) Img_Light5->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 }

@@ -116,10 +116,31 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 
 #pragma region Getters
 
-bool ACouchPlank::IsUsedByPlayer_Implementation()
+
+void ACouchPlank::PickUp_Implementation(ACouchCharacter* player)
 {
-	ICouchInteractable::IsUsedByPlayer_Implementation();
-	return IsPlayerRepairing;
+	ICouchPickable::PickUp_Implementation(player);
+}
+
+void ACouchPlank::Drop_Implementation()
+{
+	ICouchPickable::Drop_Implementation();
+}
+
+void ACouchPlank::InteractWithObject_Implementation(ACouchInteractableMaster* interactable)
+{
+	ICouchPickable::InteractWithObject_Implementation(interactable);
+}
+
+void ACouchPlank::SetIsPickable_Implementation(bool isPickable)
+{
+	ICouchPickable::SetIsPickable_Implementation(isPickable);
+}
+
+bool ACouchPlank::IsPickable_Implementation()
+{
+	ICouchPickable::IsPickable_Implementation();
+	return !IsPlayerRepairing;
 }
 
 float ACouchPlank::GetRepairingPercent() const
