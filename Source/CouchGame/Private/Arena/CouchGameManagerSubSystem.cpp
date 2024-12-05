@@ -39,7 +39,7 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 
 void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FText Text)
 {
-	if (UCouchWidgetWin* WidgetRef = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget))
+	if (UCouchWidgetWin* WidgetRef = CreateWidget<UCouchWidgetWin>(GetWorld(), WinWidget); WidgetRef)
 	{
 		FInputModeUIOnly InputMode;
 		InputMode.SetWidgetToFocus(WidgetRef->TakeWidget());

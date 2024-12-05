@@ -136,6 +136,18 @@ int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromGamepadDeviceID(int De
 	return -1;
 }
 
+int ULocalMultiplayerSubsystem::GetAssignedGamepadDeviceIDFromPlayerIndex(int PlayerIndex)
+{
+	for (const auto& Pair : PlayerIndexFromGamepadProfileIndex)
+	{
+		if (Pair.Value == PlayerIndex)
+		{
+			return Pair.Key; 
+		}
+	}
+	return -1;
+}
+
 int ULocalMultiplayerSubsystem::AssignNewPlayerToGamepadDeviceID(int DeviceID)
 {
 	if (int PlayerIndex = GetFirstAvailablePlayerIndex(); PlayerIndex != -1)
