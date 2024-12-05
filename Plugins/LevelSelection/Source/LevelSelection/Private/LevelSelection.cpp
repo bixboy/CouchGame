@@ -466,50 +466,78 @@ void FLevelSelectionModule::ShowTemporaryNotification(const FText& NotificationT
 
 void FLevelSelectionModule::SaveCategoriesToConfig()
 {
-	FString ConfigFilePath = FPaths::ConvertRelativePathToFull(FPaths::ProjectConfigDir() + TEXT("LevelCategories.ini"));
+    // Récupère le chemin
+    FString ConfigFilePath = FPaths::ConvertRelativePathToFull(FPaths::ProjectConfigDir() + TEXT("LevelCategories.ini"));
+    FFileHelper::SaveStringToFile(TEXT(""), *ConfigFilePath);
 
-	FFileHelper::SaveStringToFile(TEXT(""), *ConfigFilePath);
-	
-	UE_LOG(LogTemp, Log, TEXT("Saving the following level categories:"));
+    // Parcourt les sections existantes dans le fichier pour :
+    // 1. Supprimer les catégories obsolètes.
+    // 2. Nettoyer les niveaux déplacés.
+	TSet<FString> CurrentCategories;
+	TMap<FString, TSet<FString>> CurrentLevelsInCategories;
 
-	TArray<FString> TempList;
-	GConfig->GetSectionNames(ConfigFilePath, TempList);
-	
-	TSet<FString> CurrentCategoryNames;
-	for (const auto& CategoryPair : LevelCategories)
-	{
-		CurrentCategoryNames.Add(CategoryPair.Key);
-	}
-	
-	for (const FString& ExistingCategory : TempList)
-	{
-		if (!CurrentCategoryNames.Contains(ExistingCategory))
-		{
-			UE_LOG(LogTemp, Log, TEXT("Deleting category from config: %s"), *ExistingCategory);
-			GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
-		}
-	}
-	
 	for (const auto& CategoryPair : LevelCategories)
 	{
 		const FString& CategoryName = CategoryPair.Key;
-		UE_LOG(LogTemp, Log, TEXT("Category: %s"), *CategoryName);
+		const TArray<FString>& Levels = CategoryPair.Value;
 
-		if (CategoryPair.Value.Num() > 0)
+		CurrentCategories.Add(CategoryName);
+		
+		TSet<FString> LevelsSet(Levels);
+		CurrentLevelsInCategories.Add(CategoryName, LevelsSet);
+	}
+
+	TArray<FString> ExistingCategories;
+	GConfig->GetSectionNames(ConfigFilePath, ExistingCategories);
+
+	for (const FString& ExistingCategory : ExistingCategories)
+	{
+		// Vérifier si la catégorie existe encore
+		if (!CurrentCategories.Contains(ExistingCategory))
 		{
-			// Réécrire chaque catégorie dans le fichier .ini
-			for (const FString& LevelName : CategoryPair.Value)
+			UE_LOG(LogTemp, Log, TEXT("Deleting category '%s' from config"), *ExistingCategory);
+			GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
+			continue;
+		}
+
+		// Supprimer les niveaux obsolètes
+		TArray<FString> StoredLevels;
+		GConfig->GetSection(*ExistingCategory, StoredLevels, ConfigFilePath);
+
+		const TSet<FString>* CurrentLevels = CurrentLevelsInCategories.Find(ExistingCategory);
+		if (CurrentLevels)
+		{
+			for (const FString& StoredLevel : StoredLevels)
 			{
-				UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
-				GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+				if (!CurrentLevels->Contains(StoredLevel))
+				{
+					UE_LOG(LogTemp, Log, TEXT("Deleting level '%s' from category '%s' in config"), *StoredLevel, *ExistingCategory);
+					GConfig->RemoveKey(*ExistingCategory, *StoredLevel, ConfigFilePath);
+				}
 			}
 		}
 	}
 
-	// Sauvegarde les modifications dans le fichier de configuration
 	GConfig->Flush(false, ConfigFilePath);
 
-	UE_LOG(LogTemp, Log, TEXT("Successfully flushed level categories to temp config file: %s"), *ConfigFilePath);
+    // Sauvegarde les catégories et leurs niveaux
+    for (const auto& CategoryPair : LevelCategories)
+    {
+        const FString& CategoryName = CategoryPair.Key;
+        const TArray<FString>& LevelNames = CategoryPair.Value;
+
+        UE_LOG(LogTemp, Log, TEXT("Saving category: %s"), *CategoryName);
+
+        for (const FString& LevelName : LevelNames)
+        {
+            UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
+            GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+        }
+    }
+
+    // Sauvegarde les modifications
+    GConfig->Flush(false, ConfigFilePath);
+    UE_LOG(LogTemp, Log, TEXT("Level categories successfully saved to: %s"), *ConfigFilePath);
 }
 
 void FLevelSelectionModule::LoadCategoriesFromConfig()
