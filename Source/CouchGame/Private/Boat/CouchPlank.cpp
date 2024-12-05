@@ -25,7 +25,7 @@ ACouchPlank::ACouchPlank()
 	if (UStaticMesh* RandomStaticMesh = GetRandomStaticMesh()) HitMesh->SetStaticMesh(RandomStaticMesh);
 	InterractiveBoxRange->SetupAttachment(HitMesh);
 	WaterParticle->SetupAttachment(HitMesh);
-	WidgetPos->SetupAttachment(HitMesh);
+	WidgetPos->SetupAttachment(RootComponent);
 
 	InterractiveBoxRange->OnComponentBeginOverlap.AddDynamic(this, &ACouchPlank::OnOverlapBegin);
 	InterractiveBoxRange->OnComponentEndOverlap.AddDynamic(this, &ACouchPlank::OnOverlapEnd);

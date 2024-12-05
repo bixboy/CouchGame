@@ -119,6 +119,8 @@ public:
 	TArray<FCouchPlayerData> Players;
 	UFUNCTION(BlueprintCallable)
 	void AddPlayer(FCouchPlayerData Data);
+	UFUNCTION(BlueprintCallable)
+	void ResetPlayers();
 	// void RemovePlayer();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplayer")
 	ELocalMultiplayerInputMappingType MappingType = ELocalMultiplayerInputMappingType::Menu;
