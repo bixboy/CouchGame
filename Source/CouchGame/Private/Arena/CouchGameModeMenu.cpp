@@ -52,7 +52,10 @@ void ACouchGameModeMenu::FindPlayerStartActorsInArena(TArray<ACouchPlayerStart*>
 
 void ACouchGameModeMenu::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnPoints)
 {
-	if (SpawnPoints.Num() == 0) return;
+	if (SpawnPoints.Num() == 0) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No Spawn Point");
+		return;
+	};
 	UCouchCharacterInputData* InputData = LoadInputDataFromConfig();
 	// UInputMappingContext* InputMappingContext = LoadInputMappingContextFromConfig();
 	
@@ -62,7 +65,11 @@ void ACouchGameModeMenu::SpawnCharacter(const TArray<ACouchPlayerStart*>& SpawnP
 		if (!SpawnPoint) return;
 		ACouchCharacterMenu* NewCharacter = GetWorld()->SpawnActorDeferred<ACouchCharacterMenu>(MenuCharacter,
 			SpawnPoint->GetTransform());
-		if (!NewCharacter) continue;
+		if (!NewCharacter)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Failed to Spawn Character");
+			continue;
+		}
 		NewCharacter->InputData = InputData;
 		// NewCharacter->InputMappingContext = InputMappingContext;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
