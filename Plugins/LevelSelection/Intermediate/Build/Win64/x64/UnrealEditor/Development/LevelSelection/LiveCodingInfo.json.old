@@ -2,8 +2,6 @@
 	"RemapUnityFiles": 
 	{
 		"Module.LevelSelection.cpp.obj": [
-			"LevelSelection.gen.cpp.obj",
-			"LevelSelection.init.gen.cpp.obj",
 			"LevelSelectionCommands.cpp.obj",
 			"LevelSelectionStyle.cpp.obj",
 			"LevelSelection.cpp.obj"
