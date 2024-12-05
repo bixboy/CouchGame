@@ -105,10 +105,10 @@ int ACouchCharacter::GetPlayerIndex()
 {
 	if (!PlayerController) return -1;
 
-	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	if (!LocalPlayer) return -1;
 
-	return LocalPlayer->GetControllerId();
+	return LocalPlayer->GetLocalPlayerIndex();
 }
 
 int ACouchCharacter::GetCurrentTeam()

@@ -36,6 +36,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID);
+	UFUNCTION(BlueprintCallable)
+	int GetAssignedGamepadDeviceIDFromPlayerIndex(int PlayerIndex);
 
 	int AssignNewPlayerToGamepadDeviceID(int DeviceID);
 	
