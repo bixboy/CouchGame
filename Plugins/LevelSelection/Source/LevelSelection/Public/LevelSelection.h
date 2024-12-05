@@ -23,10 +23,16 @@ private:
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 	
 	void AddMenuEntry(FMenuBarBuilder& MenuBuilder);
-	void FillSubmenu(FMenuBuilder& MenuBuilder);
-void AddLevelToMenu(const FString& LevelName, FMenuBuilder& MenuBuilder);
-void OnOpenLevelClicked(const FString& LevelPath);
+	void OnOpenLevelClicked(const FString& LevelPath);
 
+#pragma endregion
+
+// Menu
+#pragma region Menu
+private:
+	void FillSubmenu(FMenuBuilder& MenuBuilder);
+	void AddLevelToMenu(const FString& LevelName, FMenuBuilder& MenuBuilder);
+	
 #pragma endregion	
 
 // Find Level Path	
@@ -53,7 +59,7 @@ private:
 
 	void MoveLevelToCategory(const FString& LevelName, const FString& TargetCategory);
 	void OnDeleteCategory(const FString& CategoryName);
-	void OnCreateNewCategory();
+	void OnCreateNewCategory(const FString& LevelNameToMove);
 
 #pragma endregion	
 };
