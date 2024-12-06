@@ -152,6 +152,8 @@ void UCouchGameManagerSubSystem::ResetRound()
 	TeamAPRoundWin = 0;
 	TeamBPRoundWin = 0;
 	RoundsWinners.Reset();
+	GetWorld()->GetTimerManager().ClearTimer(RoundTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(UiTimerHandle);
 }
 
 // Update Life
