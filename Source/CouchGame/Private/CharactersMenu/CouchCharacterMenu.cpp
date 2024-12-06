@@ -121,10 +121,12 @@ void ACouchCharacterMenu::OnInputNavigate(const FInputActionValue& InputActionVa
 		return;
 	}
 	InputDirection.Normalize();
-	if (InputDirection.IsNearlyZero(0.1f))
+	
+	if (InputDirection.IsNearlyZero(0.3f))
 	{
 		return;
 	}
+	
 	const int PlayerIndex = GetPlayerIndex();
 	if (FMath::Abs(InputDirection.Y) > FMath::Abs(InputDirection.X))
 	{

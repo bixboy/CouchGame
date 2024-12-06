@@ -1,8 +1,9 @@
 #include "Widget/CouchWidgetPause.h"
-#include "Animation/WidgetAnimation.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+
 
 bool UCouchWidgetPause::Initialize()
 {
@@ -61,6 +62,14 @@ void UCouchWidgetPause::OnResumePressed()
 
 void UCouchWidgetPause::OnMenuPressed()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	
+	if (UCouchGameManagerSubSystem* SubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
+	{
+		SubSystem->SwitchMappingType();
+	}
+	
 	UGameplayStatics::OpenLevel(GetWorld(), MenuName);
 }
 

@@ -215,6 +215,12 @@ void UCouchGameManagerSubSystem::AddPlayer(FCouchPlayerData Data)
 {
 	Players.Add(Data);
 }
+
+void UCouchGameManagerSubSystem::ResetPlayers()
+{
+	Players.Reset();
+}
+
 // void UCouchGameManagerSubSystem::AddPlayer()
 // {
 // 	NbPlayersTeam1 = FMath::Clamp( NbPlayersTeam1+1, 0, 4);

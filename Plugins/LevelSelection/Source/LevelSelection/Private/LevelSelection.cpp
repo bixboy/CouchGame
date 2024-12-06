@@ -12,11 +12,6 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Windows/WindowsPlatformApplicationMisc.h"
-#include "Serialization/JsonSerializer.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonWriter.h"
-#include "Dom/JsonObject.h"
-#include "Dom/JsonValue.h"
 
 static const FName LevelSelectionTabName("LevelSelection");
 #define LOCTEXT_NAMESPACE "FLevelSelectionModule"
@@ -89,17 +84,6 @@ void FLevelSelectionModule::AddMenuEntry(FMenuBarBuilder& MenuBuilder)
 
 void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 {
-	// Ajouter un bouton pour créer une nouvelle catégorie
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("CreateCategory", "Create New Category"),
-		LOCTEXT("CreateCategoryTooltip", "Add a new category to organize your levels."),
-		FSlateIcon(),
-		FUIAction(FExecuteAction::CreateRaw(this, &FLevelSelectionModule::OnCreateNewCategory))
-	);
-
-	MenuBuilder.AddSeparator();
-
-	// Afficher les catégories existantes
 	if (LevelCategories.Num() > 0)
 	{
 		for (const auto& CategoryPair : LevelCategories)
@@ -116,13 +100,11 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 					{
 						for (const FString& LevelName : Levels)
 						{
-							// Ajouter chaque niveau dans la catégorie
 							AddLevelToMenu(LevelName, SubMenuBuilder);
 						}
 					}
 					else
 					{
-						// Catégorie vide
 						SubMenuBuilder.AddMenuEntry(
 							LOCTEXT("EmptyCategory", "No levels in this category."),
 							FText::GetEmpty(),
@@ -173,57 +155,89 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 
 void FLevelSelectionModule::AddLevelToMenu(const FString& LevelName, FMenuBuilder& MenuBuilder)
 {
-	MenuBuilder.AddSubMenu(
-		FText::FromString(FPaths::GetBaseFilename(LevelName)),
-		FText::FromString(FString::Printf(TEXT("Options for level %s"), *FPaths::GetBaseFilename(LevelName))),
-		FNewMenuDelegate::CreateLambda([this, LevelName](FMenuBuilder& SubMenuBuilder)
-		{
-			// Option 1: Ouvrir le niveau
-			SubMenuBuilder.AddMenuEntry(
-				LOCTEXT("OpenLevel", "Open Level"),
-				LOCTEXT("OpenLevelTooltip", "Open this level in the editor."),
-				FSlateIcon(),
-				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
-				{
-					OnOpenLevelClicked(LevelName);
-				}))
-			);
+    MenuBuilder.BeginSection("LevelSection", LOCTEXT("LevelSection", "Level"));
 
-			// Option 2: Copier le nom
-			SubMenuBuilder.AddMenuEntry(
-				LOCTEXT("CopyLevelName", "Copy Level Name"),
-				LOCTEXT("CopyLevelNameTooltip", "Copy the name of this level to clipboard."),
-				FSlateIcon(),
-				FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
-				{
-					OnCopyLevelNameClicked(LevelName);
-				}))
-			);
+    MenuBuilder.AddMenuEntry(
+        FText::FromString(FPaths::GetBaseFilename(LevelName)),
+        FText::FromString(FString::Printf(TEXT("Open level: %s"), *LevelName)),
+        FSlateIcon(),
+        FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+        {
+            OnOpenLevelClicked(LevelName);
+        }))
+    );
 
-			// Option 3: Déplacer vers une catégorie
-			SubMenuBuilder.AddSubMenu(
-				LOCTEXT("MoveToCategory", "Move To Category"),
-				LOCTEXT("MoveToCategoryTooltip", "Move this level to another category."),
-				FNewMenuDelegate::CreateLambda([this, LevelName](FMenuBuilder& MoveMenuBuilder)
-				{
-					for (const auto& CategoryPair : LevelCategories)
-					{
-						const FString& TargetCategory = CategoryPair.Key;
+    // Options 1 : Copy Name Level
+    MenuBuilder.AddSubMenu(
+        LOCTEXT("Options", "Options"),
+        LOCTEXT("OptionsTooltip", "Hover over to show options."),
+        FNewMenuDelegate::CreateLambda([this, LevelName](FMenuBuilder& SubMenuBuilder)
+        {
+            SubMenuBuilder.AddMenuEntry(
+                LOCTEXT("CopyLevelName", "Copy Level Name"),
+                LOCTEXT("CopyLevelNameTooltip", "Copy the name of this level to clipboard."),
+                FSlateIcon(),
+                FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+                {
+                    OnCopyLevelNameClicked(LevelName);
+                }))
+            );
 
-						MoveMenuBuilder.AddMenuEntry(
-							FText::FromString(TargetCategory),
-							FText::FromString(FString::Printf(TEXT("Move %s to category %s"), *FPaths::GetBaseFilename(LevelName), *TargetCategory)),
-							FSlateIcon(),
-							FUIAction(FExecuteAction::CreateLambda([this, LevelName, TargetCategory]()
-							{
-								MoveLevelToCategory(LevelName, TargetCategory);
-							}))
-						);
-					}
-				})
-			);
-		})
-	);
+            // Option 2 : Déplacer vers une catégorie
+            SubMenuBuilder.AddSubMenu(
+                LOCTEXT("MoveToCategory", "Move To Category"),
+                LOCTEXT("MoveToCategoryTooltip", "Move this level to another category."),
+                FNewMenuDelegate::CreateLambda([this, LevelName](FMenuBuilder& MoveMenuBuilder)
+                {
+                    // Trouver la catégorie actuelle du niveau
+                    FString CurrentCategory;
+                    for (const auto& CategoryPair : LevelCategories)
+                    {
+                        if (CategoryPair.Value.Contains(LevelName))
+                        {
+                            CurrentCategory = CategoryPair.Key;
+                            break;
+                        }
+                    }
+
+                    MoveMenuBuilder.AddMenuEntry(
+                        LOCTEXT("CreateNewCategory", "Create New Category"),
+                        LOCTEXT("CreateNewCategoryTooltip", "Add a new category to organize your levels."),
+                        FSlateIcon(),
+                        FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+                        {
+                            OnCreateNewCategory(LevelName);
+                        }))
+                    );
+
+                    MoveMenuBuilder.AddSeparator();
+
+                    for (const auto& CategoryPair : LevelCategories)
+                    {
+                        const FString& TargetCategory = CategoryPair.Key;
+
+                        // Ne pas afficher la catégorie actuelle
+                        if (TargetCategory == CurrentCategory)
+                        {
+                            continue;
+                        }
+
+                        MoveMenuBuilder.AddMenuEntry(
+                            FText::FromString(TargetCategory),
+                            FText::FromString(FString::Printf(TEXT("Move %s to category %s"), *FPaths::GetBaseFilename(LevelName), *TargetCategory)),
+                            FSlateIcon(),
+                            FUIAction(FExecuteAction::CreateLambda([this, LevelName, TargetCategory]()
+                            {
+                                MoveLevelToCategory(LevelName, TargetCategory);
+                            }))
+                        );
+                    }
+                })
+            );
+        })
+    );
+
+    MenuBuilder.EndSection();
 }
 
 #pragma endregion
@@ -263,7 +277,7 @@ void FLevelSelectionModule::OnOpenLevelClicked(const FString& LevelPath)
 // Categories
 #pragma region Categories Management
 
-void FLevelSelectionModule::OnCreateNewCategory()
+void FLevelSelectionModule::OnCreateNewCategory(const FString& LevelNameToMove)
 {
     TSharedRef<SWindow> InputWindow = SNew(SWindow)
         .Title(FText::FromString("Create New Category"))
@@ -271,7 +285,6 @@ void FLevelSelectionModule::OnCreateNewCategory()
         .SupportsMinimize(false)
         .SupportsMaximize(false);
 
-    // Crée un champ de texte
     TSharedPtr<SEditableTextBox> InputTextBox;
     InputWindow->SetContent(
         SNew(SVerticalBox)
@@ -295,105 +308,126 @@ void FLevelSelectionModule::OnCreateNewCategory()
         [
             SNew(SButton)
             .Text(FText::FromString("OK"))
-            .OnClicked_Lambda([InputWindow, InputTextBox, this]() -> FReply
+            .OnClicked_Lambda([InputWindow, InputTextBox, this, LevelNameToMove]() -> FReply
             {
-                // Vérifiez si InputTextBox est valide
                 if (!InputTextBox.IsValid())
                 {
                     UE_LOG(LogTemp, Error, TEXT("InputTextBox is not valid."));
                     return FReply::Unhandled();
                 }
 
-                // Récupérez le texte saisi
                 const FString NewCategoryName = InputTextBox->GetText().ToString().TrimStartAndEnd();
 
-                // Vérifiez si le nom est vide
                 if (NewCategoryName.IsEmpty())
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Category name is empty."));
                     return FReply::Handled();
                 }
 
-                // Vérifiez si la catégorie existe déjà
                 if (LevelCategories.Contains(NewCategoryName))
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Category already exists: %s"), *NewCategoryName);
                     return FReply::Handled();
                 }
 
-                // Ajoutez la nouvelle catégorie
                 LevelCategories.Add(NewCategoryName);
                 UE_LOG(LogTemp, Log, TEXT("Created new category: %s"), *NewCategoryName);
 
-                // Détruire la fenêtre
+                if (!LevelNameToMove.IsEmpty())
+                {
+                    MoveLevelToCategory(LevelNameToMove, NewCategoryName);
+                }
+
                 InputWindow->RequestDestroyWindow();
                 return FReply::Handled();
             })
         ]
     );
-	FSlateApplication::Get().AddWindow(InputWindow);
+
+    FSlateApplication::Get().AddWindow(InputWindow);
 }
 
 void FLevelSelectionModule::MoveLevelToCategory(const FString& LevelName, const FString& TargetCategory)
 {
 	bool bLevelMoved = false;
+    bool bLevelFound = false;
 
-	for (const auto& CategoryPair : LevelCategories)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Category: %s, Levels: %s"),
-			*CategoryPair.Key,
-			*FString::Join(CategoryPair.Value, TEXT(", "))
-		);
-	}
+    if (LevelName.IsEmpty())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Level name is empty."));
+        ShowTemporaryNotification(LOCTEXT("LevelNotFound", "Level name is empty."));
+        return;
+    }
 
-	bool bLevelFound = false;
+    for (auto& CategoryPair : LevelCategories)
+    {
+        int32 RemovedCount = CategoryPair.Value.Remove(LevelName);
+        if (RemovedCount > 0)
+        {
+            LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
 
-	for (auto& CategoryPair : LevelCategories)
-	{
-		int32 RemovedCount = CategoryPair.Value.Remove(LevelName);
-		if (RemovedCount > 0)
-		{
-			LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
+            ShowTemporaryNotification(FText::Format(
+                LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
+                FText::FromString(LevelName),
+                FText::FromString(TargetCategory)
+            ));
 
-			ShowTemporaryNotification(FText::Format(
-				LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
-				FText::FromString(LevelName),
-				FText::FromString(TargetCategory)
-			));
+            bLevelMoved = true;
+            bLevelFound = true;
+            break;
+        }
+    }
 
-			bLevelMoved = true;
-			bLevelFound = true;
-			break;
-		}
-	}
+    if (!bLevelFound)
+    {
+        LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
 
-	if (!bLevelFound)
-	{
-		LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
+        ShowTemporaryNotification(FText::Format(
+            LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
+            FText::FromString(LevelName),
+            FText::FromString(TargetCategory)
+        ));
 
-		ShowTemporaryNotification(FText::Format(
-			LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
-			FText::FromString(LevelName),
-			FText::FromString(TargetCategory)
-		));
+        bLevelMoved = true;
+    }
 
-		bLevelMoved = true;
-	}
+    if (bLevelMoved)
+    {
+        TArray<FString> CategoriesToDelete;
 
-	if (!bLevelMoved)
-	{
-		ShowTemporaryNotification(LOCTEXT("LevelNotFound", "Level not found in any category."));
-	}
+        for (auto& CategoryPair : LevelCategories)
+        {
+            if (CategoryPair.Value.Num() == 0)
+            {
+                CategoriesToDelete.Add(CategoryPair.Key);
+            }
+        }
+
+        for (const FString& CategoryToDelete : CategoriesToDelete)
+        {
+            OnDeleteCategory(CategoryToDelete);
+        }
+    }
 	SaveCategoriesToConfig();
+	
+    if (!bLevelMoved)
+    {
+        ShowTemporaryNotification(LOCTEXT("LevelNotFound", "Level not found in any category."));
+    }
 }
 
 void FLevelSelectionModule::OnDeleteCategory(const FString& CategoryName)
 {
-	if (LevelCategories.Contains(CategoryName))
-	{
-		LevelCategories.Remove(CategoryName);
-		ShowTemporaryNotification(FText::Format(LOCTEXT("CategoryDeleted", "Category '{0}' deleted!"), FText::FromString(CategoryName)));
-	}
+    if (!CategoryName.IsEmpty() && LevelCategories.Contains(CategoryName))
+    {
+        LevelCategories.Remove(CategoryName);
+        ShowTemporaryNotification(FText::Format(LOCTEXT("CategoryDeleted", "Category '{0}' deleted!"), FText::FromString(CategoryName)));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Category does not exist: %s"), *CategoryName);
+        ShowTemporaryNotification(FText::Format(LOCTEXT("CategoryNotFound", "Category '{0}' not found."), FText::FromString(CategoryName)));
+    }
 }
 
 #pragma endregion
@@ -432,26 +466,78 @@ void FLevelSelectionModule::ShowTemporaryNotification(const FText& NotificationT
 
 void FLevelSelectionModule::SaveCategoriesToConfig()
 {
-	FString TempConfigFile = FPaths::ProjectConfigDir() / "TempConfig.ini";
-	FConfigCacheIni::NormalizeConfigIniPath(TempConfigFile);
+    // Récupère le chemin
+    FString ConfigFilePath = FPaths::ConvertRelativePathToFull(FPaths::ProjectConfigDir() + TEXT("LevelCategories.ini"));
+    FFileHelper::SaveStringToFile(TEXT(""), *ConfigFilePath);
 
-	// Créer un fichier temporaire
-	if (!FPaths::FileExists(TempConfigFile))
-	{
-		FFileHelper::SaveStringToFile(TEXT(""), *TempConfigFile);
-	}
+    // Parcourt les sections existantes dans le fichier pour :
+    // 1. Supprimer les catégories obsolètes.
+    // 2. Nettoyer les niveaux déplacés.
+	TSet<FString> CurrentCategories;
+	TMap<FString, TSet<FString>> CurrentLevelsInCategories;
 
 	for (const auto& CategoryPair : LevelCategories)
 	{
 		const FString& CategoryName = CategoryPair.Key;
-		for (const FString& LevelName : CategoryPair.Value)
+		const TArray<FString>& Levels = CategoryPair.Value;
+
+		CurrentCategories.Add(CategoryName);
+		
+		TSet<FString> LevelsSet(Levels);
+		CurrentLevelsInCategories.Add(CategoryName, LevelsSet);
+	}
+
+	TArray<FString> ExistingCategories;
+	GConfig->GetSectionNames(ConfigFilePath, ExistingCategories);
+
+	for (const FString& ExistingCategory : ExistingCategories)
+	{
+		// Vérifier si la catégorie existe encore
+		if (!CurrentCategories.Contains(ExistingCategory))
 		{
-			GConfig->SetString(*CategoryName, *LevelName, *LevelName, TempConfigFile);
-			GConfig->Flush(false, TempConfigFile);
+			UE_LOG(LogTemp, Log, TEXT("Deleting category '%s' from config"), *ExistingCategory);
+			GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
+			continue;
+		}
+
+		// Supprimer les niveaux obsolètes
+		TArray<FString> StoredLevels;
+		GConfig->GetSection(*ExistingCategory, StoredLevels, ConfigFilePath);
+
+		const TSet<FString>* CurrentLevels = CurrentLevelsInCategories.Find(ExistingCategory);
+		if (CurrentLevels)
+		{
+			for (const FString& StoredLevel : StoredLevels)
+			{
+				if (!CurrentLevels->Contains(StoredLevel))
+				{
+					UE_LOG(LogTemp, Log, TEXT("Deleting level '%s' from category '%s' in config"), *StoredLevel, *ExistingCategory);
+					GConfig->RemoveKey(*ExistingCategory, *StoredLevel, ConfigFilePath);
+				}
+			}
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Successfully flushed level categories to temp config file: %s"), *TempConfigFile);
+	GConfig->Flush(false, ConfigFilePath);
+
+    // Sauvegarde les catégories et leurs niveaux
+    for (const auto& CategoryPair : LevelCategories)
+    {
+        const FString& CategoryName = CategoryPair.Key;
+        const TArray<FString>& LevelNames = CategoryPair.Value;
+
+        UE_LOG(LogTemp, Log, TEXT("Saving category: %s"), *CategoryName);
+
+        for (const FString& LevelName : LevelNames)
+        {
+            UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
+            GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+        }
+    }
+
+    // Sauvegarde les modifications
+    GConfig->Flush(false, ConfigFilePath);
+    UE_LOG(LogTemp, Log, TEXT("Level categories successfully saved to: %s"), *ConfigFilePath);
 }
 
 void FLevelSelectionModule::LoadCategoriesFromConfig()
@@ -464,12 +550,17 @@ void FLevelSelectionModule::LoadCategoriesFromConfig()
 		{
 			for (const FString& CategoryName : CategoryNames)
 			{
-				TArray<FString> Levels;
-				if (GConfig->GetArray(*CategoryName, *CategoryName, Levels, CategoriesConfigFile))
+				TArray<FString> LevelEntries;
+				if (GConfig->GetSection(*CategoryName, LevelEntries, CategoriesConfigFile))
 				{
-					for (const FString& LevelName : Levels)
+					for (const FString& LevelEntry : LevelEntries)
 					{
-						LevelCategories.FindOrAdd(CategoryName).Add(LevelName);
+						// Chaque entrée a le format "Key=Value", donc on les sépare
+						FString LevelKey, LevelValue;
+						if (LevelEntry.Split(TEXT("="), &LevelKey, &LevelValue))
+						{
+							LevelCategories.FindOrAdd(CategoryName).Add(LevelValue);
+						}
 					}
 				}
 				else
