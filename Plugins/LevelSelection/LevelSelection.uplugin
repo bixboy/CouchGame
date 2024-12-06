@@ -2,14 +2,11 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "LevelSelection",
-	"Description": "",
+	"FriendlyName": "Level Selection",
+	"Description": "A plugin to organize and manage your levels more efficiently in the Unreal Editor.",
 	"Category": "Editor",
 	"CreatedBy": "Bixboy",
-	"CreatedByURL": "",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "",
+	"CreatedByURL": "https://bixboy.dev",
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
@@ -24,5 +21,10 @@
 	"EnabledByDefault": true,
 	"TargetAllowList": [
 		"Editor"
+	],
+	"SupportPlatforms": [
+		"Win64",
+		"Mac",
+		"Linux"
 	]
 }
