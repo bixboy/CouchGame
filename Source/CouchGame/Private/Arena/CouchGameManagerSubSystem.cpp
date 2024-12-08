@@ -48,6 +48,7 @@ void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FTe
 		
 		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		WidgetRef->ChangeWinnerText(Text);
+		WidgetRef->TurnOnLight();
 		WidgetRef->AddToViewport();
 	}
 }
@@ -65,7 +66,7 @@ void UCouchGameManagerSubSystem::StartNewRound()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	CurrentRound++;
-
+	
 	// Démarre un timer de 3 minutes pour la manche
 	int Hours = FMath::FloorToInt(RoundDurationMinutes);
 	float DecimalPart = RoundDurationMinutes - Hours;
@@ -82,11 +83,29 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 
+	if (CurrentRound >= MaxRounds)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Game Finish!"));
+
+		if (TeamAPRoundWin > TeamBPRoundWin)
+		{
+			RoundsWinners.Add(1);
+			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
+		}
+		else if (TeamBPRoundWin > TeamAPRoundWin)
+		{
+			RoundsWinners.Add(2);
+			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
+		}
+		return;
+	}
+
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("BlueLagoon wins the round!"));
 		TeamAPRoundWin++;
+		RoundsWinners.Add(1);
 
 		OpenUi(WinWidget, FText::FromString("BlueLagoon wins the round!"));
 	}
@@ -95,6 +114,7 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		// L'équipe B gagne la manche
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Red Tuna wins the round!"));
 		TeamBPRoundWin++;
+		RoundsWinners.Add(2);
 		
 		OpenUi(WinWidget, FText::FromString("Red Tuna wins the round!"));
 	}
@@ -102,23 +122,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	{
 		// No Team win
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("No Team Win!"));
-		
+		RoundsWinners.Add(0);
 		OpenUi(WinWidget, FText::FromString("No Team wins the round!"));
-	}
-
-	// Condition de fin de jeu si le nombre maximum de manches est atteint
-	if (CurrentRound > MaxRounds)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Game Finish!"));
-
-		if (TeamAPRoundWin > TeamBPRoundWin)
-		{
-			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
-		}
-		else if (TeamBPRoundWin > TeamAPRoundWin)
-		{
-			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
-		}
 	}
 }
 
@@ -146,6 +151,9 @@ void UCouchGameManagerSubSystem::ResetRound()
 	CurrentRound = 0;
 	TeamAPRoundWin = 0;
 	TeamBPRoundWin = 0;
+	RoundsWinners.Reset();
+	GetWorld()->GetTimerManager().ClearTimer(RoundTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(UiTimerHandle);
 }
 
 // Update Life
@@ -206,6 +214,12 @@ int UCouchGameManagerSubSystem::GetMaxRound()
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
 	return CurrentRound;
+}
+
+// Get Rounds Winners
+TArray<int> UCouchGameManagerSubSystem::GetRoundsWinners()
+{
+	return RoundsWinners;
 }
 
 #pragma endregion

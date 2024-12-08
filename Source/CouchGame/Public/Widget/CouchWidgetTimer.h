@@ -14,7 +14,14 @@ class COUCHGAME_API UCouchWidgetTimer : public UUserWidget
 public:
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> Txt_Timer;
+	
+	UPROPERTY(meta = (BindWidgetAnim), Transient, BlueprintReadWrite)
+	TObjectPtr<UWidgetAnimation> WarningAnimation;
 
 	UFUNCTION(BlueprintCallable)
-	FText UpdateTimer(float time);
+	FText UpdateTimer(float Time);
+
+private:
+	UPROPERTY(EditAnywhere)
+	float TimeWarning = 0.30f;
 };

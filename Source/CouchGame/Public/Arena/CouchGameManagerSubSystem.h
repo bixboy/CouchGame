@@ -65,6 +65,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
 	int32 MaxRounds;
 
+	UPROPERTY()
+	TArray<int> RoundsWinners;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
 	TSubclassOf<UCouchWidgetWin> WinWidget;
 
@@ -101,6 +104,8 @@ public:
 	int GetMaxRound();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentRound();
+
+	TArray<int> GetRoundsWinners();
 
 	void ResetRound();
 	void OnRoundTimerEnd();

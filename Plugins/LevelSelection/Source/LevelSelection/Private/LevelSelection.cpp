@@ -502,40 +502,43 @@ void FLevelSelectionModule::SaveCategoriesToConfig()
 
 		// Supprimer les niveaux obsolètes
 		TArray<FString> StoredLevels;
-		GConfig->GetSection(*ExistingCategory, StoredLevels, ConfigFilePath);
-
-		const TSet<FString>* CurrentLevels = CurrentLevelsInCategories.Find(ExistingCategory);
-		if (CurrentLevels)
+		if (GConfig->GetSection(*ExistingCategory, StoredLevels, ConfigFilePath))
 		{
-			for (const FString& StoredLevel : StoredLevels)
+			const TSet<FString>* CurrentLevels = CurrentLevelsInCategories.Find(ExistingCategory);
+			if (CurrentLevels)
 			{
-				if (!CurrentLevels->Contains(StoredLevel))
+				for (const FString& StoredLevel : StoredLevels)
 				{
-					UE_LOG(LogTemp, Log, TEXT("Deleting level '%s' from category '%s' in config"), *StoredLevel, *ExistingCategory);
-					GConfig->RemoveKey(*ExistingCategory, *StoredLevel, ConfigFilePath);
+					if (!CurrentLevels->Contains(StoredLevel))
+					{
+						GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
+						GConfig->RemoveKey(*ExistingCategory, *StoredLevel, ConfigFilePath);
+					}
 				}
 			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to retrieve levels for category '%s'"), *ExistingCategory);
+		}
+	}
+	GConfig->Flush(false, ConfigFilePath);
+	
+    // Sauvegarde les catégories et leurs niveaux
+	for (const auto& CategoryPair : LevelCategories)
+	{
+		const FString& CategoryName = CategoryPair.Key;
+		const TArray<FString>& LevelNames = CategoryPair.Value;
+
+		UE_LOG(LogTemp, Log, TEXT("Saving category: %s"), *CategoryName);
+
+		for (const FString& LevelName : LevelNames)
+		{
+			UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
+			GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+		}
 	}
 
-	GConfig->Flush(false, ConfigFilePath);
-
-    // Sauvegarde les catégories et leurs niveaux
-    for (const auto& CategoryPair : LevelCategories)
-    {
-        const FString& CategoryName = CategoryPair.Key;
-        const TArray<FString>& LevelNames = CategoryPair.Value;
-
-        UE_LOG(LogTemp, Log, TEXT("Saving category: %s"), *CategoryName);
-
-        for (const FString& LevelName : LevelNames)
-        {
-            UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
-            GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
-        }
-    }
-
-    // Sauvegarde les modifications
     GConfig->Flush(false, ConfigFilePath);
     UE_LOG(LogTemp, Log, TEXT("Level categories successfully saved to: %s"), *ConfigFilePath);
 }
