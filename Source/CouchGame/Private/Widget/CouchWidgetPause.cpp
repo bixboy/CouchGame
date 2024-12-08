@@ -68,6 +68,7 @@ void UCouchWidgetPause::OnMenuPressed()
 	if (UCouchGameManagerSubSystem* SubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
 	{
 		SubSystem->SwitchMappingType();
+		SubSystem->ResetRound();
 	}
 	
 	UGameplayStatics::OpenLevel(GetWorld(), MenuName);

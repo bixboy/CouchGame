@@ -56,9 +56,11 @@ void LoadCategoriesFromConfig();
 #pragma region Categories
 private:
 	TMap<FString, TArray<FString>> LevelCategories;
-
+	TArray<FString> CategoryOrder;
+	
 	void MoveLevelToCategory(const FString& LevelName, const FString& TargetCategory);
 	void OnDeleteCategory(const FString& CategoryName);
+	void ReorderCategories(const FString& CategoryName, int32 NewIndex);
 	void OnCreateNewCategory(const FString& LevelNameToMove);
 
 #pragma endregion	
