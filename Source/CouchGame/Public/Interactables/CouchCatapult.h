@@ -45,7 +45,7 @@ private:
 	UAnimMontage* ShootAnimation;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	UClass* PowerChargeWidget;
+	TSubclassOf<ACouchWidget3D> PowerChargeWidget;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<UCameraShakeBase> CameraShake;

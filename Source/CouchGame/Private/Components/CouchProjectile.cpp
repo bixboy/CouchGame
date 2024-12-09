@@ -7,16 +7,8 @@ UCouchProjectile::UCouchProjectile()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 // Init
-void UCouchProjectile::Initialize(const FVector& LaunchVelocity,const FVector& TargetLoc, const TArray<AActor*> ActorsToIgnore, bool UnableCollision)
+void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore, bool UnableCollision)
 {
-	if (TargetLoc != FVector::ZeroVector)
-	{
-		TargetLocation = TargetLoc;
-
-		FTransform Transform = FTransform(FRotator::ZeroRotator, TargetLocation);
-		ShadowProjectile = GetWorld()->SpawnActor<AShadowProjectile>(Shadow, Transform);
-	}
-		
 	Velocity = LaunchVelocity;
 	Location = GetOwner()->GetActorLocation();
 	TimeElapsed = 0.0f;
@@ -33,11 +25,6 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (CanMove)
 	{
-		if (ShadowProjectile)
-		{
-			
-		}
-		
 		// Movement
 		TimeElapsed += DeltaTime;
 		FVector NewLocation = Location + (Velocity * SpeedMultiplier * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
