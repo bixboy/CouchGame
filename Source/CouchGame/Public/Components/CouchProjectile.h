@@ -6,6 +6,8 @@
 #include "Components/SphereComponent.h"
 #include "CouchProjectile.generated.h"
 
+class AShadowProjectile;
+
 UCLASS()
 class COUCHGAME_API UCouchProjectile : public UActorComponent
 {
@@ -19,7 +21,7 @@ public:
 	TObjectPtr<USphereComponent> ProjectileCollision;
 
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
-	void Initialize(const FVector& LaunchVelocity, const TArray<AActor*> ActorsToIgnore, bool UnableCollision = true);
+	void Initialize(const FVector& LaunchVelocity, const FVector& TargetLoc = FVector::ZeroVector, const TArray<AActor*> ActorsToIgnore, bool UnableCollision = true);
 
 	UFUNCTION(BlueprintCallable, Category = "Couch Projectile")
 	bool GetCanMove() const;
@@ -33,11 +35,16 @@ private:
 	FVector Location;      // Position actuelle du projectile
 	float TimeElapsed;     // Temps écoulé depuis le lancement
 	const float Gravity = -980.0f;
+	FVector TargetLocation;
 	
 	bool CollisionIsActive;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> IgnoredActors;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AShadowProjectile> Shadow;
+	TObjectPtr<AShadowProjectile> ShadowProjectile;
 	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	bool CanMove = false;
