@@ -37,8 +37,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UImage> Img_Light5;
 
+	void TurnOnLight();
+
 private:
 	void CheckLight();
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> LightOn;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> LightOff;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> LightRed;
 
 #pragma endregion	
 
