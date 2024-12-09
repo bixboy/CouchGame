@@ -12,7 +12,7 @@ public class CouchGame : ModuleRules
 		
 		if (Target.bBuildEditor)
 		{
-			PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "EditorInteractiveToolsFramework" });
+			PrivateDependencyModuleNames.AddRange(new string[] {"EditorInteractiveToolsFramework" });
 		}
 	}
 }
