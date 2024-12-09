@@ -16,6 +16,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/Button.h"
 #include "Components/SphereComponent.h"
+#include "Crafting/CouchCraftingTable.h"
 #include "Crafting/CouchCraftingValidateItem.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CouchFishingRod.h"
@@ -459,7 +460,7 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 }
 
 // Interact
-void ACouchCharacter::OnInputInteract()
+void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 {
 	if ((InteractingActors.IsEmpty() && !IsInteracting) || isFishing)
 	{
@@ -486,17 +487,24 @@ void ACouchCharacter::OnInputInteract()
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
-		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem)
+		else if (!InteractingActor->Implements<UCouchPickable>() && !IsHoldingItem && !InteractingActor.IsA(ACouchCraftingTable::StaticClass()))
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::InteractingObject);
-			if (InteractingActor->IsA(ACouchCraftingValidateItem::StaticClass())) OnInputInteract();
+			if (InteractingActor->IsA(ACouchCraftingValidateItem::StaticClass())) OnInputInteract(InputActionValue);
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Interacting with actor.");
 		}
 		
 	}
 	else if (IsInteracting)
 	{
-		StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		if (InteractingActor->Implements<UCouchInteractable>() && IsHoldingItem)
+		{
+			OnInputHold(InputActionValue);
+		}
+		else
+		{
+			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
+		}
 		IsInteracting = false;
 		InteractingActor = nullptr;
 		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
@@ -612,6 +620,7 @@ bool ACouchCharacter::GetIsHoldingItem() const
 void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 {
 	if (!IsHoldingItem) return;
+	if (InputActionValue.Get<float>() <= 0.3f && !InteractingActor.IsA(ACouchPlank::StaticClass())) return;
 	if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
 	{
 		TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
