@@ -49,9 +49,25 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 {
 	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
+
 	if (BoatLife == 0)
 	{
 		SinkBoatAndGameOver();
+		return;
+	}
+
+	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
+	{
+		switch (GetBoatTeam())
+		{
+		case EBoatTeam::Team1:
+			GameManager->UpdateCurrentLife(1, BoatLife);
+			break;
+
+		case EBoatTeam::Team2:
+			GameManager->UpdateCurrentLife(2, BoatLife);
+			break;
+		}
 	}
 }
 

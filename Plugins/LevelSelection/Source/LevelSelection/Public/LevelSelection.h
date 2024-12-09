@@ -49,16 +49,20 @@ private:
 	void ShowTemporaryNotification(const FText& NotificationText);
 void SaveCategoriesToConfig();
 void LoadCategoriesFromConfig();
+void LoadCategoryOrderFromConfig(const FString& ConfigFilePath);
 
 #pragma endregion
 
 // Categories	
 #pragma region Categories
 private:
+	TArray<FString> UnCategorizedLevels;
 	TMap<FString, TArray<FString>> LevelCategories;
-
+	TArray<FString> CategoryOrder;
+	
 	void MoveLevelToCategory(const FString& LevelName, const FString& TargetCategory);
 	void OnDeleteCategory(const FString& CategoryName);
+	void ReorderCategories(const FString& CategoryName, int32 NewIndex);
 	void OnCreateNewCategory(const FString& LevelNameToMove);
 
 #pragma endregion	

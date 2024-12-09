@@ -195,6 +195,12 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 		GetMesh()->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 }
+
+
+void ACouchCharacter::SetCanMove(bool Value)
+{
+	CanMove = Value;
+}
 #pragma endregion
 
 #pragma region State Machine
@@ -586,7 +592,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 					{
 						ICouchInteractable::Execute_StopChargeActor(FishingRod);
 					}
-					CanMove = true;	
 				}
 				else if (FishingRod && FishingRod->isPlayerFishing)
 				{

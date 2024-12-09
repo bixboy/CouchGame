@@ -72,6 +72,8 @@ public:
 
 	void MoveInDirectionOfRotation(float InputStrength);
 
+	void SetCanMove(bool Value);
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Orient = FVector2D::ZeroVector;
