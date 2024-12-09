@@ -1,5 +1,7 @@
 #include "Components/CouchProjectile.h"
 
+#include "ShadowProjectile.h"
+
 UCouchProjectile::UCouchProjectile()
 {
 	PrimaryComponentTick.bCanEverTick = true;
