@@ -19,7 +19,7 @@ public:
 	ACouchCannonBall();
 
 	virtual void Tick(float DeltaTime) override;
-	void Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player);
+	void Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player, const FVector& TargetLoc);
 
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
 	void PlayVibration(int TeamVibration);
@@ -64,6 +64,11 @@ private:
 	UPROPERTY()
 	TObjectPtr<ACouchPickableCannonBall> PickableCannonBall;
 	bool HasBeenLaunched;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AShadowProjectile> Shadow;
+	TObjectPtr<AShadowProjectile> ShadowProjectile;
+	FVector TargetLocation;
 
 #pragma region Mesh
 private:
