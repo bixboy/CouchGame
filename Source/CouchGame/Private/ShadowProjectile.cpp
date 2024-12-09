@@ -10,11 +10,15 @@ AShadowProjectile::AShadowProjectile()
 void AShadowProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AShadowProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AShadowProjectile::OpacityChange(float Opacity)
+{
+	UpdateOpacity(Opacity);
 }
 

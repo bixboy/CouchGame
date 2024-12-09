@@ -47,6 +47,10 @@ private:
 	UPROPERTY()
 	float TimeElapsed;     // Temps écoulé depuis le lancement
 	const float Gravity = -980.0f;
+	FVector StartLocation;
+	
+
+	
 	UPROPERTY()
 	TArray<TObjectPtr<ACouchProjectileEffect>> ProjectileEffects;
 	TArray<TSubclassOf<ACouchProjectileEffect>> ProjectileEffectsClass;
