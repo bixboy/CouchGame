@@ -59,13 +59,14 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	}
 	else if (CurrentPlayer && CurrentPv == 0)
 	{
-		DetachPlayer(Player);
-		return;
+		//DetachPlayer(Player);
+		//return;
 	}
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Start Repair");
 		SetCurrentPlayer(Player);
 		SetPlayerIsIn(true);
 		SetCanUse(true);
@@ -73,6 +74,8 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	}
 	else if (IsPlayerRepairing && Player == GetCurrentPlayer() && CurrentPv == 0)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "End Repair");
+		DetachPlayer(Player);
 		IsPlayerRepairing = false;
 		RemoveCurrentPlayer();
 		SetPlayerIsIn(false);
