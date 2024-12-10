@@ -20,7 +20,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
 	TObjectPtr<USoundBase> DamageSound;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
-	TObjectPtr<USoundBase> BrokeSound;	
+	TObjectPtr<USoundBase> BrokeSound;
+	void SpawnWarningWidget();
 	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
@@ -29,6 +30,8 @@ private:
 	TObjectPtr<USkeletalMesh> DamagedMesh;
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
 	TObjectPtr<USkeletalMesh> DestroyedMesh;
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
+	TSubclassOf<ACouchWidget3D> WarningWidget;
 	
 #pragma region Life
 public:
