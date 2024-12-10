@@ -1,6 +1,4 @@
 #include "Interactables/CouchUmbrella.h"
-
-#include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidget3D.h"
 
 ACouchUmbrella::ACouchUmbrella()
@@ -15,24 +13,7 @@ ACouchUmbrella::ACouchUmbrella()
 	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchUmbrella::OnActorEndOverlap);
 }
 
-void ACouchUmbrella::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (IsPlayerRepairing)
-	{
-		Timer += DeltaTime;
-		if (Timer >= TimeToRepair)
-		{
-			FinishRepairing();
-		}
-	}
-	else if (Timer > 0)
-	{
-		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
-	}
-}
-
+#pragma region Interfaces
 void ACouchUmbrella::PickUp_Implementation(ACouchCharacter* player)
 {
 	ICouchPickable::PickUp_Implementation(player);
@@ -54,9 +35,31 @@ void ACouchUmbrella::SetIsPickable_Implementation(bool isPickable)
 	ICouchPickable::SetIsPickable_Implementation(isPickable);
 }
 
+#pragma endregion
+
+// Tick Repairing
+void ACouchUmbrella::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (IsPlayerRepairing)
+	{
+		Timer += DeltaTime;
+		if (Timer >= TimeToRepair)
+		{
+			FinishRepairing();
+		}
+	}
+	else if (Timer > 0)
+	{
+		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
+	}
+}
+
+// Spawn Widget
 void ACouchUmbrella::SpawnWarningWidget()
 {
-	if(WarningWidget, !WidgetComponent->GetCurrentWidget())
+	if(!WidgetComponent->GetCurrentWidget(), WarningWidget)
 	{
 		WidgetComponent->SpawnWidget(WarningWidget, WidgetPose);
 	}
@@ -66,6 +69,7 @@ void ACouchUmbrella::SpawnWarningWidget()
 	}
 }
 
+// Custom Interaction
 void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 {
 	// Si un autre joueur utilise déjà la planche, empêcher l'interaction
@@ -81,30 +85,36 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 		Super::Interact_Implementation(Player);
 		return;
 	}
-	// if (CurrentPlayer && CurrentPv == 0)
-	// {
-	// 	DetachPlayer(Player);
-	// 	return;
-	// }
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Start Repair");
-		SetCurrentPlayer(Player);
-		SetPlayerIsIn(true);
-		SetCanUse(true);
-		IsPlayerRepairing = true;
+		StartRepair(Player);
 	}
 	else if (IsPlayerRepairing && Player == GetCurrentPlayer() && CurrentPv == 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "End Repair");
-		DetachPlayer(Player);
-		IsPlayerRepairing = false;
-		RemoveCurrentPlayer();
-		SetPlayerIsIn(false);
-		SetCanUse(false);
+		StopRepair();
 	}
+}
+
+// Start Repair
+void ACouchUmbrella::StartRepair(ACouchCharacter* Player)
+{
+	SetCurrentPlayer(Player);
+	SetPlayerIsIn(true);
+	SetCanUse(true);
+	IsPlayerRepairing = true;
+}
+
+// Stop Repair
+void ACouchUmbrella::StopRepair()
+{
+	IsPlayerRepairing = false;
+	RemoveCurrentPlayer();
+	SetPlayerIsIn(false);
+	SetCanUse(false);
 }
 
 #pragma region Life
@@ -119,25 +129,29 @@ ACouchPlank* ACouchUmbrella::Hit_Implementation(FHitResult HitResult, float Repa
 
 void ACouchUmbrella::DecreasePv()
 {
-	CurrentPv --;
-	CurrentPv = FMath::Clamp(CurrentPv, 0, MaxPv);
-	SkeletalMesh->SetSkeletalMeshAsset(DamagedMesh);
-	
+	CurrentPv = FMath::Clamp(CurrentPv - 1, 0, MaxPv);
+	SkeletalMesh->SetSkeletalMeshAsset(CurrentPv > 0 ? DamagedMesh : DestroyedMesh);
+
 	if (CurrentPv == 0)
 	{
-		PlayFx();
-		ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-		SkeletalMesh->SetSkeletalMeshAsset(DestroyedMesh);
-		SetInteractWidget(RepairingWidget);
-		SetCanUse(false);
-		MovementComponent->SetCanMove(false);
-		
-		Timer = 0.f;
-		if(CurrentPlayer)
-		{
-			FInputActionValue InputActionValue;
-			CurrentPlayer->OnInputInteract(InputActionValue);	
-		}
+		HandleZeroPv();
+	}
+}
+
+void ACouchUmbrella::HandleZeroPv()
+{
+	PlayFx();
+	ShieldBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetInteractWidget(RepairingWidget);
+	SetCanUse(false);
+	MovementComponent->SetCanMove(false);
+
+	Timer = 0.f;
+
+	if (CurrentPlayer)
+	{
+		FInputActionValue InputActionValue;
+		CurrentPlayer->OnInputHold(InputActionValue);
 	}
 }
 
@@ -162,22 +176,22 @@ void ACouchUmbrella::FinishRepairing()
 	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
-}
-
-void ACouchUmbrella::OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing)
-	{
-		IsPlayerRepairing = false;
-		FInputActionValue InputActionValue;
-		CurrentPlayer->OnInputHold(InputActionValue);
-	}
+	StopRepair();
 }
 
 float ACouchUmbrella::GetPercentRepair_Implementation()
 {
 	return Timer / TimeToRepair;
+}
+
+bool ACouchUmbrella::GetIsInRepair() const
+{
+	return IsPlayerRepairing;
+}
+
+void ACouchUmbrella::SetIsInRepair(bool Value)
+{
+	IsPlayerRepairing = Value;
 }
 
 #pragma endregion

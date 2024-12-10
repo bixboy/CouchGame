@@ -56,6 +56,7 @@ private:
 	int CurrentPv = MaxPv;
 
 	void DecreasePv();
+	void HandleZeroPv();
 
 #pragma endregion
 
@@ -63,6 +64,11 @@ private:
 public:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	virtual float GetPercentRepair_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsInRepair() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsInRepair(bool Value);
 
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
@@ -74,7 +80,10 @@ private:
 	TSubclassOf<ACouchWidget3D> RepairingWidget;
 
 	void FinishRepairing();
+	void StartRepair(ACouchCharacter* Player);
+	void StopRepair();
 
+	UFUNCTION()
 	void OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
