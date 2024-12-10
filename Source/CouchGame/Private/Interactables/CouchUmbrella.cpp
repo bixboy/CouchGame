@@ -11,6 +11,8 @@ ACouchUmbrella::ACouchUmbrella()
 
 	DamageSound = CreateDefaultSubobject<USoundBase>(TEXT("DamageSound"));
 	BrokeSound = CreateDefaultSubobject<USoundBase>(TEXT("BrokeSound"));
+
+	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchUmbrella::OnActorEndOverlap);
 }
 
 void ACouchUmbrella::Tick(float DeltaTime)
@@ -29,6 +31,27 @@ void ACouchUmbrella::Tick(float DeltaTime)
 	{
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
 	}
+}
+
+void ACouchUmbrella::PickUp_Implementation(ACouchCharacter* player)
+{
+	ICouchPickable::PickUp_Implementation(player);
+}
+void ACouchUmbrella::Drop_Implementation()
+{
+	ICouchPickable::Drop_Implementation();
+}
+void ACouchUmbrella::InteractWithObject_Implementation(ACouchInteractableMaster* interactable)
+{
+	ICouchPickable::InteractWithObject_Implementation(interactable);
+}
+bool ACouchUmbrella::IsPickable_Implementation()
+{
+	return !IsPlayerRepairing && !CurrentPlayer;
+}
+void ACouchUmbrella::SetIsPickable_Implementation(bool isPickable)
+{
+	ICouchPickable::SetIsPickable_Implementation(isPickable);
 }
 
 void ACouchUmbrella::SpawnWarningWidget()
@@ -55,13 +78,14 @@ void ACouchUmbrella::Interact_Implementation(ACouchCharacter* Player)
 	// Execute le parent
 	if (CurrentPv > 0)
 	{
-		Super::Interact_Implementation(Player);	
+		Super::Interact_Implementation(Player);
+		return;
 	}
-	else if (CurrentPlayer && CurrentPv == 0)
-	{
-		//DetachPlayer(Player);
-		//return;
-	}
+	// if (CurrentPlayer && CurrentPv == 0)
+	// {
+	// 	DetachPlayer(Player);
+	// 	return;
+	// }
 
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing && CurrentPv == 0)
@@ -138,6 +162,17 @@ void ACouchUmbrella::FinishRepairing()
 	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;
+}
+
+void ACouchUmbrella::OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing)
+	{
+		IsPlayerRepairing = false;
+		FInputActionValue InputActionValue;
+		CurrentPlayer->OnInputHold(InputActionValue);
+	}
 }
 
 float ACouchUmbrella::GetPercentRepair_Implementation()

@@ -3,10 +3,11 @@
 #include "CoreMinimal.h"
 #include "CouchInteractableWeapons.h"
 #include "Interfaces/CouchDamageable.h"
+#include "Interfaces/CouchPickable.h"
 #include "CouchUmbrella.generated.h"
 
 UCLASS()
-class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public ICouchDamageable
+class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public ICouchDamageable, public ICouchPickable
 {
 	GENERATED_BODY()
 
@@ -14,6 +15,16 @@ public:
 	ACouchUmbrella();
 	void Tick(float DeltaTime);
 
+	virtual void PickUp_Implementation(ACouchCharacter* player) override;
+
+	virtual void Drop_Implementation() override;
+
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	virtual bool IsPickable_Implementation() override;
+
+	virtual void SetIsPickable_Implementation(bool isPickable) override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* ShieldBox;
 
@@ -63,6 +74,9 @@ private:
 	TSubclassOf<ACouchWidget3D> RepairingWidget;
 
 	void FinishRepairing();
+
+	void OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 #pragma endregion	
 };
