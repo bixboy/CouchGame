@@ -1,6 +1,7 @@
 #include "Interactables/CouchUmbrella.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Widget/CouchWidget3D.h"
 
 ACouchUmbrella::ACouchUmbrella()
 {
@@ -27,6 +28,18 @@ void ACouchUmbrella::Tick(float DeltaTime)
 	else if (Timer > 0)
 	{
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
+	}
+}
+
+void ACouchUmbrella::SpawnWarningWidget()
+{
+	if(WarningWidget, !WidgetComponent->GetCurrentWidget())
+	{
+		WidgetComponent->SpawnWidget(WarningWidget, WidgetPose);
+	}
+	else
+	{
+		WidgetComponent->DestroyWidget();
 	}
 }
 

@@ -200,6 +200,7 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 			this->ProcessEvent(Function, nullptr); // Exécute la fonction
 			
 			PlayVibration(ICouchDamageable::Execute_GetBoatTeam(OtherActor));
+			PlayScreenShake();
 		}
 		else
 		{
