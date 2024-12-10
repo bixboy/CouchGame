@@ -1,5 +1,4 @@
 #include "Widget/CouchWidgetMenu.h"
-#include "Animation/WidgetAnimation.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"

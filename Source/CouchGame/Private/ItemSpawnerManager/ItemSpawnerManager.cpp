@@ -65,7 +65,7 @@ void AItemSpawnerManager::OnItemBeginOverlapDestoryBox(UPrimitiveComponent* Over
 
 void AItemSpawnerManager::DestroyItem(ACouchPickableMaster* ItemToDestroy, bool isDestroyByItemSpawnerManager)
 {
-	CurrentSpawnedItems.Remove(ItemToDestroy);
+	if (ItemToDestroy && CurrentSpawnedItems.Contains(ItemToDestroy)) CurrentSpawnedItems.Remove(ItemToDestroy);
 	if (isDestroyByItemSpawnerManager)
 	{
 		ItemToDestroy->Destroy();

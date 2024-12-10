@@ -3,6 +3,7 @@
 #include "CouchCannonBall.h"
 
 #include "CouchStaticCanonBall.h"
+#include "ShadowProjectile.h"
 #include "Boat/BoatFloor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -102,12 +103,17 @@ void ACouchCannonBall::InitEffectWithExecuteTime(ECouchProjectileExecuteTime Exe
 	}
 }
 
-void ACouchCannonBall::Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player)
+void ACouchCannonBall::Initialize(const FVector& LaunchVelocity, ACouchCharacter* Player, const FVector& TargetLoc)
 {
 	CurrentPlayer = Player;
 	Velocity = LaunchVelocity;  // Définir la vélocité initiale
 	Location = GetActorLocation(); // Obtenir la position initiale
 	TimeElapsed = 0.0f; // Réinitialiser le temps écoulé
+	TargetLocation = TargetLoc;
+	StartLocation = GetActorLocation();
+
+	FTransform Transform = FTransform(FRotator::ZeroRotator, TargetLocation);
+	ShadowProjectile = GetWorld()->SpawnActor<AShadowProjectile>(Shadow, Transform);
 }
 
 void ACouchCannonBall::InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCannonBall)
@@ -210,7 +216,14 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 				(PickableCannonBall->GetClass(), GetActorTransform());
 				InitEffectWithExecuteTime(ECouchProjectileExecuteTime::OnDelay, this, PickCannonBall, OtherActor, Hit);
 				if (!HasEffectWithExecuteTime(ECouchProjectileExecuteTime::OnImpactWithHit) &&
-				!HasEffectWithExecuteTime(ECouchProjectileExecuteTime::OnImpactWithoutHit)) Destroy();
+				!HasEffectWithExecuteTime(ECouchProjectileExecuteTime::OnImpactWithoutHit))
+				{
+					if (ShadowProjectile)
+					{
+						ShadowProjectile->Destroy();	
+					}
+					Destroy();
+				}
 			}
 			if (HasEffectWithExecuteTimeImpactWithHit = HasEffectWithExecuteTime(ECouchProjectileExecuteTime::OnImpactWithHit); HasEffectWithExecuteTimeImpactWithHit)
 			{
@@ -228,22 +241,38 @@ void ACouchCannonBall::OnCannonBallHit(UPrimitiveComponent* HitComponent, AActor
 				&& !HasEffectWithExecuteTimeImpactWithoutHit)
 			{
 				ICouchDamageable::Execute_Hit(OtherActor,Hit,0,0);
+				if (ShadowProjectile)
+				{
+					ShadowProjectile->Destroy();	
+				}
 				Destroy();
 			}
 			if (ProjectileEffects.IsEmpty())
 			{
+				if (ShadowProjectile)
+				{
+					ShadowProjectile->Destroy();	
+				}
 				Destroy();
 			}
 		}	
 		else if (!HasEffectWithExecuteTime(ECouchProjectileExecuteTime::OnDelay))
 		{
 			ICouchDamageable::Execute_Hit(OtherActor, Hit,0,0);
+			if (ShadowProjectile)
+			{
+				ShadowProjectile->Destroy();	
+			}
 			Destroy();
 		}
 	}
 	else if (OtherActor->Implements<UCouchDamageable>() && OtherActor->IsA(ACouchUmbrella::StaticClass()))
 	{
 		ICouchDamageable::Execute_Hit(OtherActor, Hit,0,0);
+		if (ShadowProjectile)
+		{
+			ShadowProjectile->Destroy();	
+		}
 		Destroy();
 	}
 }
@@ -259,6 +288,20 @@ void ACouchCannonBall::Tick(float DeltaTime)
 		FVector NewLocation = Location + (Velocity * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
 		SetActorLocation(NewLocation);
 		HasBeenLaunched = true;
+
+		if (ShadowProjectile)
+		{
+			float TotalDistance = FVector::Dist(StartLocation, TargetLocation);
+			float CurrentDistance = FVector::Dist(NewLocation, TargetLocation);
+
+			// Calcul de l'opacité basé sur la distance
+			float Opacity = FMath::Clamp((TotalDistance - CurrentDistance) / TotalDistance, 0.0f, 1.0f);
+			float ScaleFactor = FMath::Clamp(CurrentDistance / TotalDistance, 0.1f, 1.0f);
+			GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, FString::Printf(TEXT("Opacity : %f"), Opacity));
+
+			ShadowProjectile->OpacityChange(Opacity);
+			ShadowProjectile->SetActorScale3D(FVector(ScaleFactor));
+		}
 	}
 }
 

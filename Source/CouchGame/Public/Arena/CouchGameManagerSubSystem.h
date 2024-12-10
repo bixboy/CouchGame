@@ -16,13 +16,13 @@ struct FCouchPlayerData
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
-	int PlayerIndex;
+	int PlayerIndex = 0;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
 	TEnumAsByte<EAutoReceiveInput::Type> InputType = EAutoReceiveInput::Type::Disabled;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
-	int TeamIndex;
+	int TeamIndex = 0;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
-	int CardIndex;
+	int CardIndex = 0;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Couch Player")
 	TObjectPtr<USkeletalMesh> SkeletalMeshAsset;
 };

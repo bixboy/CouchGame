@@ -179,7 +179,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* PickUpItemPosition;
 
-	void OnInputInteract();
+	void OnInputInteract(const FInputActionValue& InputActionValue);
 	
 private :
 	void BindInputInteractAndActions(UEnhancedInputComponent* EnhancedInputComponent);
