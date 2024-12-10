@@ -6,6 +6,8 @@
 #include "Components/SphereComponent.h"
 #include "CouchProjectile.generated.h"
 
+class AShadowProjectile;
+
 UCLASS()
 class COUCHGAME_API UCouchProjectile : public UActorComponent
 {

@@ -39,6 +39,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EBoatTeam GetBoatTeam();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsRepaired();
+
 private:
 	UPROPERTY(EditAnywhere)
 	ABoatFloor* BoatFloor;
@@ -61,6 +64,7 @@ private:
 	EBoatTeam Team;
 
 	bool IsDestroyed = false;
+	bool IsRepaired = true;
 	
 	FRotator InitialRotation;
 };

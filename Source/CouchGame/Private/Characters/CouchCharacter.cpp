@@ -678,6 +678,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	
 	WidgetSpawner->DestroyWidget();
 	CanFish = false;
+	CanMove = true;
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }

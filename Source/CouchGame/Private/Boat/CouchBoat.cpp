@@ -45,10 +45,16 @@ EBoatTeam ACouchBoat::GetBoatTeam()
 	return Team;
 }
 
+bool ACouchBoat::GetIsRepaired()
+{
+	return IsRepaired;
+}
+
 void ACouchBoat::BoatDamage(float DamageAmount)
 {
 	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
+	IsRepaired = false;
 
 	if (BoatLife == 0)
 	{
@@ -80,6 +86,7 @@ void ACouchBoat::BoatRepair(float HealAmount)
 void ACouchBoat::BoatRepair()
 {
 	BoatRepair(HealAmountPerHitRepaired);
+	IsRepaired = true;
 }
 
 void ACouchBoat::SinkBoatAndGameOver()
