@@ -82,10 +82,6 @@ private:
 	void FinishRepairing();
 	void StartRepair(ACouchCharacter* Player);
 	void StopRepair();
-
-	UFUNCTION()
-	void OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 #pragma endregion	
 };

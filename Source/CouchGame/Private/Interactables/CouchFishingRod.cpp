@@ -28,6 +28,7 @@ void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int T
    {
       AttachToComponent(CurrentPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripAttach"));
       CurrentPlayer->AnimationManager->IsFishing = true;
+      CurrentPlayer->SetCanMove(false);
       //FVector SocketLocation = FVector(SkeletalMesh->GetSocketTransform(FName("GripPoint"), RTS_Component).GetLocation());
       //AddActorLocalOffset(SocketLocation);
    }

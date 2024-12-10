@@ -9,8 +9,6 @@ ACouchUmbrella::ACouchUmbrella()
 
 	DamageSound = CreateDefaultSubobject<USoundBase>(TEXT("DamageSound"));
 	BrokeSound = CreateDefaultSubobject<USoundBase>(TEXT("BrokeSound"));
-
-	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchUmbrella::OnActorEndOverlap);
 }
 
 #pragma region Interfaces
