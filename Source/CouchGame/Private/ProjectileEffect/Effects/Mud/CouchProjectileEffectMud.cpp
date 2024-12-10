@@ -1,48 +1,44 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ProjectileEffect/Effects/Storm/CouchProjectileEffectStorm.h"
+#include "ProjectileEffect/Effects/Mud/CouchProjectileEffectMud.h"
+
 #include "CouchCannonBall.h"
-#include "ProjectileEffect/Effects/Storm/Storm.h"
+#include "ProjectileEffect/Effects/Mud/Mud.h"
 
 
 // Sets default values
-ACouchProjectileEffectStorm::ACouchProjectileEffectStorm()
+ACouchProjectileEffectMud::ACouchProjectileEffectMud()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Timer = 0;
-	// Initialisation du Radial Force Component
 }
 
+
 // Called every frame
-void ACouchProjectileEffectStorm::Tick(float DeltaTime)
+void ACouchProjectileEffectMud::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HasExecutedEffect && StormPtr)
+	if (HasExecutedEffect && MudPtr)
 	{
-		Timer += DeltaTime;
+		Timer+= DeltaTime;
 		if (Timer >= DelayToExecute)
 		{
-			StormPtr->Destroy();
+			MudPtr->Destroy();
 			Destroy();
 		}
 	}
 }
 
-void ACouchProjectileEffectStorm::ExecuteEffect()
+void ACouchProjectileEffectMud::ExecuteEffect()
 {
 	Super::ExecuteEffect();
 	FTransform Transform = FTransform(FRotator::ZeroRotator, CouchCannonBall->GetActorLocation(), FVector(1.0f));
-	StormPtr = GetWorld()->SpawnActor<AStorm>(Storm, Transform);
-	if (StormPtr)
+	MudPtr = GetWorld()->SpawnActor<AMud>(Mud, Transform);
+	if (MudPtr)
 	{
-		StormPtr->Init(StormStrength, ForceRadius);
-		StormPtr->RadialForceComponent->Activate(true);
+		MudPtr->Init(PlayerSlowingSpeed, ItemsSlowingSpeed);
 	}
 	if (CouchCannonBall) CouchCannonBall->Destroy();
 }
-
-
-
 
