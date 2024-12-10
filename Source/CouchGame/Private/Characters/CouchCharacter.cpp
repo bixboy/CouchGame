@@ -196,6 +196,12 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 		GetMesh()->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 }
+
+
+void ACouchCharacter::SetCanMove(bool Value)
+{
+	CanMove = Value;
+}
 #pragma endregion
 
 #pragma region State Machine
@@ -587,7 +593,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 					{
 						ICouchInteractable::Execute_StopChargeActor(FishingRod);
 					}
-					CanMove = true;	
 				}
 				else if (FishingRod && FishingRod->isPlayerFishing)
 				{
@@ -675,6 +680,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	
 	WidgetSpawner->DestroyWidget();
 	CanFish = false;
+	CanMove = true;
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }

@@ -118,25 +118,26 @@ void FLevelSelectionModule::FillSubmenu(FMenuBuilder& MenuBuilder)
 	}
 
 	// Ajouter une catégorie pour les niveaux non catégorisés
-	TArray<FString> UnCategorizedLevels = GetAllMapNames();
+	TArray<FString>	UnCategorizedLevelsTemp = GetAllMapNames();
 
 	for (const auto& CategoryPair : LevelCategories)
 	{
 		for (const FString& LevelName : CategoryPair.Value)
 		{
-			UnCategorizedLevels.Remove(LevelName);
+			UnCategorizedLevelsTemp.Remove(LevelName);
 		}
 	}
 
 	MenuBuilder.AddSubMenu(
 		LOCTEXT("Uncategorized", "Uncategorized Levels"),
 		LOCTEXT("UncategorizedTooltip", "Levels that are not in any category."),
-		FNewMenuDelegate::CreateLambda([this, UnCategorizedLevels](FMenuBuilder& SubMenuBuilder)
+		FNewMenuDelegate::CreateLambda([this, UnCategorizedLevelsTemp](FMenuBuilder& SubMenuBuilder)
 		{
-			if (UnCategorizedLevels.Num() > 0)
+			if (UnCategorizedLevelsTemp.Num() > 0)
 			{
-				for (const FString& LevelName : UnCategorizedLevels)
+				for (const FString& LevelName : UnCategorizedLevelsTemp)
 				{
+					UnCategorizedLevels.Add(LevelName);
 					AddLevelToMenu(LevelName, SubMenuBuilder);
 				}
 			}
@@ -212,6 +213,19 @@ void FLevelSelectionModule::AddLevelToMenu(const FString& LevelName, FMenuBuilde
 
                     MoveMenuBuilder.AddSeparator();
 
+                    if (!UnCategorizedLevels.Contains(LevelName))
+                    {
+                        MoveMenuBuilder.AddMenuEntry(
+                            LOCTEXT("MoveToUncategorized", "Uncategorized"),
+                            LOCTEXT("MoveToUncategorizedTooltip", "Move this level to the Uncategorized category."),
+                            FSlateIcon(),
+                            FUIAction(FExecuteAction::CreateLambda([this, LevelName]()
+                            {
+                                MoveLevelToCategory(LevelName, TEXT("Uncategorized Levels"));
+                            }))
+                        );
+                    }
+                	
                     for (const auto& CategoryPair : LevelCategories)
                     {
                         const FString& TargetCategory = CategoryPair.Key;
@@ -331,6 +345,7 @@ void FLevelSelectionModule::OnCreateNewCategory(const FString& LevelNameToMove)
                 }
 
                 LevelCategories.Add(NewCategoryName);
+            	CategoryOrder.Add(NewCategoryName);
                 UE_LOG(LogTemp, Log, TEXT("Created new category: %s"), *NewCategoryName);
 
                 if (!LevelNameToMove.IsEmpty())
@@ -364,13 +379,23 @@ void FLevelSelectionModule::MoveLevelToCategory(const FString& LevelName, const 
         int32 RemovedCount = CategoryPair.Value.Remove(LevelName);
         if (RemovedCount > 0)
         {
-            LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
+        	if (TargetCategory == TEXT("Uncategorized Levels"))
+        	{
+        		ShowTemporaryNotification(FText::Format(
+					LOCTEXT("LevelMovedToUncategorized", "Level '{0}' moved to Uncategorized."),
+					FText::FromString(LevelName)
+				));
+        	}
+        	else
+        	{
+        		LevelCategories.FindOrAdd(TargetCategory).AddUnique(LevelName);
 
-            ShowTemporaryNotification(FText::Format(
-                LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
-                FText::FromString(LevelName),
-                FText::FromString(TargetCategory)
-            ));
+        		ShowTemporaryNotification(FText::Format(
+					LOCTEXT("LevelMoved", "Level '{0}' moved to category '{1}'!"),
+					FText::FromString(LevelName),
+					FText::FromString(TargetCategory)
+				));
+        	}
 
             bLevelMoved = true;
             bLevelFound = true;
@@ -466,117 +491,141 @@ void FLevelSelectionModule::ShowTemporaryNotification(const FText& NotificationT
 
 void FLevelSelectionModule::SaveCategoriesToConfig()
 {
-    // Récupère le chemin
     FString ConfigFilePath = FPaths::ConvertRelativePathToFull(FPaths::ProjectConfigDir() + TEXT("LevelCategories.ini"));
     FFileHelper::SaveStringToFile(TEXT(""), *ConfigFilePath);
 
-    // Parcourt les sections existantes dans le fichier pour :
-    // 1. Supprimer les catégories obsolètes.
-    // 2. Nettoyer les niveaux déplacés.
-	TSet<FString> CurrentCategories;
-	TMap<FString, TSet<FString>> CurrentLevelsInCategories;
+    TSet<FString> CurrentCategories;
+    TMap<FString, TSet<FString>> CurrentLevelsInCategories;
 
-	for (const auto& CategoryPair : LevelCategories)
-	{
-		const FString& CategoryName = CategoryPair.Key;
-		const TArray<FString>& Levels = CategoryPair.Value;
-
-		CurrentCategories.Add(CategoryName);
-		
-		TSet<FString> LevelsSet(Levels);
-		CurrentLevelsInCategories.Add(CategoryName, LevelsSet);
-	}
-
-	TArray<FString> ExistingCategories;
-	GConfig->GetSectionNames(ConfigFilePath, ExistingCategories);
-
-	for (const FString& ExistingCategory : ExistingCategories)
-	{
-		// Vérifier si la catégorie existe encore
-		if (!CurrentCategories.Contains(ExistingCategory))
-		{
-			UE_LOG(LogTemp, Log, TEXT("Deleting category '%s' from config"), *ExistingCategory);
-			GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
-			continue;
-		}
-
-		// Supprimer les niveaux obsolètes
-		TArray<FString> StoredLevels;
-		GConfig->GetSection(*ExistingCategory, StoredLevels, ConfigFilePath);
-
-		const TSet<FString>* CurrentLevels = CurrentLevelsInCategories.Find(ExistingCategory);
-		if (CurrentLevels)
-		{
-			for (const FString& StoredLevel : StoredLevels)
-			{
-				if (!CurrentLevels->Contains(StoredLevel))
-				{
-					UE_LOG(LogTemp, Log, TEXT("Deleting level '%s' from category '%s' in config"), *StoredLevel, *ExistingCategory);
-					GConfig->RemoveKey(*ExistingCategory, *StoredLevel, ConfigFilePath);
-				}
-			}
-		}
-	}
-
-	GConfig->Flush(false, ConfigFilePath);
-
-    // Sauvegarde les catégories et leurs niveaux
+    // Remplir CurrentCategories et CurrentLevelsInCategories
     for (const auto& CategoryPair : LevelCategories)
     {
         const FString& CategoryName = CategoryPair.Key;
-        const TArray<FString>& LevelNames = CategoryPair.Value;
+        const TArray<FString>& Levels = CategoryPair.Value;
 
-        UE_LOG(LogTemp, Log, TEXT("Saving category: %s"), *CategoryName);
+        CurrentCategories.Add(CategoryName);
+        CurrentLevelsInCategories.Add(CategoryName, TSet<FString>(Levels));
+    }
 
-        for (const FString& LevelName : LevelNames)
+    TArray<FString> ExistingCategories;
+    GConfig->GetSectionNames(ConfigFilePath, ExistingCategories);
+
+    for (const FString& ExistingCategory : ExistingCategories)
+    {
+        if (!CurrentCategories.Contains(ExistingCategory))
         {
-            UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
-            GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+            UE_LOG(LogTemp, Log, TEXT("Deleting category '%s' from config"), *ExistingCategory);
+            GConfig->EmptySection(*ExistingCategory, ConfigFilePath);
         }
     }
 
-    // Sauvegarde les modifications
+    for (int32 i = CategoryOrder.Num() - 1; i >= 0; --i)
+    {
+        if (!CurrentCategories.Contains(CategoryOrder[i]))
+        {
+            UE_LOG(LogTemp, Log, TEXT("Removing obsolete category '%s' from CategoryOrder"), *CategoryOrder[i]);
+            CategoryOrder.RemoveAt(i);
+        }
+    }
+
+    FString OrderString = FString::Join(CategoryOrder, TEXT(","));
+    GConfig->SetString(TEXT("CategoryOrder"), TEXT("Order"), *OrderString, ConfigFilePath);
+
+    for (const FString& CategoryName : CategoryOrder)
+    {
+        if (LevelCategories.Contains(CategoryName))
+        {
+            const TArray<FString>& LevelNames = LevelCategories[CategoryName];
+
+            for (const FString& LevelName : LevelNames)
+            {
+                GConfig->SetString(*CategoryName, *LevelName, *LevelName, ConfigFilePath);
+            }
+        }
+    }
+
     GConfig->Flush(false, ConfigFilePath);
     UE_LOG(LogTemp, Log, TEXT("Level categories successfully saved to: %s"), *ConfigFilePath);
 }
 
 void FLevelSelectionModule::LoadCategoriesFromConfig()
 {
-	FString CategoriesConfigFile = FPaths::ProjectConfigDir() + "LevelCategories.ini";
-	if (FPaths::FileExists(CategoriesConfigFile))
+	LevelCategories.Empty();
+    CategoryOrder.Empty();
+
+    FString CategoriesConfigFile = FPaths::ProjectConfigDir() + "LevelCategories.ini";
+    if (FPaths::FileExists(CategoriesConfigFile))
+    {
+        // Charger l'ordre des catégories
+        LoadCategoryOrderFromConfig(CategoriesConfigFile);
+    	TArray<FString> CategoryNames;
+
+        if (GConfig->GetSectionNames(CategoriesConfigFile, CategoryNames))
+        {
+            for (const FString& CategoryName : CategoryNames)
+            {
+                // Ignorer la section CategoryOrder
+                if (CategoryName.Equals(TEXT("CategoryOrder"), ESearchCase::IgnoreCase))
+                {
+                    continue;
+                }
+
+                // Charger les niveaux pour chaque catégorie
+                TArray<FString> LevelEntries;
+                if (GConfig->GetSection(*CategoryName, LevelEntries, CategoriesConfigFile))
+                {
+                    for (const FString& LevelEntry : LevelEntries)
+                    {
+                        FString LevelKey, LevelValue;
+                        if (LevelEntry.Split(TEXT("="), &LevelKey, &LevelValue))
+                        {
+                            LevelCategories.FindOrAdd(CategoryName).Add(LevelValue);
+                        }
+                    }
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Failed to load levels for category: %s"), *CategoryName);
+                }
+            }
+
+            // Debug : Vérifie les catégories et niveaux chargés
+            for (const FString& CategoryName : CategoryOrder)
+            {
+                UE_LOG(LogTemp, Log, TEXT("Category: %s"), *CategoryName);
+
+                if (LevelCategories.Contains(CategoryName))
+                {
+                    const TArray<FString>& Levels = LevelCategories[CategoryName];
+                    for (const FString& LevelName : Levels)
+                    {
+                        UE_LOG(LogTemp, Log, TEXT("  Level: %s"), *LevelName);
+                    }
+                }
+            }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No categories found in config file: %s"), *CategoriesConfigFile);
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Config file does not exist: %s"), *CategoriesConfigFile);
+    }
+}
+
+void FLevelSelectionModule::LoadCategoryOrderFromConfig(const FString& ConfigFilePath)
+{
+	FString OrderString;
+	if (GConfig->GetString(TEXT("CategoryOrder"), TEXT("Order"), OrderString, ConfigFilePath))
 	{
-		TArray<FString> CategoryNames;
-		if (GConfig->GetSectionNames(CategoriesConfigFile, CategoryNames))
-		{
-			for (const FString& CategoryName : CategoryNames)
-			{
-				TArray<FString> LevelEntries;
-				if (GConfig->GetSection(*CategoryName, LevelEntries, CategoriesConfigFile))
-				{
-					for (const FString& LevelEntry : LevelEntries)
-					{
-						// Chaque entrée a le format "Key=Value", donc on les sépare
-						FString LevelKey, LevelValue;
-						if (LevelEntry.Split(TEXT("="), &LevelKey, &LevelValue))
-						{
-							LevelCategories.FindOrAdd(CategoryName).Add(LevelValue);
-						}
-					}
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Failed to load levels for category: %s"), *CategoryName);
-				}
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No categories found in config file: %s"), *CategoriesConfigFile);
-		}
+		// Convertit la chaîne en un tableau
+		OrderString.ParseIntoArray(CategoryOrder, TEXT(","), true);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Config file does not exist: %s"), *CategoriesConfigFile);
+		UE_LOG(LogTemp, Warning, TEXT("Category order not found in config."));
 	}
 }
 

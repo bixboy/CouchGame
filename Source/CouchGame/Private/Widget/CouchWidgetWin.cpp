@@ -108,8 +108,7 @@ void UCouchWidgetWin::TurnOnLight()
 
 void UCouchWidgetWin::CheckLight()
 {
-	UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	if (GameManager)
+	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
 	{
 		int RoundNumber = GameManager->GetMaxRound();
 		if (RoundNumber == 1)

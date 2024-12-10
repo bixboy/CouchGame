@@ -90,6 +90,7 @@ void ACouchUmbrella::DecreasePv()
 		SkeletalMesh->SetSkeletalMeshAsset(DestroyedMesh);
 		SetInteractWidget(RepairingWidget);
 		SetCanUse(false);
+		MovementComponent->SetCanMove(false);
 		
 		Timer = 0.f;
 		if(CurrentPlayer)
@@ -117,6 +118,7 @@ void ACouchUmbrella::FinishRepairing()
 		WidgetComponent->DestroyWidget();
 	}
 
+	MovementComponent->SetCanMove(true);
 	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
 	CurrentPv = MaxPv;

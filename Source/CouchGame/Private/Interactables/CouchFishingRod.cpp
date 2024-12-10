@@ -220,6 +220,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
          if (LureRef->GetFishingObject())
          {
             PlayVibration(RewindVibrationEffect);
+            GetCharacter()->SetCanMove(true);
             SpawnPickableObject();  
          }
          DestroyLureAndCable();
