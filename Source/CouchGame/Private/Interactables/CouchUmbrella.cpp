@@ -182,7 +182,7 @@ void ACouchUmbrella::FinishRepairing()
 float ACouchUmbrella::GetPercentRepair_Implementation()
 {
 	return Timer / TimeToRepair;
-}
+} 
 
 bool ACouchUmbrella::GetIsInRepair() const
 {

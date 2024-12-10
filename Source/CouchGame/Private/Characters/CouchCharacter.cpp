@@ -663,6 +663,7 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
+	AnimationManager->IsRepairing = false;
 	
 	IsInteracting = false;
 	InteractingActor = nullptr;
