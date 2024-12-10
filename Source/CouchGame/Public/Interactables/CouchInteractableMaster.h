@@ -30,8 +30,8 @@ public:
 
 
 protected:
-	UPROPERTY()
-	ACouchCharacter* CurrentPlayer;
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<ACouchCharacter> CurrentPlayer;
 	UPROPERTY()
 	bool PlayerIsIn = false;
 	

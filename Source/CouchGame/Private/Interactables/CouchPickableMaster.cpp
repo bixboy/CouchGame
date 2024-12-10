@@ -203,6 +203,11 @@ bool ACouchPickableMaster::GetTeamAttached(int Team)
 	return false;
 }
 
+TArray<TObjectPtr<ACouchLure>> ACouchPickableMaster::GetLuresRef() const
+{
+	return CurrentLuresAttached;
+}
+
 void ACouchPickableMaster::StopQte()
 {
 	if (WidgetSpawner->GetCurrentWidget())

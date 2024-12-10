@@ -194,6 +194,7 @@ private :
 public:
 	bool GetIsHoldingItem() const;
 
+	UFUNCTION(BlueprintCallable)
 	void OnInputHold(const FInputActionValue& InputActionValue);
 private:
 	bool IsHoldingItem;

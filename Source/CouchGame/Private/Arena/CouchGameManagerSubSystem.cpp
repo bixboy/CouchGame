@@ -80,30 +80,17 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 
-	if (CurrentRound >= MaxRounds)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Game Finish!"));
-
-		if (TeamAPRoundWin > TeamBPRoundWin)
-		{
-			RoundsWinners.Add(1);
-			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
-		}
-		else if (TeamBPRoundWin > TeamAPRoundWin)
-		{
-			RoundsWinners.Add(2);
-			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
-		}
-		return;
-	}
-
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("BlueLagoon wins the round!"));
 		TeamAPRoundWin++;
 		RoundsWinners.Add(1);
-
+		if (CurrentRound == MaxRounds)
+		{
+			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
+			return;
+		}
 		OpenUi(WinWidget, FText::FromString("BlueLagoon wins the round!"));
 	}
 	else if (TeamWin == 2)
@@ -112,6 +99,12 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Red Tuna wins the round!"));
 		TeamBPRoundWin++;
 		RoundsWinners.Add(2);
+
+		if (CurrentRound == MaxRounds)
+		{
+			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
+			return;
+		}
 		
 		OpenUi(WinWidget, FText::FromString("Red Tuna wins the round!"));
 	}
@@ -120,6 +113,11 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		// No Team win
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("No Team Win!"));
 		RoundsWinners.Add(0);
+		if (CurrentRound == MaxRounds)
+		{
+			OpenUi(WinWidget, FText::FromString("No Team wins this game!"));
+			return;
+		}
 		OpenUi(WinWidget, FText::FromString("No Team wins the round!"));
 	}
 }
