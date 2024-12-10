@@ -21,6 +21,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactables/CouchFishingRod.h"
 #include "Interactables/CouchPickableCannonBall.h"
+#include "Interactables/CouchUmbrella.h"
 #include "Interfaces/CouchInteractable.h"
 #include "Interfaces/CouchPickable.h"
 #include "ItemSpawnerManager/ItemSpawnerManager.h"
@@ -620,7 +621,8 @@ bool ACouchCharacter::GetIsHoldingItem() const
 void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 {
 	if (!IsHoldingItem) return;
-	if (InputActionValue.Get<float>() <= 0.3f && !InteractingActor.IsA(ACouchPlank::StaticClass())) return;
+	if (InputActionValue.Get<float>() <= 0.3f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
+		|| !InteractingActor.IsA(ACouchUmbrella::StaticClass()))) return;
 	if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
 	{
 		TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
