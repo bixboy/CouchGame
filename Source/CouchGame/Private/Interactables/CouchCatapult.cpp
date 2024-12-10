@@ -4,6 +4,7 @@
 #include "CouchCannonBall.h"
 #include "CouchStaticCanonBall.h"
 #include "Components/CouchChargePower.h"
+#include "Interactables/CouchUmbrella.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectileEffect/CouchProjectileEffect.h"
 #include "ProjectileEffect/CouchProjectileExecuteTime.h"
@@ -30,6 +31,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(true);
+			ShieldRef->SpawnWarningWidget();
 		}
 		else
 		{
@@ -38,6 +40,7 @@ void ACouchCatapult::StartChargeActor_Implementation()
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 			IsInCharge = true;
 			MovementComponent->SetCanMove(true);
+			ShieldRef->SpawnWarningWidget();
 		}
 	}
 }
@@ -55,6 +58,7 @@ void ACouchCatapult::StopChargeActor_Implementation()
 		SetCanUse(false);
 		IsInCharge = false;
 		MovementComponent->SetCanMove(true);
+		ShieldRef->SpawnWarningWidget();
 	}
 }
 

@@ -54,7 +54,9 @@ public:
 private:
 	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
-	TObjectPtr<UClass> PowerChargeWidget;
+	TSubclassOf<ACouchWidget3D> PowerChargeWidgetTeam1;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> PowerChargeWidgetTeam2;
 	
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", ClampMax = "2"), Category = DefaultValue)
 	int CurrentTeam = 1;

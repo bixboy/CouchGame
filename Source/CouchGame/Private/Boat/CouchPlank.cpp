@@ -58,6 +58,13 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 	}
+	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing)
+	{
+		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
+		IsPlayerRepairing = false;
+		FInputActionValue ActionValue;
+		APlayer->OnInputHold(ActionValue);
+	}
 }
 
 #pragma endregion
@@ -75,7 +82,7 @@ void ACouchPlank::Tick(float DeltaTime)
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 			// APlayer->IsInteracting = false;
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsRepairing = false;
+			if (APlayer) APlayer->AnimationManager->IsRepairing = false;
 			SetActorTickEnabled(false);
 			Destroy();
 		}

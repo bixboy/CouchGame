@@ -40,7 +40,7 @@ void ACouchProjectileEffectStorm::ExecuteEffect()
 		StormPtr->Init(StormStrength, ForceRadius);
 		StormPtr->RadialForceComponent->Activate(true);
 	}
-	CouchCannonBall->Destroy();
+	if (CouchCannonBall) CouchCannonBall->Destroy();
 }
 
 
