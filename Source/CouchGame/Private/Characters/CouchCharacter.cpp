@@ -662,6 +662,7 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
 	AnimationManager->IsRepairing = false;
+	SetCanMove(true);
 	
 	IsInteracting = false;
 	InteractingActor = nullptr;

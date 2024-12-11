@@ -1,6 +1,7 @@
 
 #include "Arena/CouchGameManagerSubSystem.h"
 
+#include "LocalMultiplayerSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidgetWin.h"
@@ -177,6 +178,7 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 void UCouchGameManagerSubSystem::ReturnToMenu()
 {
 	ResetRound();
+	SwitchMappingType();
 	UGameplayStatics::OpenLevel(this, "LevelLobby", false);
 }
 
