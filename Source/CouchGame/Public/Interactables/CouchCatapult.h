@@ -8,6 +8,7 @@
 #include "Components/CouchChargePower.h"
 #include "CouchCatapult.generated.h"
 
+class ACouchUmbrella;
 class ACouchStaticCanonBall;
 
 UCLASS()
@@ -49,6 +50,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<UCameraShakeBase> CameraShake;
+
+	UPROPERTY(editAnywhere, Category = DefaultValue)
+	TObjectPtr<ACouchUmbrella> ShieldRef;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DefaultValue)

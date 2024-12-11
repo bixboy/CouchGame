@@ -23,7 +23,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
 	void PlayVibration(int TeamVibration);
-
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayScreenShake"))
+	void PlayScreenShake();
+	
 	void InitCanonBall(TObjectPtr<ACouchStaticCanonBall> StaticCannonBall);
 	void CopyMeshData(UStaticMeshComponent* Target, UStaticMeshComponent* Source);
 

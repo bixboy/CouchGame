@@ -55,7 +55,10 @@ void AItemSpawnerManager::OnItemBeginOverlapDestoryBox(UPrimitiveComponent* Over
 	if (OtherActor->IsA(ACouchPickableMaster::StaticClass()))
 	{
 		ACouchPickableMaster* Item = Cast<ACouchPickableMaster>(OtherActor);
-		DestroyItem(Item);
+		if (Item->GetLuresRef().IsEmpty())
+		{
+			DestroyItem(Item);	
+		}
 	}
 	else if (!OtherActor->IsA(ACouchCharacter::StaticClass()))
 	{
@@ -66,7 +69,7 @@ void AItemSpawnerManager::OnItemBeginOverlapDestoryBox(UPrimitiveComponent* Over
 void AItemSpawnerManager::DestroyItem(ACouchPickableMaster* ItemToDestroy, bool isDestroyByItemSpawnerManager)
 {
 	if (ItemToDestroy && CurrentSpawnedItems.Contains(ItemToDestroy)) CurrentSpawnedItems.Remove(ItemToDestroy);
-	if (isDestroyByItemSpawnerManager)
+	if (isDestroyByItemSpawnerManager && ItemToDestroy->GetLuresRef().IsEmpty())
 	{
 		ItemToDestroy->Destroy();
 	}

@@ -86,6 +86,8 @@ public:
 	UFUNCTION(meta = (MapParam))
 	bool GetTeamAttached(int Team);
 
+	TArray<TObjectPtr<ACouchLure>> GetLuresRef() const;
+
 private:
 	UPROPERTY()
 	TObjectPtr<USceneComponent> QteWidgetPose;

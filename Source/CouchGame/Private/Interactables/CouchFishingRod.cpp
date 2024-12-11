@@ -28,6 +28,7 @@ void ACouchFishingRod::SetupFishingRod(TObjectPtr<ACouchCharacter> Player, int T
    {
       AttachToComponent(CurrentPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripAttach"));
       CurrentPlayer->AnimationManager->IsFishing = true;
+      CurrentPlayer->SetCanMove(false);
       //FVector SocketLocation = FVector(SkeletalMesh->GetSocketTransform(FName("GripPoint"), RTS_Component).GetLocation());
       //AddActorLocalOffset(SocketLocation);
    }
@@ -71,8 +72,21 @@ void ACouchFishingRod::StartChargeActor_Implementation()
       }
 
       // Spawn Widget
-      WidgetSpawner->SpawnWidget(PowerChargeWidget, CurrentPlayer->WidgetPose, false);
-      if(WidgetSpawner->GetCurrentWidget()) {ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);}
+      switch (CurrentTeam)
+      {
+         case 1:
+            WidgetSpawner->SpawnWidget(PowerChargeWidgetTeam1, CurrentPlayer->WidgetPose, false);
+            break;
+
+         case 2:
+            WidgetSpawner->SpawnWidget(PowerChargeWidgetTeam2, CurrentPlayer->WidgetPose, false);
+            break;
+      }
+      
+      if(WidgetSpawner->GetCurrentWidget())
+      {
+         ChargePower->StartCharging(SkeletalMesh, WidgetSpawner, false, CurrentPlayer);
+      }
       
       CurrentPlayer->AnimationManager->IsFishingStart = true;
       IsInCharge = true;
@@ -224,6 +238,7 @@ void ACouchFishingRod::RewindCable(float DeltaTime)
             SpawnPickableObject();  
          }
          DestroyLureAndCable();
+         CurrentPlayer->DestroyFishingRod();
       }
    }
 }
