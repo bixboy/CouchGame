@@ -62,9 +62,10 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 		IsPlayerRepairing = false;
-		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsRepairing = false;
+		if (APlayer) APlayer->AnimationManager->IsRepairing = false;
 		FInputActionValue ActionValue;
 		APlayer->OnInputHold(ActionValue);
+		APlayer->SetCanMove(true);
 	}
 }
 
@@ -84,6 +85,8 @@ void ACouchPlank::Tick(float DeltaTime)
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 			// APlayer->IsInteracting = false;
 			if (APlayer) APlayer->AnimationManager->IsRepairing = false;
+			FInputActionValue ActionValue;
+			APlayer->OnInputHold(ActionValue);
 			SetActorTickEnabled(false);
 			Destroy();
 		}
@@ -110,13 +113,15 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 	{
 		APlayer = Player;
 		IsPlayerRepairing = true;
-		Player->AnimationManager->IsRepairing = true;
+		APlayer->AnimationManager->IsRepairing = true;
+		APlayer->SetCanMove(false);
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting");
 	}
 	else if (IsPlayerRepairing && Player == APlayer)
 	{
+		APlayer->AnimationManager->IsRepairing = false;
+		APlayer->SetCanMove(true);
 		APlayer = nullptr;
-		Player->AnimationManager->IsRepairing = false;
 		IsPlayerRepairing = false;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player stopped interacting");
 	}

@@ -25,23 +25,12 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	if(GetCanUse() && CurrentAmmo >= 1 && !IsInCharge)
 	{
 		PlayFx();
-		if (WidgetComponent->PowerChargeActor)
-		{
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
-			IsInCharge = true;
-			MovementComponent->SetCanMove(true);
-			ShieldRef->SpawnWarningWidget();
-		}
-		else
-		{
-			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
-			PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
-			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
-			IsInCharge = true;
-			MovementComponent->SetCanMove(true);
-			ShieldRef->SpawnWarningWidget();
-		}
+		if (!WidgetComponent->PowerChargeActor) WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
+		PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
+		IsInCharge = true;
+		MovementComponent->SetCanMove(true);
+		ShieldRef->SpawnOrDeSpawnWarningWidget(true);
 	}
 }
 
@@ -58,7 +47,7 @@ void ACouchCatapult::StopChargeActor_Implementation()
 		SetCanUse(false);
 		IsInCharge = false;
 		MovementComponent->SetCanMove(true);
-		ShieldRef->SpawnWarningWidget();
+		ShieldRef->SpawnOrDeSpawnWarningWidget(false);
 	}
 }
 
