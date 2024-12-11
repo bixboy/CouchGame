@@ -13,7 +13,7 @@ class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public IC
 
 public:
 	ACouchUmbrella();
-	void Tick(float DeltaTime);
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void PickUp_Implementation(ACouchCharacter* player) override;
 
@@ -32,7 +32,7 @@ public:
 	TObjectPtr<USoundBase> DamageSound;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
 	TObjectPtr<USoundBase> BrokeSound;
-	void SpawnWarningWidget();
+	void SpawnOrDeSpawnWarningWidget(bool Spawn);
 	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
