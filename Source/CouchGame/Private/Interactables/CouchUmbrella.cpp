@@ -9,8 +9,6 @@ ACouchUmbrella::ACouchUmbrella()
 
 	DamageSound = CreateDefaultSubobject<USoundBase>(TEXT("DamageSound"));
 	BrokeSound = CreateDefaultSubobject<USoundBase>(TEXT("BrokeSound"));
-
-	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchUmbrella::OnActorEndOverlap);
 }
 
 #pragma region Interfaces
@@ -57,13 +55,13 @@ void ACouchUmbrella::Tick(float DeltaTime)
 }
 
 // Spawn Widget
-void ACouchUmbrella::SpawnWarningWidget()
+void ACouchUmbrella::SpawnOrDeSpawnWarningWidget(bool Spawn)
 {
-	if(!WidgetComponent->GetCurrentWidget(), WarningWidget)
+	if(!WidgetComponent->GetCurrentWidget() && WarningWidget && Spawn)
 	{
 		WidgetComponent->SpawnWidget(WarningWidget, WidgetPose);
 	}
-	else
+	else if (!Spawn)
 	{
 		WidgetComponent->DestroyWidget();
 	}
@@ -105,6 +103,8 @@ void ACouchUmbrella::StartRepair(ACouchCharacter* Player)
 	SetCurrentPlayer(Player);
 	SetPlayerIsIn(true);
 	SetCanUse(true);
+	CurrentPlayer->SetCanMove(false);
+	CurrentPlayer->AnimationManager->IsRepairing = true;
 	IsPlayerRepairing = true;
 }
 
@@ -112,10 +112,14 @@ void ACouchUmbrella::StartRepair(ACouchCharacter* Player)
 void ACouchUmbrella::StopRepair()
 {
 	IsPlayerRepairing = false;
+	CurrentPlayer->AnimationManager->IsRepairing = false;
+	CurrentPlayer->SetCanMove(true);
 	RemoveCurrentPlayer();
 	SetPlayerIsIn(false);
 	SetCanUse(false);
 }
+
+
 
 #pragma region Life
 
@@ -140,6 +144,13 @@ void ACouchUmbrella::DecreasePv()
 
 void ACouchUmbrella::HandleZeroPv()
 {
+	if (CurrentPlayer)
+	{
+		CurrentPv = 1;
+		FInputActionValue InputActionValue;
+		CurrentPlayer->OnInputInteract(InputActionValue);
+	}
+	CurrentPv = 0;
 	PlayFx();
 	ShieldBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetInteractWidget(RepairingWidget);
@@ -148,11 +159,7 @@ void ACouchUmbrella::HandleZeroPv()
 
 	Timer = 0.f;
 
-	if (CurrentPlayer)
-	{
-		FInputActionValue InputActionValue;
-		CurrentPlayer->OnInputHold(InputActionValue);
-	}
+	
 }
 
 int ACouchUmbrella::GetCurrentPv() const
@@ -166,17 +173,24 @@ int ACouchUmbrella::GetCurrentPv() const
 
 void ACouchUmbrella::FinishRepairing()
 {
-	SetInteractWidget(InteractWidget);
 	if (WidgetComponent->GetCurrentWidget())
 	{
 		WidgetComponent->DestroyWidget();
 	}
-
-	MovementComponent->SetCanMove(true);
+	
 	ShieldBox->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+	SetInteractWidget(InteractWidget);
+	SetCanUse(true);
+	MovementComponent->SetCanMove(true);
+	
+	
 	SkeletalMesh->SetSkeletalMeshAsset(RepairingMesh);
+	if (CurrentPlayer)
+	{
+		FInputActionValue InputActionValue;
+		CurrentPlayer->OnInputHold(InputActionValue);
+	}
 	CurrentPv = MaxPv;
-	StopRepair();
 }
 
 float ACouchUmbrella::GetPercentRepair_Implementation()
