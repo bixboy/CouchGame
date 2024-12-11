@@ -205,41 +205,44 @@ void ACouchFishingRod::InitializeCable()
 // Rewind
 void ACouchFishingRod::RewindCable(float DeltaTime)
 {
-   if (LureRef && !InQte)
+   if (!LureRef || InQte)
    {
-      FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
-      FVector LurePosition = LureRef->GetActorLocation();
+      return;
+   }
 
-      // Réduction de la longueur du câble
-      float CurrentCableLength = Cable->CableLength;
-      float NewCableLength = FMath::FInterpConstantTo(CurrentCableLength, 0.0f, DeltaTime, RewindSpeed);
-      Cable->CableLength = NewCableLength;
-      
-      FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
-      FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
-      LureRef->SetActorLocation(NewPositionXY);
-      
-      // Remonte sur L'axe Z
-      if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= StopRewindZ)
+   FVector StartPosition = SkeletalMesh->GetSocketLocation(FName("barrel"));
+   FVector LurePosition = LureRef->GetActorLocation();
+
+   // Réduction de la longueur du câble
+   float CurrentCableLength = Cable->CableLength;
+   float NewCableLength = FMath::FInterpConstantTo(CurrentCableLength, 0.0f, DeltaTime, RewindSpeed);
+   Cable->CableLength = NewCableLength;
+
+   FVector TargetPositionXY = FVector(StartPosition.X, StartPosition.Y, LurePosition.Z);
+   FVector NewPositionXY = FMath::VInterpConstantTo(LurePosition, TargetPositionXY, DeltaTime, RewindSpeed);
+   LureRef->SetActorLocation(NewPositionXY);
+
+   // Vérifications sur l'axe Z
+   if (FMath::Abs(LurePosition.Y - StartPosition.Y) <= StopRewindZ)
+   {
+      FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
+      FVector NewPositionZ = FMath::VInterpConstantTo(NewPositionXY, TargetPositionZ, DeltaTime, RewindSpeed);
+      LureRef->SetActorLocation(NewPositionZ);
+
+      LureRef->SphereComponent->SetSimulatePhysics(false);
+   }
+
+   // Distance limite pour arrêter
+   if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
+   {
+      if (LureRef->GetFishingObject())
       {
-         FVector TargetPositionZ = FVector(StartPosition.X, StartPosition.Y, StartPosition.Z);
-         FVector NewPositionZ = FMath::VInterpConstantTo(NewPositionXY, TargetPositionZ, DeltaTime, RewindSpeed);
-         LureRef->SetActorLocation(NewPositionZ);
-                
-         LureRef->SphereComponent->SetSimulatePhysics(false); 
+         PlayVibration(RewindVibrationEffect);
+         GetCharacter()->SetCanMove(true);
+         SpawnPickableObject();
       }
-           
-      if (FVector::Dist(StartPosition, LurePosition) <= StopRewindDistance)
-      {
-         if (LureRef->GetFishingObject())
-         {
-            PlayVibration(RewindVibrationEffect);
-            GetCharacter()->SetCanMove(true);
-            SpawnPickableObject();  
-         }
-         DestroyLureAndCable();
-         CurrentPlayer->DestroyFishingRod();
-      }
+      DestroyLureAndCable();
+      CurrentPlayer->DestroyFishingRod();
    }
 }
 
@@ -248,6 +251,9 @@ void ACouchFishingRod::StopRewindCable()
 {
    if (LureRef && LureRef->SphereComponent && !InQte)
    {
+      LureRef->SphereComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+      LureRef->SphereComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+
       LureRef->SphereComponent->SetSimulatePhysics(true);
    }
    else if (InQte)
