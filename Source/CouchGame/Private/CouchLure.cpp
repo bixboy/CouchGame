@@ -38,6 +38,7 @@ void ACouchLure::Initialize(const FVector& LaunchVelocity, ACouchFishingRod* Fis
 	ActorToIgnore.Add(FishingRod->CurrentPlayer);
 	CouchProjectile->Initialize(LaunchVelocity, ActorToIgnore, false);
 	CouchFishingRod = FishingRod;
+	CanAttach = true;
 }
 
 #pragma endregion
@@ -66,7 +67,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
-		if (FishingObject && !FishingObject->GetTeamAttached(CouchFishingRod->GetTeam()))
+		if (CanAttach && FishingObject && !FishingObject->GetTeamAttached(CouchFishingRod->GetTeam()))
 		{
 			if (!FishingObject->AttachLure(this) && FishingObject->PhysicsCollider)
 			{

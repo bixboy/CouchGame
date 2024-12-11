@@ -29,6 +29,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCouchOctopusAnimationManager* AnimationManager;
 
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFX"))
+	void PlayFX();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="StopFX"))
+	void StopFX();
+
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
@@ -65,6 +70,7 @@ private:
 public:
 	const FCraftRecipe* IsCraftingPossible(const TArray<TSubclassOf<ACouchPickableMaster>>& Ingredients);
 	const FCraftRecipe* IsCraftingPossible();
+	int GetTeam();
 private:
 	UPROPERTY(EditAnywhere, Category = Crafting)
 	TArray<FCraftRecipe> CraftRecipes;
@@ -83,6 +89,9 @@ private:
 	bool AutoCookWhen2IngredientsSet = true;
 
 	bool IsAutoCookPossible();
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
+	int CurrentTeam = 1;
 
 public:
 	void AddIngredient(ACouchPickableMaster* Ingredient);

@@ -64,15 +64,15 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 
 	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
 	{
-		switch (GetBoatTeam())
+		switch (Team)
 		{
-		case EBoatTeam::Team1:
-			GameManager->UpdateCurrentLife(1, BoatLife);
-			break;
-
-		case EBoatTeam::Team2:
-			GameManager->UpdateCurrentLife(2, BoatLife);
-			break;
+			case EBoatTeam::Team1:
+				GameManager->UpdateCurrentLife(2, BoatLife);
+				break;
+	
+			case EBoatTeam::Team2:
+				GameManager->UpdateCurrentLife(1, BoatLife);
+				break;
 		}
 	}
 }

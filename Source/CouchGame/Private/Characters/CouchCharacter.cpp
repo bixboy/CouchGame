@@ -78,6 +78,16 @@ void ACouchCharacter::BeginPlay()
 		}
 	}
 	PlayerIndex = CurrentPlayerCount + 1;
+
+	for (TActorIterator<ACouchCraftingTable> It(GetWorld()); It; ++It)
+	{
+		ACouchCraftingTable* Table = *It;
+		if (Table && Table->GetTeam() == CurrentTeam)
+		{
+			CraftTable = Table;
+			break;
+		}
+	}
 }
 
 void ACouchCharacter::Tick(float DeltaTime)
@@ -493,6 +503,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
 			IsHoldingItem = true;
+			CraftTable->PlayFX();
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
@@ -583,7 +594,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this, CurrentTeam);
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -592,7 +602,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			else
 			{
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -659,7 +668,8 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 
 	
 	ICouchInteractable::Execute_Interact(InteractingActor, this);
-	
+
+	CraftTable->StopFX();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
@@ -704,7 +714,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	
 	WidgetSpawner->DestroyWidget();
 	CanFish = false;
-	CanMove = true;
+	SetCanMove(true);
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
@@ -723,6 +733,7 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod = nullptr;
 	}
 	isFishing = false;
+	SetCanMove(true);
 	AnimationManager->IsFishingStart = false;
 	AnimationManager->IsFishingRelease = false;
 	AnimationManager->IsFishingPull = false;
