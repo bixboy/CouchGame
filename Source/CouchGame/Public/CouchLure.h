@@ -52,6 +52,7 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchPickableMaster> FishingObject;
+	bool CanAttach = false;
 
 #pragma endregion
 

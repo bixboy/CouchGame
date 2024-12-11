@@ -583,7 +583,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this, CurrentTeam);
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -592,7 +591,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			else
 			{
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -704,7 +702,7 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 	
 	WidgetSpawner->DestroyWidget();
 	CanFish = false;
-	CanMove = true;
+	SetCanMove(true);
 	DestroyFishingRod();
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
@@ -723,6 +721,7 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod = nullptr;
 	}
 	isFishing = false;
+	SetCanMove(true);
 	AnimationManager->IsFishingStart = false;
 	AnimationManager->IsFishingRelease = false;
 	AnimationManager->IsFishingPull = false;
