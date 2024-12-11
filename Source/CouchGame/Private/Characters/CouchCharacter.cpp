@@ -688,14 +688,14 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<ACouchInteractableMaster>(OtherActor))
+	if (!FishingRod && Cast<ACouchInteractableWeapons>(OtherActor) || IsHoldingItem)
 	{
 		DontFish = true;
 		WidgetSpawner->DestroyWidget();
 		return;
 	}
 
-	if (!DontFish)
+	if (!DontFish && !Cast<ACouchPickableMaster>(OtherActor))
 	{
 		CanFish = true;
 		WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
@@ -711,11 +711,14 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 		DontFish = false;
 		return;
 	}
-	
-	WidgetSpawner->DestroyWidget();
-	CanFish = false;
-	SetCanMove(true);
-	DestroyFishingRod();
+
+	if (!Cast<ACouchInteractableMaster>(OtherActor))
+	{
+		WidgetSpawner->DestroyWidget();
+		CanFish = false;
+		SetCanMove(true);
+		DestroyFishingRod();	
+	}
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
