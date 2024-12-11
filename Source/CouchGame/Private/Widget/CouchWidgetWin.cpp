@@ -47,11 +47,11 @@ void UCouchWidgetWin::ChangeWinnerText(FText Winner)
 void UCouchWidgetWin::OnNewRoundPressed()
 {
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	if (GameManager && GameManager->GetCurrentRound() != GameManager->GetMaxRound())
+	if (GameManager && !GameManager->GetEndMatch())
 	{
 		GameManager->StartNewRound();
 	}
-	else if (GameManager && GameManager->GetCurrentRound() >= GameManager->GetMaxRound())
+	else if (GameManager && GameManager->GetEndMatch())
 	{
 		GameManager->ReturnToMenu();
 	}

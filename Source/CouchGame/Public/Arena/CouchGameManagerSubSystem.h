@@ -74,6 +74,7 @@ protected:
 	// Timer de manches
 	FTimerHandle RoundTimerHandle;
 	float CurrentRoundTimer;
+	bool EndMatch = false;
 
 	FTimerHandle UiTimerHandle;
 	void DecrementTimer();
@@ -104,6 +105,8 @@ public:
 	int GetMaxRound();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentRound();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetEndMatch();
 
 	TArray<int> GetRoundsWinners();
 
