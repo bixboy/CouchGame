@@ -62,6 +62,7 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 		IsPlayerRepairing = false;
+		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsRepairing = false;
 		FInputActionValue ActionValue;
 		APlayer->OnInputHold(ActionValue);
 	}
