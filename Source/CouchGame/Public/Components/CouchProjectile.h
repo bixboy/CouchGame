@@ -43,4 +43,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	bool CanMove = false;
+
+	float ReactivatePhysicsCountdown = -1.f;
+	float ReactivatePhysicsDelay = 0.05f;
 };

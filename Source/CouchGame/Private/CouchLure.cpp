@@ -67,7 +67,7 @@ void ACouchLure::OnLureBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor->Implements<UCouchPickable>() && !FishingObject)
 	{
 		FishingObject = Cast<ACouchPickableMaster>(OtherActor);
-		if (CanAttach && FishingObject && !FishingObject->GetTeamAttached(CouchFishingRod->GetTeam()))
+		if (FishingObject && CouchFishingRod && !FishingObject->GetTeamAttached(CouchFishingRod->GetTeam()))
 		{
 			if (!FishingObject->AttachLure(this) && FishingObject->PhysicsCollider)
 			{
