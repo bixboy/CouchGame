@@ -3,10 +3,11 @@
 #include "CoreMinimal.h"
 #include "CouchInteractableWeapons.h"
 #include "Interfaces/CouchDamageable.h"
+#include "Interfaces/CouchPickable.h"
 #include "CouchUmbrella.generated.h"
 
 UCLASS()
-class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public ICouchDamageable
+class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public ICouchDamageable, public ICouchPickable
 {
 	GENERATED_BODY()
 
@@ -14,6 +15,16 @@ public:
 	ACouchUmbrella();
 	void Tick(float DeltaTime);
 
+	virtual void PickUp_Implementation(ACouchCharacter* player) override;
+
+	virtual void Drop_Implementation() override;
+
+	virtual void InteractWithObject_Implementation(ACouchInteractableMaster* interactable) override;
+
+	virtual bool IsPickable_Implementation() override;
+
+	virtual void SetIsPickable_Implementation(bool isPickable) override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* ShieldBox;
 
@@ -45,6 +56,7 @@ private:
 	int CurrentPv = MaxPv;
 
 	void DecreasePv();
+	void HandleZeroPv();
 
 #pragma endregion
 
@@ -52,6 +64,11 @@ private:
 public:
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 	virtual float GetPercentRepair_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsInRepair() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsInRepair(bool Value);
 
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
@@ -63,6 +80,12 @@ private:
 	TSubclassOf<ACouchWidget3D> RepairingWidget;
 
 	void FinishRepairing();
+	void StartRepair(ACouchCharacter* Player);
+	void StopRepair();
+
+	UFUNCTION()
+	void OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 #pragma endregion	
 };
