@@ -688,14 +688,14 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!FishingRod && Cast<ACouchInteractableWeapons>(OtherActor) || IsHoldingItem)
+	if (!FishingRod && OtherActor->IsA(ACouchInteractableWeapons::StaticClass()) || IsHoldingItem)
 	{
 		DontFish = true;
 		WidgetSpawner->DestroyWidget();
 		return;
 	}
 
-	if (!DontFish && !Cast<ACouchPickableMaster>(OtherActor))
+	if (!DontFish && !OtherActor->IsA(ACouchInteractableMaster::StaticClass()))
 	{
 		CanFish = true;
 		WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
