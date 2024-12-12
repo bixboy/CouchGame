@@ -6,6 +6,7 @@
 #include "CouchCraftingTable.generated.h"
 
 
+class ACouchNiagaraActorMaster;
 class UCouchOctopusAnimationManager;
 struct FTimeline;
 class UTimelineComponent;
@@ -30,7 +31,7 @@ public:
 	UCouchOctopusAnimationManager* AnimationManager;
 
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFX"))
-	void PlayFX();
+	void PlayFX(TSubclassOf<ACouchNiagaraActorMaster> NiagaraRef = nullptr, FVector SpawnLocation = FVector::ZeroVector);
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="StopFX"))
 	void StopFX();
 
@@ -64,6 +65,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCouchWidgetSpawn> WidgetSpawn;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchNiagaraActorMaster> ImpactObject;
 #pragma endregion
 
 #pragma region Crafting

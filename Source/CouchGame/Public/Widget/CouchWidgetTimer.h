@@ -12,6 +12,9 @@ class COUCHGAME_API UCouchWidgetTimer : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Start Anim Warning"))
+	void StartAnimWarning();
+	
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> Txt_Timer;
 	

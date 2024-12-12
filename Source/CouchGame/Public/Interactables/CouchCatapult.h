@@ -69,6 +69,9 @@ private:
 	UPROPERTY()
 	int CurrentAmmo;
 
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchNiagaraActorMaster> ImpactReload;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void Reload(ACouchPickableCannonBall* CannonBallReload);

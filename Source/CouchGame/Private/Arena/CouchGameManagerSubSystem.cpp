@@ -86,34 +86,34 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("BlueLagoon wins the round!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Aoi Kumo wins the round!"));
 		TeamAPRoundWin++;
 		RoundsWinners.Add(1);
 		
 		if (TeamAPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
 			EndMatch = true;
-			OpenUi(WinWidget, FText::FromString("BlueLagoon wins the game!"));
+			OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the game!"));
 			return;
 		}
 		
-		OpenUi(WinWidget, FText::FromString("BlueLagoon wins the round!"));
+		OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the round!"));
 	}
 	else if (TeamWin == 2)
 	{
 		// L'équipe B gagne la manche
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Red Tuna wins the round!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Akai Taiyo wins the round!"));
 		TeamBPRoundWin++;
 		RoundsWinners.Add(2);
 
 		if (TeamBPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
 			EndMatch = true;
-			OpenUi(WinWidget, FText::FromString("Red Tuna wins the game!"));
+			OpenUi(WinWidget, FText::FromString("Akai Taiyo wins the game!"));
 			return;
 		}
 		
-		OpenUi(WinWidget, FText::FromString("Red Tuna wins the round!"));
+		OpenUi(WinWidget, FText::FromString("Akai Taiyo wins the round!"));
 	}
 	else if (TeamWin == 0)
 	{
@@ -133,8 +133,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	{
 		EndMatch = true;
 		FString WinningTeamMessage = TeamAPRoundWin > TeamBPRoundWin 
-			? "BlueLagoon wins the game!" 
-			: "Red Tuna wins the game!";
+			? "Aoi Kumo wins the game!" 
+			: "Akai Taiyo wins the game!";
 		OpenUi(WinWidget, FText::FromString(WinningTeamMessage));
 		return;
 	}
