@@ -17,7 +17,7 @@ void UCouchWidgetWin::NativeConstruct()
 		if (ConstructAnim)
 		{
 			FTimerHandle RoundTimerHandle;
-			PlayAnimationForward(OpenAnimation);
+			PlayAnimation(OpenAnimation, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
 			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);		
 		}
 	}

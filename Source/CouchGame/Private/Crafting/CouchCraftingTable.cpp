@@ -173,6 +173,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		if (Plate1Position)
 		{
 			PlaceActor(Plate1, Plate1Position);
+			PlayFX(ImpactObject, Plate1Position->GetComponentLocation());
 		}
 	}
 	else
@@ -181,6 +182,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		if (Plate2Position)
 		{
 			PlaceActor(Plate2, Plate2Position);
+			PlayFX(ImpactObject, Plate2Position->GetComponentLocation());
 		}
 	}
 	AnimationManager->HasObjectOnTheTable = true;
