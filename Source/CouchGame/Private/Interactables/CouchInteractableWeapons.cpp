@@ -104,10 +104,15 @@ void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection
 	Super::StartMoveActor_Implementation(InputDirection);
 	if (Execute_IsUsedByPlayer(this) && MovementComponent->GetCanMove())
 	{
+		int Direction = InputDirection;
+		if (InvertInputMove)
+		{
+			Direction = InputDirection * -1.f;	
+		}
 		PlayVibration(MoveVibrationEffect);
 		CanUse = true;
-		MovementComponent->StartMovement(InputDirection);
-		if (InputDirection == 1)
+		MovementComponent->StartMovement(Direction);
+		if (Direction == 1)
 		{
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = true;
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingBackward = false;

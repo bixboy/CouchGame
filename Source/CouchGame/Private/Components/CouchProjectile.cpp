@@ -13,7 +13,11 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AA
 	Location = GetOwner()->GetActorLocation();
 	TimeElapsed = 0.0f;
 	CanMove = true;
-
+	UPrimitiveComponent* PrimitiveComponent = GetOwner()->FindComponentByClass<UPrimitiveComponent>();
+	if (PrimitiveComponent)
+	{
+		PrimitiveComponent->SetSimulatePhysics(false);
+	}
 	CollisionIsActive = UnableCollision;
 	IgnoredActors = ActorsToIgnore;
 }
@@ -22,6 +26,19 @@ void UCouchProjectile::Initialize(const FVector& LaunchVelocity, const TArray<AA
 void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(ReactivatePhysicsCountdown > 0.0f)
+	{
+		ReactivatePhysicsCountdown -= DeltaTime;
+		if(ReactivatePhysicsCountdown <= 0.0f)
+		{
+			UPrimitiveComponent* PrimitiveComponent = GetOwner()->FindComponentByClass<UPrimitiveComponent>();
+			if (PrimitiveComponent)
+			{
+				PrimitiveComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+			}			
+		}
+	}
 
 	if (CanMove)
 	{
@@ -60,7 +77,14 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				NewLocation = HitResult.Location;
 				Velocity = FVector::ZeroVector;
 				SetCanMove(false);
-			
+				UPrimitiveComponent* PrimitiveComponent = GetOwner()->FindComponentByClass<UPrimitiveComponent>();
+				if (PrimitiveComponent)
+				{
+					PrimitiveComponent->SetSimulatePhysics(true);
+					PrimitiveComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+				}
+
+				ReactivatePhysicsCountdown = ReactivatePhysicsDelay;
 				FString ActorName = HitResult.GetActor()->GetName();
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Actor hit: %s"), *ActorName));
 			}

@@ -78,6 +78,16 @@ void ACouchCharacter::BeginPlay()
 		}
 	}
 	PlayerIndex = CurrentPlayerCount + 1;
+
+	for (TActorIterator<ACouchCraftingTable> It(GetWorld()); It; ++It)
+	{
+		ACouchCraftingTable* Table = *It;
+		if (Table && Table->GetTeam() == CurrentTeam)
+		{
+			CraftTable = Table;
+			break;
+		}
+	}
 }
 
 void ACouchCharacter::Tick(float DeltaTime)
@@ -493,6 +503,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
 			IsHoldingItem = true;
+			CraftTable->PlayFX();
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
@@ -657,7 +668,8 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 
 	
 	ICouchInteractable::Execute_Interact(InteractingActor, this);
-	
+
+	CraftTable->StopFX();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
@@ -676,14 +688,14 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<ACouchInteractableMaster>(OtherActor))
+	if (!FishingRod && Cast<ACouchInteractableWeapons>(OtherActor) || IsHoldingItem)
 	{
 		DontFish = true;
 		WidgetSpawner->DestroyWidget();
 		return;
 	}
 
-	if (!DontFish)
+	if (!DontFish && !Cast<ACouchPickableMaster>(OtherActor))
 	{
 		CanFish = true;
 		WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
@@ -699,11 +711,14 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 		DontFish = false;
 		return;
 	}
-	
-	WidgetSpawner->DestroyWidget();
-	CanFish = false;
-	SetCanMove(true);
-	DestroyFishingRod();
+
+	if (!Cast<ACouchInteractableMaster>(OtherActor))
+	{
+		WidgetSpawner->DestroyWidget();
+		CanFish = false;
+		SetCanMove(true);
+		DestroyFishingRod();	
+	}
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
