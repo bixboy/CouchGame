@@ -17,8 +17,12 @@ void ACouchBoat::BeginPlay()
 {
 	InitialRotation = GetActorRotation();
 	Super::BeginPlay();
-	
 	BoatLife = BoatStartLife;
+	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
+	{
+		GameManager->UpdateCurrentLife(2, BoatLife);
+		GameManager->UpdateCurrentLife(1, BoatLife);
+	}
 	if (BoatFloor)
 	{
 		BoatFloor->Init(this);
@@ -67,11 +71,11 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 		switch (Team)
 		{
 			case EBoatTeam::Team1:
-				GameManager->UpdateCurrentLife(2, BoatLife);
+				GameManager->UpdateCurrentLife(1, BoatLife);
 				break;
 	
 			case EBoatTeam::Team2:
-				GameManager->UpdateCurrentLife(1, BoatLife);
+				GameManager->UpdateCurrentLife(2, BoatLife);
 				break;
 		}
 	}
