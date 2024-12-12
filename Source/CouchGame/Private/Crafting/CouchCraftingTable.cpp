@@ -98,6 +98,11 @@ const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible()
 	return IsCraftingPossible(Ingredients);
 }
 
+int ACouchCraftingTable::GetTeam()
+{
+	return CurrentTeam;
+}
+
 bool ACouchCraftingTable::AreArraysEqualIgnoringOrder(const TArray<TSubclassOf<ACouchPickableMaster>>& Array1,
                                                       const TArray<TSubclassOf<ACouchPickableMaster>>& Array2) const
 {

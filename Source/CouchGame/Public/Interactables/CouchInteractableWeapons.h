@@ -75,6 +75,8 @@ private:
 	virtual void StartMoveActor_Implementation(int InputDirection) override;
 	UFUNCTION()
 	virtual void StopMoveActor_Implementation() override;
+	UPROPERTY(EditAnywhere)
+	bool InvertInputMove = false;
 	
 #pragma endregion
 

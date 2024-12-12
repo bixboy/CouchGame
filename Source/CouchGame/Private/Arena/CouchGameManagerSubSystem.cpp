@@ -32,6 +32,7 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	RoundDurationMinutes = RoundDuration;
 	LevelName = Level;
 	WinWidget = Widget;
+	EndMatch = false;
 	StartNewRound();
 }
 
@@ -80,6 +81,7 @@ void UCouchGameManagerSubSystem::StartNewRound()
 void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
+	int RoundsToWin = (MaxRounds / 2) + 1;
 
 	if (TeamWin == 1)
 	{
@@ -87,11 +89,14 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("BlueLagoon wins the round!"));
 		TeamAPRoundWin++;
 		RoundsWinners.Add(1);
-		if (CurrentRound == MaxRounds)
+		
+		if (TeamAPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
-			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
+			EndMatch = true;
+			OpenUi(WinWidget, FText::FromString("BlueLagoon wins the game!"));
 			return;
 		}
+		
 		OpenUi(WinWidget, FText::FromString("BlueLagoon wins the round!"));
 	}
 	else if (TeamWin == 2)
@@ -101,9 +106,10 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		TeamBPRoundWin++;
 		RoundsWinners.Add(2);
 
-		if (CurrentRound == MaxRounds)
+		if (TeamBPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
-			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
+			EndMatch = true;
+			OpenUi(WinWidget, FText::FromString("Red Tuna wins the game!"));
 			return;
 		}
 		
@@ -116,10 +122,21 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		RoundsWinners.Add(0);
 		if (CurrentRound == MaxRounds)
 		{
+			EndMatch = true;
 			OpenUi(WinWidget, FText::FromString("No Team wins this game!"));
 			return;
 		}
 		OpenUi(WinWidget, FText::FromString("No Team wins the round!"));
+	}
+
+	if (TeamAPRoundWin > MaxRounds / 2 || TeamBPRoundWin > MaxRounds / 2)
+	{
+		EndMatch = true;
+		FString WinningTeamMessage = TeamAPRoundWin > TeamBPRoundWin 
+			? "BlueLagoon wins the game!" 
+			: "Red Tuna wins the game!";
+		OpenUi(WinWidget, FText::FromString(WinningTeamMessage));
+		return;
 	}
 }
 
@@ -211,6 +228,11 @@ int UCouchGameManagerSubSystem::GetMaxRound()
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
 	return CurrentRound;
+}
+
+bool UCouchGameManagerSubSystem::GetEndMatch()
+{
+	return EndMatch;
 }
 
 // Get Rounds Winners
