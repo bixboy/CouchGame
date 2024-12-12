@@ -10,9 +10,9 @@ FText UCouchWidgetTimer::UpdateTimer(float Time)
 
 	Txt_Timer->SetText(FText::FromString(TimerText));
 	
-	if (Time <= TimeWarning && !IsAnimationPlaying(WarningAnimation))
+	if (Time <= TimeWarning)
 	{
-		PlayAnimationForward(WarningAnimation);
+		StartAnimWarning();
 	}
 
 	return FText::FromString(TimerText);

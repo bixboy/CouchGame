@@ -163,6 +163,7 @@ void ACouchCatapult::Reload(ACouchPickableCannonBall* CannonBallReload)
 		StaticBall->InitCanonBall(CannonBallReload);
 		StaticBall->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("barrel"));
 
+		PlayFx(ImpactReload, Transform.GetLocation());
 		AmmoActor = StaticBall;
 		CurrentAmmo = 1;
 		SetCanUse(true);		
