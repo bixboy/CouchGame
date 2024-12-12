@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetBoatLife() const;
 
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Start Anim Sequence"))
+	void StartAnimSequence();
+
 	UFUNCTION(BlueprintCallable)
 	void UpdateBoatRotation(float Value);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -41,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIsRepaired();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool CanMove = true;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -65,6 +71,8 @@ private:
 
 	bool IsDestroyed = false;
 	bool IsRepaired = true;
+	
+	FTimerHandle TimerHandle;
 	
 	FRotator InitialRotation;
 };

@@ -62,6 +62,7 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 
 	if (BoatLife == 0)
 	{
+		StartAnimSequence();
 		SinkBoatAndGameOver();
 		return;
 	}
@@ -102,13 +103,13 @@ void ACouchBoat::SinkBoatAndGameOver()
 	{
 		case EBoatTeam::Team1:
 		{
-			// Team 2 Win	
+			// Team 2 Win
 			GameManager->CheckRoundWinCondition(2);
 			break;
 		}
 		case EBoatTeam::Team2:
 		{
-			// Team 1 Win		
+			// Team 1 Win
 			GameManager->CheckRoundWinCondition(1);
 			break;
 		}

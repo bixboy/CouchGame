@@ -48,6 +48,7 @@ void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FTe
 		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		WidgetRef->ChangeWinnerText(Text);
 		WidgetRef->TurnOnLight();
+		WidgetRef->PlayRate = 0.05f;
 		WidgetRef->AddToViewport();
 	}
 }
