@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright (c) Bixboy, 2024. All Rights Reserved.
 #if WITH_EDITOR
 
 #include "LevelSelection.h"
