@@ -71,6 +71,7 @@ private:
 
 	bool IsDestroyed = false;
 	bool IsRepaired = true;
+	bool AnimIsInPlay = false;
 	
 	FTimerHandle TimerHandle;
 	

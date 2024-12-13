@@ -72,7 +72,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool ConstructAnim = true;
 
-	float PlayRate = 1.f;
+	float PlayRate = 0.3f;
 	
 #pragma endregion 	
 

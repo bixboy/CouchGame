@@ -16,9 +16,10 @@ void UCouchWidgetWin::NativeConstruct()
 	{
 		if (ConstructAnim)
 		{
+			float TotalAnimationDuration = OpenAnimation->GetEndTime() / PlayRate;
 			FTimerHandle RoundTimerHandle;
 			PlayAnimation(OpenAnimation, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
-			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);		
+			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, TotalAnimationDuration, false);		
 		}
 	}
 }
