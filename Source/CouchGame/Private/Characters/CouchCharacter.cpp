@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Boat/CouchPlank.h"
@@ -766,7 +767,8 @@ void ACouchCharacter::DestroyFishingRod()
 
 void ACouchCharacter::OnInputPause(const FInputActionValue& InputActionValue)
 {
-	if (!GetFirstWidgetOfClass(WidgetPause))
+	UCouchGameManagerSubSystem* GameManagerSubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (!GetFirstWidgetOfClass(WidgetPause) && !GameManagerSubSystem->GetEndMatch())
 	{
 		if (TObjectPtr<UCouchWidgetPause> WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause))
 		{
