@@ -34,6 +34,8 @@ void UCouchWidgetStartMenu::OnCameraTransitionEnd(bool Forward)
 
 void UCouchWidgetStartMenu::InitializeStartMenu()
 {
+	FInternationalization::Get().LoadAllCultureData();
+	FTextLocalizationManager::Get().RefreshResources();
 	if (Btn_Play)
 	{
 		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetStartMenu::OnPlayPressed);
