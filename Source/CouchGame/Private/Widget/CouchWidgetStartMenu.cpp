@@ -59,7 +59,22 @@ void UCouchWidgetStartMenu::InitializeStartMenu()
 
 void UCouchWidgetStartMenu::OnPlayPressed()
 {
-	if (!CameraMove) return;
+	if (!CameraMove)
+	{
+		if (AActor* Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ACameraActor::StaticClass()))
+		{
+			if (Camera = Cast<ACameraActor>(Actor); Camera)
+			{
+				if(UActorComponent* CameraComponent = Camera->GetComponentByClass(UCouchCameraMove::StaticClass()))
+				{
+					if (CameraMove = Cast<UCouchCameraMove>(CameraComponent); CameraMove)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Starting Menu");
+					}
+				}
+			}
+		}
+	}
 	Receive_OnPlayPressed(true);
 	CameraMove->StartCameraMove(true);
 }

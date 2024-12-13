@@ -83,6 +83,7 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 	int RoundsToWin = (MaxRounds / 2) + 1;
+	Team1WinTheGame = false;
 
 	if (TeamWin == 1)
 	{
@@ -95,6 +96,7 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		{
 			EndMatch = true;
 			OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the game!"));
+			Team1WinTheGame = true;
 			return;
 		}
 		
