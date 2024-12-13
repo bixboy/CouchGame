@@ -60,8 +60,9 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
 	IsRepaired = false;
 
-	if (BoatLife == 0)
+	if (BoatLife == 0 && !AnimIsInPlay)
 	{
+		AnimIsInPlay = false;
 		StartAnimSequence();
 		SinkBoatAndGameOver();
 		return;
