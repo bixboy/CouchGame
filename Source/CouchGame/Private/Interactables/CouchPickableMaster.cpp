@@ -52,6 +52,7 @@ void ACouchPickableMaster::PickUp_Implementation(ACouchCharacter* player)
 {
 	ICouchPickable::PickUp_Implementation(player);
 	if (!PhysicsCollider) return;
+	CouchProjectile->SetCanMove(false);
 	CurrentPlayer->AnimationManager->IsCarryingItem = true;
 	
 	PhysicsCollider->SetSimulatePhysics(false);

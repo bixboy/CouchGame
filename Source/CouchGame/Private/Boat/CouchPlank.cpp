@@ -65,7 +65,6 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 		if (APlayer) APlayer->AnimationManager->IsRepairing = false;
 		FInputActionValue ActionValue;
 		APlayer->OnInputHold(ActionValue);
-		APlayer->SetCanMove(true);
 	}
 }
 

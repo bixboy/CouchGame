@@ -211,6 +211,10 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 void ACouchCharacter::SetCanMove(bool Value)
 {
 	CanMove = Value;
+	if (!CanMove)
+	{
+		InputMove = FVector2D::ZeroVector;
+	}
 }
 #pragma endregion
 
@@ -651,7 +655,7 @@ bool ACouchCharacter::GetIsHoldingItem() const
 void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 {
 	
-	if (!IsHoldingItem) return;
+	if (!IsHoldingItem || !InteractingActor) return;
 	
 	if (InputActionValue.Get<float>() <= 0.1f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
 		&& !InteractingActor.IsA(ACouchUmbrella::StaticClass()))) return;

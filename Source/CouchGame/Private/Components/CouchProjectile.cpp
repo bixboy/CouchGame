@@ -1,6 +1,8 @@
 #include "Components/CouchProjectile.h"
 
 #include "ShadowProjectile.h"
+#include "Interactables/CouchPickableMaster.h"
+#include "Interfaces/CouchPickable.h"
 
 UCouchProjectile::UCouchProjectile()
 {
@@ -33,7 +35,7 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		if(ReactivatePhysicsCountdown <= 0.0f)
 		{
 			UPrimitiveComponent* PrimitiveComponent = GetOwner()->FindComponentByClass<UPrimitiveComponent>();
-			if (PrimitiveComponent)
+			if (PrimitiveComponent && PrimitiveComponent->IsSimulatingPhysics())
 			{
 				PrimitiveComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
 			}			
@@ -42,6 +44,13 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (CanMove)
 	{
+		if (GetOwner()->IsA(ACouchPickableMaster::StaticClass()))
+		{
+			if (GetOwner()->Implements<UCouchPickable>() && !ICouchPickable::Execute_IsPickable(GetOwner()))
+			{
+				SetCanMove(false);
+			}
+		}
 		// Movement
 		TimeElapsed += DeltaTime;
 		FVector NewLocation = Location + (Velocity * SpeedMultiplier * TimeElapsed) + (FVector(0, 0, Gravity) * TimeElapsed * TimeElapsed * 0.5f);
@@ -82,9 +91,8 @@ void UCouchProjectile::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				{
 					PrimitiveComponent->SetSimulatePhysics(true);
 					PrimitiveComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+					ReactivatePhysicsCountdown = ReactivatePhysicsDelay;
 				}
-
-				ReactivatePhysicsCountdown = ReactivatePhysicsDelay;
 				FString ActorName = HitResult.GetActor()->GetName();
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Actor hit: %s"), *ActorName));
 			}
