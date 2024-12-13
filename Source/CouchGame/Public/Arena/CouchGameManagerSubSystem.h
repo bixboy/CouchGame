@@ -54,6 +54,9 @@ public:
 
 	void UpdateCurrentLife(int CurrentTeam, float CurrentLife);
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Teams")
+	bool Team1WinTheGame;
+
 #pragma endregion	
 
 #pragma region Rounds
