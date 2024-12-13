@@ -9,7 +9,6 @@ FText UCouchWidgetTimer::UpdateTimer(float Time)
 	FString TimerText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 
 	Txt_Timer->SetText(FText::FromString(TimerText));
-	
 	if (Time <= TimeWarning)
 	{
 		StartAnimWarning();

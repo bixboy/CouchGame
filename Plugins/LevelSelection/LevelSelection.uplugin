@@ -11,8 +11,9 @@
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
+	"DocsURL": "https://www.dropbox.com/scl/fi/9winwhun35t8kv2ja4jsc/README.txt?rlkey=kzzhbbmv3rvgiex01zgkvoy0e&st=k5valc0r&dl=1",
 	"FabURL": "com.epicgames.launcher://ue/Fab/7aea0e98-d107-4839-bafe-1c9e24a3286e/",
-	"Installed": false,
+	"Installed",: false,
 	"Modules": [
 		{
 			"Name": "LevelSelection",
@@ -30,8 +31,5 @@
 		"Win64",
 		"Mac",
 		"Linux"
-	],
-	"DocsURL": "https://www.dropbox.com/scl/fi/9winwhun35t8kv2ja4jsc/README.txt?rlkey=kzzhbbmv3rvgiex01zgkvoy0e&st=k5valc0r&dl=1",
-	"MarketplaceURL": "com.epicgames.launcher://ue/Fab/7aea0e98-d107-4839-bafe-1c9e24a3286e/",
-	"SupportURL": ""
+	]
 }

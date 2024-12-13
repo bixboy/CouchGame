@@ -1,5 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+// Copyright (c) Bixboy, 2024. All Rights Reserved.
 using UnrealBuildTool;
 
 public class LevelSelection : ModuleRules
