@@ -9,6 +9,8 @@ ACouchUmbrella::ACouchUmbrella()
 
 	DamageSound = CreateDefaultSubobject<USoundBase>(TEXT("DamageSound"));
 	BrokeSound = CreateDefaultSubobject<USoundBase>(TEXT("BrokeSound"));
+
+	BoxInteract->OnComponentEndOverlap.AddDynamic(this, &ACouchUmbrella::OnPlayerEndOverlapp);
 }
 
 #pragma region Interfaces
@@ -119,7 +121,15 @@ void ACouchUmbrella::StopRepair()
 	SetCanUse(false);
 }
 
-
+void ACouchUmbrella::OnPlayerEndOverlapp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor == CurrentPlayer)
+	{
+		FInputActionValue InputActionValue;
+		CurrentPlayer->OnInputInteract(InputActionValue);
+	}
+}
 
 #pragma region Life
 

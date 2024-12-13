@@ -12,6 +12,8 @@ class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public IC
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
+	void OnPlayerEndOverlapp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	ACouchUmbrella();
 	virtual void Tick(float DeltaTime) override;
 
