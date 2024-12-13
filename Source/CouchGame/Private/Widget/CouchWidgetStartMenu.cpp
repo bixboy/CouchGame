@@ -95,5 +95,4 @@ void UCouchWidgetStartMenu::OnCreditsPressed()
 void UCouchWidgetStartMenu::OnQuitPressed()
 {
 	Receive_OnQuitPressed();
-	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr, EQuitPreference::Quit, false);
 }
