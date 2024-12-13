@@ -1,5 +1,6 @@
 {
 	"FileVersion": 3,
+	"EngineVersion": "5.3.0",
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "Level Selection",
@@ -10,21 +11,27 @@
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
+	"FabURL": "com.epicgames.launcher://ue/Fab/7aea0e98-d107-4839-bafe-1c9e24a3286e/",
 	"Installed": false,
 	"Modules": [
 		{
 			"Name": "LevelSelection",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		}
 	],
 	"EnabledByDefault": true,
-	"TargetAllowList": [
-		"Editor"
-	],
 	"SupportPlatforms": [
 		"Win64",
 		"Mac",
 		"Linux"
-	]
+	],
+	"DocsURL": "https://www.dropbox.com/scl/fi/9winwhun35t8kv2ja4jsc/README.txt?rlkey=kzzhbbmv3rvgiex01zgkvoy0e&st=k5valc0r&dl=1",
+	"MarketplaceURL": "com.epicgames.launcher://ue/Fab/7aea0e98-d107-4839-bafe-1c9e24a3286e/",
+	"SupportURL": ""
 }
