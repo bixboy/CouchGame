@@ -63,6 +63,7 @@ ACouchPlank* ABoatFloor::Hit_Implementation(FHitResult HitResult, float Repairin
 		{
 			ACouchPlank* NewHit =  GetWorld()->SpawnActor<ACouchPlank>(FloorHit, SpawnTransform);
 			NewHit->Init(this, RepairingTime, Scale);
+			NewHit->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			Hits.Add(NewHit);
 			return NewHit;
 		}
