@@ -211,6 +211,10 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 void ACouchCharacter::SetCanMove(bool Value)
 {
 	CanMove = Value;
+	if (!CanMove)
+	{
+		InputMove = FVector2D::ZeroVector;
+	}
 }
 #pragma endregion
 
