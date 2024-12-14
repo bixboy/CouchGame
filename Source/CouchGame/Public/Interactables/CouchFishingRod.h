@@ -165,5 +165,12 @@ private:
 	UPROPERTY(editAnywhere, Category = DefaultVibrationValue)
 	UForceFeedbackEffect* RewindVibrationEffect;
 
+#pragma endregion
+
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> EndFishingSound;
+	
 #pragma endregion	
 };

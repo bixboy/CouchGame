@@ -103,4 +103,14 @@ private:
 	UForceFeedbackEffect* MoveVibrationEffect;
 
 #pragma endregion
+
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> EnterInSound;
+
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> ChargeSound;
+	
+#pragma endregion	
 };

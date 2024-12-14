@@ -236,6 +236,13 @@ public:
 	UCouchCharacterAnimationManager* AnimationManager;
 #pragma endregion
 
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> GrabItemSound;
+	
+#pragma endregion	
+
 #pragma region Widget
 
 private:

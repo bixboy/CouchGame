@@ -15,6 +15,7 @@
 #include "Crafting/FCraftingRecipe.h"
 #include "Interactables/CouchPickableCannonBall.h"
 #include "Kismet/GameplayStatics.h"
+#include "Widget/CouchCraftValidateWidget.h"
 #include "Widget/CouchWidget3D.h"
 #include "Widget/CouchWidgetSpawn.h"
 
@@ -82,6 +83,19 @@ void ACouchCraftingTable::BeginPlay()
 	Super::BeginPlay();
 	InitializeMoveTimeline();
 	AnimationManager = NewObject<UCouchOctopusAnimationManager>(this);
+
+	if (ValidateWidget)
+	{
+		FVector LocationTemp = Plate1Position->GetComponentLocation();
+		FTransform PlateTransform = FTransform(Plate1Position->GetComponentRotation(), LocationTemp + OffsetWiget);
+		ValidateWidgetLeft = GetWorld()->SpawnActor<ACouchCraftValidateWidget>(ValidateWidget, PlateTransform);
+		ValidateWidgetLeft->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+
+		LocationTemp = Plate2Position->GetComponentLocation();
+		PlateTransform = FTransform(Plate2Position->GetComponentRotation(),LocationTemp + OffsetWiget);
+		ValidateWidgetRight = GetWorld()->SpawnActor<ACouchCraftValidateWidget>(ValidateWidget, PlateTransform);
+		ValidateWidgetRight->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 
 void ACouchCraftingTable::Tick(float DeltaTime)
@@ -174,6 +188,12 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		{
 			PlaceActor(Plate1, Plate1Position);
 			PlayFX(ImpactObject, Plate1Position->GetComponentLocation());
+			if(ValidateWidgetLeft)
+			{
+				ValidateWidgetLeft->SetIsValid(true);
+				ValidateWidgetLeft->SetActorHiddenInGame(false);
+			}
+			UGameplayStatics::PlaySound2D(this, SpawnIngredientSound);
 		}
 	}
 	else
@@ -183,6 +203,12 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		{
 			PlaceActor(Plate2, Plate2Position);
 			PlayFX(ImpactObject, Plate2Position->GetComponentLocation());
+			if(ValidateWidgetRight)
+			{
+				ValidateWidgetRight->SetIsValid(true);
+				ValidateWidgetRight->SetActorHiddenInGame(false);
+			}
+			UGameplayStatics::PlaySound2D(this, SpawnIngredientSound);
 		}
 	}
 	AnimationManager->HasObjectOnTheTable = true;
@@ -196,10 +222,12 @@ void ACouchCraftingTable::RemoveIngredient(ACouchPickableMaster* Ingredient)
 	if (Plate1.Get() == Ingredient)
 	{
 		Plate1 = nullptr;
+		if(ValidateWidgetLeft)ValidateWidgetLeft->SetIsValid(false);
 	}
 	else
 	{
 		Plate2 = nullptr;
+		if(ValidateWidgetRight)ValidateWidgetRight->SetIsValid(false);
 	}
 	
 	if (!Plate1 && !Plate2)
@@ -284,6 +312,12 @@ void ACouchCraftingTable::OnMoveCompleted()
 	}
 	SpawnCraft();
 	UpdateCraftSuggestion();
+}
+
+void ACouchCraftingTable::HiddWidget(bool Val)
+{
+	ValidateWidgetRight->SetActorHiddenInGame(Val);
+	ValidateWidgetLeft->SetActorHiddenInGame(Val);
 }
 
 void ACouchCraftingTable::PlaceActor(ACouchPickableMaster* Ingredient, USceneComponent* Position)

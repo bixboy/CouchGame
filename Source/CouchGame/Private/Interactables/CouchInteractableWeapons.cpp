@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactables/CouchInteractableWeapons.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidget3D.h"
 
 ACouchInteractableWeapons::ACouchInteractableWeapons()
@@ -64,6 +66,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 		WidgetComponent->DestroyWidget();
 		if (!Execute_IsUsedByPlayer(this))
 		{
+			UGameplayStatics::PlaySound2D(this, EnterInSound);
 			SetPlayerIsIn(true);
 			CanUse = true;
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = true;

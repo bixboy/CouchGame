@@ -76,5 +76,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Reload(ACouchPickableCannonBall* CannonBallReload);
 	
+#pragma endregion
+
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> ReloadSound;
+	
 #pragma endregion	
 };
