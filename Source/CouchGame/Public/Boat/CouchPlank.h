@@ -71,6 +71,10 @@ public:
 	UPROPERTY(VisibleAnywhere, blueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> InterractiveBoxRange;
 
+	// Widget
+	UPROPERTY(EditAnywhere, Category = DefaultValues)
+	TSubclassOf<ACouchWidget3D> InteractWidgetClass;
+
 #pragma endregion	
 
 protected:
@@ -81,9 +85,7 @@ private:
 	TObjectPtr<ACouchCharacter> APlayer;
 	bool IsPlayerRepairing;
 
-	// Widget
-	UPROPERTY(EditAnywhere, Category = DefaultValues)
-	TSubclassOf<ACouchWidget3D> InteractWidgetClass;
+
 	UPROPERTY()
 	TObjectPtr<AActor> InteractWidgetPtr;
 
