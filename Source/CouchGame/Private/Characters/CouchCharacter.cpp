@@ -83,7 +83,7 @@ void ACouchCharacter::BeginPlay()
 	for (TActorIterator<ACouchCraftingTable> It(GetWorld()); It; ++It)
 	{
 		ACouchCraftingTable* Table = *It;
-		if (Table && Table->GetTeam() == CurrentTeam)
+		if (Table && Table->GetTeam() != CurrentTeam)
 		{
 			CraftTable = Table;
 			break;
@@ -508,7 +508,8 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
 			IsHoldingItem = true;
-			CraftTable->PlayFX();
+			CraftTable->SpawnWidget();
+			UGameplayStatics::PlaySound2D(this, GrabItemSound);
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
@@ -674,7 +675,7 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 	
 	ICouchInteractable::Execute_Interact(InteractingActor, this);
 
-	CraftTable->StopFX();
+	CraftTable->DestroyWidget();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
