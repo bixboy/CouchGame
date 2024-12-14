@@ -6,6 +6,7 @@
 #include "CouchCraftingTable.generated.h"
 
 
+class ACouchCraftValidateWidget;
 class ACouchNiagaraActorMaster;
 class UCouchOctopusAnimationManager;
 struct FTimeline;
@@ -32,8 +33,11 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFX"))
 	void PlayFX(TSubclassOf<ACouchNiagaraActorMaster> NiagaraRef = nullptr, FVector SpawnLocation = FVector::ZeroVector);
-	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="StopFX"))
-	void StopFX();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="SpawnWidget"))
+	void SpawnWidget();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="DestroyWidget"))
+	void DestroyWidget();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -130,6 +134,31 @@ public:
 
 	bool IsUpdating;
 #pragma endregion
+
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> SpawnIngredientSound;
+	
+#pragma endregion
+
+#pragma region Widgets
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<ACouchCraftValidateWidget> ValidateWidgetLeft;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<ACouchCraftValidateWidget> ValidateWidgetRight;
+
+	UFUNCTION(BlueprintCallable)
+	void HiddWidget(bool Val);
+
+private:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchCraftValidateWidget> ValidateWidget;
+	UPROPERTY(EditAnywhere)
+	FVector OffsetWiget = FVector(0, 0, 50.f);
+
+#pragma endregion	
 };
 
 

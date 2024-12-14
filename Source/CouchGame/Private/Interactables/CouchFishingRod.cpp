@@ -294,7 +294,8 @@ void ACouchFishingRod::SpawnPickableObject()
       ActorToIgnore.Add(CurrentPlayer);
       PickableActor->CouchProjectile->Initialize(SuggestedVelocity, ActorToIgnore);  
    }
-   
+
+   UGameplayStatics::PlaySound2D(this, EndFishingSound);
    DestroyLureAndCable();
    CurrentPlayer->DestroyFishingRod();
 }
