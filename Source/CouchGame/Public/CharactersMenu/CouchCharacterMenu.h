@@ -57,6 +57,7 @@ public:
 	void OnInputNavigate(const FInputActionValue& InputActionValue);
 	void OnInputValidate();
 	void OnInputCancel();
+	void OnInputCancelCompleted();
 
 	UPROPERTY()
 	TObjectPtr<UCouchCharacterLobby> Lobby;

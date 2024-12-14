@@ -32,5 +32,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPlayerCancel"))
 	void Receive_Cancel(int PlayerIndex = -1);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPlayerCancelCompleted"))
+	void Receive_Cancel_Completed(int PlayerIndex = -1);
+
+	
 	
 };

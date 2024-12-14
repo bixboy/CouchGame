@@ -56,6 +56,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Teams")
 	bool Team1WinTheGame;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Teams")
+	bool ShowVictoryScreen;
+	
 
 #pragma endregion	
 
