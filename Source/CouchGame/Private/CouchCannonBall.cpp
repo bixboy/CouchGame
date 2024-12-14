@@ -112,7 +112,7 @@ void ACouchCannonBall::Initialize(const FVector& LaunchVelocity, ACouchCharacter
 	TargetLocation = TargetLoc;
 	StartLocation = GetActorLocation();
 
-	FTransform Transform = FTransform(FRotator::ZeroRotator, TargetLocation);
+	FTransform Transform = FTransform(FRotator::ZeroRotator, TargetLocation, FVector(3.f,3.f,3.f));
 	ShadowProjectile = GetWorld()->SpawnActor<AShadowProjectile>(Shadow, Transform);
 }
 

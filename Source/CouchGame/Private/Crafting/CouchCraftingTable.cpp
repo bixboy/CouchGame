@@ -98,6 +98,11 @@ const FCraftRecipe* ACouchCraftingTable::IsCraftingPossible()
 	return IsCraftingPossible(Ingredients);
 }
 
+int ACouchCraftingTable::GetTeam()
+{
+	return CurrentTeam;
+}
+
 bool ACouchCraftingTable::AreArraysEqualIgnoringOrder(const TArray<TSubclassOf<ACouchPickableMaster>>& Array1,
                                                       const TArray<TSubclassOf<ACouchPickableMaster>>& Array2) const
 {
@@ -168,6 +173,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		if (Plate1Position)
 		{
 			PlaceActor(Plate1, Plate1Position);
+			PlayFX(ImpactObject, Plate1Position->GetComponentLocation());
 		}
 	}
 	else
@@ -176,6 +182,7 @@ void ACouchCraftingTable::AddIngredient(ACouchPickableMaster* Ingredient)
 		if (Plate2Position)
 		{
 			PlaceActor(Plate2, Plate2Position);
+			PlayFX(ImpactObject, Plate2Position->GetComponentLocation());
 		}
 	}
 	AnimationManager->HasObjectOnTheTable = true;

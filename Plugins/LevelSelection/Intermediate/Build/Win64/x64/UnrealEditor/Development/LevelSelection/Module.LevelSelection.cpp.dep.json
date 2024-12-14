@@ -33,20 +33,7 @@
             "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\core\\public\\misc\\asynctasknotification.h",
             "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\slate\\public\\widgets\\notifications\\snotificationlist.h",
             "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\applicationcore\\public\\windows\\windowsplatformapplicationmisc.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\applicationcore\\public\\genericplatform\\genericplatformapplicationmisc.h",
-            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\private\\levelselectioncommands.cpp",
-            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\public\\levelselectioncommands.h",
-            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\public\\levelselectionstyle.h",
-            "c:\\apps\\unreal\\projects\\couchgame\\plugins\\levelselection\\source\\levelselection\\private\\levelselectionstyle.cpp",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\slatecore\\public\\styling\\slatestyleregistry.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\interfaces\\ipluginmanager.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\plugindescriptor.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\custombuildsteps.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\localizationdescriptor.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\moduledescriptor.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\pluginreferencedescriptor.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\projects\\public\\versescope.h",
-            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\slatecore\\public\\styling\\slatestylemacros.h"
+            "c:\\apps\\unreal\\versions\\ue_5.3\\engine\\source\\runtime\\applicationcore\\public\\genericplatform\\genericplatformapplicationmisc.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

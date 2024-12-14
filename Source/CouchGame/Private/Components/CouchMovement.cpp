@@ -57,12 +57,13 @@ void UCouchMovement::MoveActor(float Alpha)
 	{
 		float Distance = FMath::Lerp(0, LinePathComponent->GetSplineLength(), Alpha);
 		FVector Location = LinePathComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FRotator Rotation =	FRotator(GetOwner()->GetActorRotation()); //LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
+		FRotator SplineRotation = LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+
+		FRotator Rotation =	FRotator(SplineRotation.Pitch, SplineRotation.Yaw, GetOwner()->GetActorRotation().Roll); //LinePathComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
 		FTransform Transform = FTransform(Rotation, Location, GetOwner()->GetActorScale());
 		GetOwner()->SetActorTransform(Transform, false);
 	}
 }
-
 
 bool UCouchMovement::GetCanMove() const
 {

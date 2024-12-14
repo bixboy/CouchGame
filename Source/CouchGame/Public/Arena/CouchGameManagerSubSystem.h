@@ -54,6 +54,9 @@ public:
 
 	void UpdateCurrentLife(int CurrentTeam, float CurrentLife);
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Teams")
+	bool Team1WinTheGame;
+
 #pragma endregion	
 
 #pragma region Rounds
@@ -74,6 +77,7 @@ protected:
 	// Timer de manches
 	FTimerHandle RoundTimerHandle;
 	float CurrentRoundTimer;
+	bool EndMatch = false;
 
 	FTimerHandle UiTimerHandle;
 	void DecrementTimer();
@@ -104,6 +108,8 @@ public:
 	int GetMaxRound();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetCurrentRound();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetEndMatch();
 
 	TArray<int> GetRoundsWinners();
 

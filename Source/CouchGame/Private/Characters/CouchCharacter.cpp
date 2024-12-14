@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/CouchCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Arena/CouchGameManagerSubSystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Boat/CouchPlank.h"
@@ -78,6 +79,16 @@ void ACouchCharacter::BeginPlay()
 		}
 	}
 	PlayerIndex = CurrentPlayerCount + 1;
+
+	for (TActorIterator<ACouchCraftingTable> It(GetWorld()); It; ++It)
+	{
+		ACouchCraftingTable* Table = *It;
+		if (Table && Table->GetTeam() == CurrentTeam)
+		{
+			CraftTable = Table;
+			break;
+		}
+	}
 }
 
 void ACouchCharacter::Tick(float DeltaTime)
@@ -201,6 +212,10 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 void ACouchCharacter::SetCanMove(bool Value)
 {
 	CanMove = Value;
+	if (!CanMove)
+	{
+		InputMove = FVector2D::ZeroVector;
+	}
 }
 #pragma endregion
 
@@ -493,6 +508,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
 			IsHoldingItem = true;
+			CraftTable->PlayFX();
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
 		}
@@ -583,7 +599,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 				FishingRod = GetWorld()->SpawnActor<ACouchFishingRod>(FishingRodSpawn);
 				FishingRod->SetupFishingRod(this, CurrentTeam);
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -592,7 +607,6 @@ void ACouchCharacter::OnInputFire(const FInputActionValue& InputActionValue)
 			else
 			{
 				isFishing = true;
-				CanMove = false;
 				InputMove = FVector2D::ZeroVector;
 				StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 				WidgetSpawner->DestroyWidget();
@@ -642,7 +656,7 @@ bool ACouchCharacter::GetIsHoldingItem() const
 void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 {
 	
-	if (!IsHoldingItem) return;
+	if (!IsHoldingItem || !InteractingActor) return;
 	
 	if (InputActionValue.Get<float>() <= 0.1f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
 		&& !InteractingActor.IsA(ACouchUmbrella::StaticClass()))) return;
@@ -659,10 +673,13 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 
 	
 	ICouchInteractable::Execute_Interact(InteractingActor, this);
-	
+
+	CraftTable->StopFX();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
 	IsHoldingItem = false;
 	AnimationManager->IsCarryingItem = false;
+	AnimationManager->IsRepairing = false;
+	SetCanMove(true);
 	
 	IsInteracting = false;
 	InteractingActor = nullptr;
@@ -676,14 +693,14 @@ void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnCharacterBeginOverlapFishingZone(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<ACouchInteractableMaster>(OtherActor))
+	if (!FishingRod && OtherActor->IsA(ACouchInteractableWeapons::StaticClass()) || IsHoldingItem)
 	{
 		DontFish = true;
 		WidgetSpawner->DestroyWidget();
 		return;
 	}
 
-	if (!DontFish)
+	if (!DontFish && !OtherActor->IsA(ACouchInteractableMaster::StaticClass()))
 	{
 		CanFish = true;
 		WidgetSpawner->SpawnWidget(FishingWidget, WidgetPose);
@@ -699,11 +716,14 @@ void ACouchCharacter::OnCharacterEndOverlapFishingZone(UPrimitiveComponent* Over
 		DontFish = false;
 		return;
 	}
-	
-	WidgetSpawner->DestroyWidget();
-	CanFish = false;
-	CanMove = true;
-	DestroyFishingRod();
+
+	if (!Cast<ACouchInteractableMaster>(OtherActor))
+	{
+		WidgetSpawner->DestroyWidget();
+		CanFish = false;
+		SetCanMove(true);
+		DestroyFishingRod();	
+	}
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Not Fishing");
 }
 
@@ -721,6 +741,7 @@ void ACouchCharacter::DestroyFishingRod()
 		FishingRod = nullptr;
 	}
 	isFishing = false;
+	SetCanMove(true);
 	AnimationManager->IsFishingStart = false;
 	AnimationManager->IsFishingRelease = false;
 	AnimationManager->IsFishingPull = false;
@@ -746,7 +767,8 @@ void ACouchCharacter::DestroyFishingRod()
 
 void ACouchCharacter::OnInputPause(const FInputActionValue& InputActionValue)
 {
-	if (!GetFirstWidgetOfClass(WidgetPause))
+	UCouchGameManagerSubSystem* GameManagerSubSystem = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (!GetFirstWidgetOfClass(WidgetPause) && !GameManagerSubSystem->GetEndMatch())
 	{
 		if (TObjectPtr<UCouchWidgetPause> WidgetRef = CreateWidget<UCouchWidgetPause>(GetWorld(), WidgetPause))
 		{

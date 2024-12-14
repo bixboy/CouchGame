@@ -1,6 +1,7 @@
 
 #include "Arena/CouchGameManagerSubSystem.h"
 
+#include "LocalMultiplayerSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidgetWin.h"
@@ -31,6 +32,7 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	RoundDurationMinutes = RoundDuration;
 	LevelName = Level;
 	WinWidget = Widget;
+	EndMatch = false;
 	StartNewRound();
 }
 
@@ -46,6 +48,7 @@ void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FTe
 		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		WidgetRef->ChangeWinnerText(Text);
 		WidgetRef->TurnOnLight();
+		WidgetRef->PlayRate = 0.05f;
 		WidgetRef->AddToViewport();
 	}
 }
@@ -78,35 +81,42 @@ void UCouchGameManagerSubSystem::StartNewRound()
 
 void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
+	if (EndMatch) return;
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
-
+	int RoundsToWin = (MaxRounds / 2) + 1;
+	Team1WinTheGame = false;
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("BlueLagoon wins the round!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Aoi Kumo wins the round!"));
 		TeamAPRoundWin++;
 		RoundsWinners.Add(1);
-		if (CurrentRound == MaxRounds)
+		
+		if (TeamAPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
-			OpenUi(WinWidget, FText::FromString("BlueLagoon win this game!"));
+			EndMatch = true;
+			OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the game!"));
+			Team1WinTheGame = true;
 			return;
 		}
-		OpenUi(WinWidget, FText::FromString("BlueLagoon wins the round!"));
+		
+		OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the round!"));
 	}
 	else if (TeamWin == 2)
 	{
 		// L'équipe B gagne la manche
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Red Tuna wins the round!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,TEXT("Akai Taiyo wins the round!"));
 		TeamBPRoundWin++;
 		RoundsWinners.Add(2);
 
-		if (CurrentRound == MaxRounds)
+		if (TeamBPRoundWin >= RoundsToWin || CurrentRound == MaxRounds)
 		{
-			OpenUi(WinWidget, FText::FromString("Red Tuna win this game!"));
+			EndMatch = true;
+			OpenUi(WinWidget, FText::FromString("Akai Taiyo wins the game!"));
 			return;
 		}
 		
-		OpenUi(WinWidget, FText::FromString("Red Tuna wins the round!"));
+		OpenUi(WinWidget, FText::FromString("Akai Taiyo wins the round!"));
 	}
 	else if (TeamWin == 0)
 	{
@@ -115,10 +125,21 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		RoundsWinners.Add(0);
 		if (CurrentRound == MaxRounds)
 		{
+			EndMatch = true;
 			OpenUi(WinWidget, FText::FromString("No Team wins this game!"));
 			return;
 		}
 		OpenUi(WinWidget, FText::FromString("No Team wins the round!"));
+	}
+
+	if (TeamAPRoundWin > MaxRounds / 2 || TeamBPRoundWin > MaxRounds / 2)
+	{
+		EndMatch = true;
+		FString WinningTeamMessage = TeamAPRoundWin > TeamBPRoundWin 
+			? "Aoi Kumo wins the game!" 
+			: "Akai Taiyo wins the game!";
+		OpenUi(WinWidget, FText::FromString(WinningTeamMessage));
+		return;
 	}
 }
 
@@ -177,6 +198,7 @@ void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float Curren
 void UCouchGameManagerSubSystem::ReturnToMenu()
 {
 	ResetRound();
+	SwitchMappingType();
 	UGameplayStatics::OpenLevel(this, "LevelLobby", false);
 }
 
@@ -209,6 +231,11 @@ int UCouchGameManagerSubSystem::GetMaxRound()
 int UCouchGameManagerSubSystem::GetCurrentRound()
 {
 	return CurrentRound;
+}
+
+bool UCouchGameManagerSubSystem::GetEndMatch()
+{
+	return EndMatch;
 }
 
 // Get Rounds Winners

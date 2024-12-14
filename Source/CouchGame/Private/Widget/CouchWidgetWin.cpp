@@ -16,9 +16,10 @@ void UCouchWidgetWin::NativeConstruct()
 	{
 		if (ConstructAnim)
 		{
+			float TotalAnimationDuration = OpenAnimation->GetEndTime() / PlayRate;
 			FTimerHandle RoundTimerHandle;
-			PlayAnimationForward(OpenAnimation);
-			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, OpenAnimation->GetEndTime(), false);		
+			PlayAnimation(OpenAnimation, 0.0f, 1, EUMGSequencePlayMode::Forward, PlayRate);
+			GetWorld()->GetTimerManager().SetTimer(RoundTimerHandle, [this]() { EndAnimation(); }, TotalAnimationDuration, false);		
 		}
 	}
 }
@@ -47,11 +48,11 @@ void UCouchWidgetWin::ChangeWinnerText(FText Winner)
 void UCouchWidgetWin::OnNewRoundPressed()
 {
 	UCouchGameManagerSubSystem* GameManager = GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
-	if (GameManager && GameManager->GetCurrentRound() != GameManager->GetMaxRound())
+	if (GameManager && !GameManager->GetEndMatch())
 	{
 		GameManager->StartNewRound();
 	}
-	else if (GameManager && GameManager->GetCurrentRound() >= GameManager->GetMaxRound())
+	else if (GameManager && GameManager->GetEndMatch())
 	{
 		GameManager->ReturnToMenu();
 	}

@@ -9,14 +9,15 @@
 #include "Widget/CouchWidgetSpawn.h"
 #include "CouchInteractableWeapons.generated.h"
 
+class ACouchNiagaraActorMaster;
+
 UCLASS()
 class COUCHGAME_API ACouchInteractableWeapons : public ACouchInteractableMaster
 {
 	GENERATED_BODY()
-
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFx"))
-	void PlayFx();
+	void PlayFx(TSubclassOf<ACouchNiagaraActorMaster> NiagaraActor = nullptr, FVector SpawnLocation = FVector::ZeroVector);
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayVibration"))
 	void PlayVibration(UForceFeedbackEffect* Vibration);
 
@@ -75,6 +76,8 @@ private:
 	virtual void StartMoveActor_Implementation(int InputDirection) override;
 	UFUNCTION()
 	virtual void StopMoveActor_Implementation() override;
+	UPROPERTY(EditAnywhere)
+	bool InvertInputMove = false;
 	
 #pragma endregion
 

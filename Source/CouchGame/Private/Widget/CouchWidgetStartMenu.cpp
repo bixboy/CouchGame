@@ -34,6 +34,8 @@ void UCouchWidgetStartMenu::OnCameraTransitionEnd(bool Forward)
 
 void UCouchWidgetStartMenu::InitializeStartMenu()
 {
+	FInternationalization::Get().LoadAllCultureData();
+	FTextLocalizationManager::Get().RefreshResources();
 	if (Btn_Play)
 	{
 		Btn_Play->OnPressed.AddDynamic(this, &UCouchWidgetStartMenu::OnPlayPressed);
@@ -59,7 +61,22 @@ void UCouchWidgetStartMenu::InitializeStartMenu()
 
 void UCouchWidgetStartMenu::OnPlayPressed()
 {
-	if (!CameraMove) return;
+	if (!CameraMove)
+	{
+		if (AActor* Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ACameraActor::StaticClass()))
+		{
+			if (Camera = Cast<ACameraActor>(Actor); Camera)
+			{
+				if(UActorComponent* CameraComponent = Camera->GetComponentByClass(UCouchCameraMove::StaticClass()))
+				{
+					if (CameraMove = Cast<UCouchCameraMove>(CameraComponent); CameraMove)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Starting Menu");
+					}
+				}
+			}
+		}
+	}
 	Receive_OnPlayPressed(true);
 	CameraMove->StartCameraMove(true);
 }
@@ -80,5 +97,4 @@ void UCouchWidgetStartMenu::OnCreditsPressed()
 void UCouchWidgetStartMenu::OnQuitPressed()
 {
 	Receive_OnQuitPressed();
-	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr, EQuitPreference::Quit, false);
 }

@@ -17,8 +17,12 @@ void ACouchBoat::BeginPlay()
 {
 	InitialRotation = GetActorRotation();
 	Super::BeginPlay();
-	
 	BoatLife = BoatStartLife;
+	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
+	{
+		GameManager->UpdateCurrentLife(2, BoatLife);
+		GameManager->UpdateCurrentLife(1, BoatLife);
+	}
 	if (BoatFloor)
 	{
 		BoatFloor->Init(this);
@@ -56,23 +60,25 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
 	IsRepaired = false;
 
-	if (BoatLife == 0)
+	if (BoatLife == 0 && !AnimIsInPlay)
 	{
+		AnimIsInPlay = false;
+		StartAnimSequence();
 		SinkBoatAndGameOver();
 		return;
 	}
 
 	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
 	{
-		switch (GetBoatTeam())
+		switch (Team)
 		{
-		case EBoatTeam::Team1:
-			GameManager->UpdateCurrentLife(1, BoatLife);
-			break;
-
-		case EBoatTeam::Team2:
-			GameManager->UpdateCurrentLife(2, BoatLife);
-			break;
+			case EBoatTeam::Team1:
+				GameManager->UpdateCurrentLife(1, BoatLife);
+				break;
+	
+			case EBoatTeam::Team2:
+				GameManager->UpdateCurrentLife(2, BoatLife);
+				break;
 		}
 	}
 }
@@ -98,13 +104,13 @@ void ACouchBoat::SinkBoatAndGameOver()
 	{
 		case EBoatTeam::Team1:
 		{
-			// Team 2 Win	
+			// Team 2 Win
 			GameManager->CheckRoundWinCondition(2);
 			break;
 		}
 		case EBoatTeam::Team2:
 		{
-			// Team 1 Win		
+			// Team 1 Win
 			GameManager->CheckRoundWinCondition(1);
 			break;
 		}

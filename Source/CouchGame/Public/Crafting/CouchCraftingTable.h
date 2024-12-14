@@ -6,6 +6,7 @@
 #include "CouchCraftingTable.generated.h"
 
 
+class ACouchNiagaraActorMaster;
 class UCouchOctopusAnimationManager;
 struct FTimeline;
 class UTimelineComponent;
@@ -28,6 +29,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCouchOctopusAnimationManager* AnimationManager;
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="PlayFX"))
+	void PlayFX(TSubclassOf<ACouchNiagaraActorMaster> NiagaraRef = nullptr, FVector SpawnLocation = FVector::ZeroVector);
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="StopFX"))
+	void StopFX();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -59,12 +65,16 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCouchWidgetSpawn> WidgetSpawn;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACouchNiagaraActorMaster> ImpactObject;
 #pragma endregion
 
 #pragma region Crafting
 public:
 	const FCraftRecipe* IsCraftingPossible(const TArray<TSubclassOf<ACouchPickableMaster>>& Ingredients);
 	const FCraftRecipe* IsCraftingPossible();
+	int GetTeam();
 private:
 	UPROPERTY(EditAnywhere, Category = Crafting)
 	TArray<FCraftRecipe> CraftRecipes;
@@ -83,6 +93,9 @@ private:
 	bool AutoCookWhen2IngredientsSet = true;
 
 	bool IsAutoCookPossible();
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1, ClampMax = 2))
+	int CurrentTeam = 1;
 
 public:
 	void AddIngredient(ACouchPickableMaster* Ingredient);

@@ -7,6 +7,7 @@
 #include "Interfaces/CouchDamageable.h"
 #include "CouchCharacter.generated.h"
 
+class ACouchCraftingTable;
 class ACouchWidget3D;
 class UCouchWidgetSpawn;
 class UCouchWidgetPause;
@@ -61,6 +62,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<ACouchWidget3D> FishingWidget;
+
+	UPROPERTY()
+	ACouchCraftingTable* CraftTable = nullptr;
 #pragma endregion
 #pragma region Move And Orient
 public:

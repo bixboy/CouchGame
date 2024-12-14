@@ -12,8 +12,10 @@ class COUCHGAME_API ACouchUmbrella : public ACouchInteractableWeapons, public IC
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
+	void OnPlayerEndOverlapp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	ACouchUmbrella();
-	void Tick(float DeltaTime);
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void PickUp_Implementation(ACouchCharacter* player) override;
 
@@ -32,7 +34,7 @@ public:
 	TObjectPtr<USoundBase> DamageSound;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sounds)
 	TObjectPtr<USoundBase> BrokeSound;
-	void SpawnWarningWidget();
+	void SpawnOrDeSpawnWarningWidget(bool Spawn);
 	
 private:
 	UPROPERTY(EditAnywhere, Category = DefaultValues)
@@ -82,10 +84,6 @@ private:
 	void FinishRepairing();
 	void StartRepair(ACouchCharacter* Player);
 	void StopRepair();
-
-	UFUNCTION()
-	void OnActorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 #pragma endregion	
 };
