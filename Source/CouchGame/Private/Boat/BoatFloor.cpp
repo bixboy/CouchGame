@@ -55,12 +55,28 @@ ACouchPlank* ABoatFloor::Hit_Implementation(FHitResult HitResult, float Repairin
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, HitLocationString);
 	
-	if (FloorHit)
+	if (FloorHitTeam1)
 	{
 		FTransform SpawnTransform(GetActorRotation(), HitResult.ImpactPoint);
 		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + PlankLocationOffset);
 		if (SpawnTransform.GetLocation() != FVector::ZeroVector)
 		{
+			TSubclassOf<ACouchPlank> FloorHit;
+			switch (CurrentTeam)
+			{
+				case 1 :
+				{
+					FloorHit = FloorHitTeam1;
+					break;
+				}
+				case 2 :
+				{
+					FloorHit = FloorHitTeam2;
+					break;
+				}
+				default:
+					break;
+			}
 			ACouchPlank* NewHit =  GetWorld()->SpawnActor<ACouchPlank>(FloorHit, SpawnTransform);
 			NewHit->Init(this, RepairingTime, Scale);
 			NewHit->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);

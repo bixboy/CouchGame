@@ -93,6 +93,12 @@ void ACouchCharacterMenu::BindInputActions(UEnhancedInputComponent* EnhancedInpu
 			this,
 			&ACouchCharacterMenu::OnInputCancel
 		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionCancel,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacterMenu::OnInputCancelCompleted
+		);
 	}
 }
 
@@ -166,5 +172,12 @@ void ACouchCharacterMenu::OnInputCancel()
 	if (!Lobby) return;
 	const int PlayerIndex = GetPlayerIndex();
 	Lobby->Receive_Cancel(PlayerIndex);
+}
+
+void ACouchCharacterMenu::OnInputCancelCompleted()
+{
+	if (!Lobby) return;
+	const int PlayerIndex = GetPlayerIndex();
+	Lobby->Receive_Cancel_Completed(PlayerIndex);
 }
 

@@ -40,7 +40,12 @@ private:
 	UBoxComponent* Collision;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ACouchPlank> FloorHit;
+	TSubclassOf<ACouchPlank> FloorHitTeam1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ACouchPlank> FloorHitTeam2;
+
+	
 
 	TArray<ACouchPlank*> Hits;
 

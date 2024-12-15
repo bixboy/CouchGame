@@ -34,6 +34,7 @@ void UCouchGameManagerSubSystem::SetupRounds(int RoundsNumber, float RoundDurati
 	WinWidget = Widget;
 	EndMatch = false;
 	StartNewRound();
+	ShowVictoryScreen = false;
 }
 
 void UCouchGameManagerSubSystem::OpenUi(TSubclassOf<UCouchWidgetWin> Widget, FText Text)
@@ -97,6 +98,7 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 			EndMatch = true;
 			OpenUi(WinWidget, FText::FromString("Aoi Kumo wins the game!"));
 			Team1WinTheGame = true;
+			ShowVictoryScreen = true;
 			return;
 		}
 		
@@ -113,6 +115,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 		{
 			EndMatch = true;
 			OpenUi(WinWidget, FText::FromString("Akai Taiyo wins the game!"));
+			Team1WinTheGame = false;
+			ShowVictoryScreen = true;
 			return;
 		}
 		
