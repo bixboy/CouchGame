@@ -454,7 +454,7 @@ void ACouchCharacter::BindInputInteractAndActions(UEnhancedInputComponent* Enhan
 			InputData->InputActionInteract,
 			ETriggerEvent::Completed,
 			this,
-			&ACouchCharacter::OnInputHold
+			&ACouchCharacter::InputHold
 		);
 	}
 	if (InputData->InputActionFire)
@@ -540,11 +540,13 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 		if (InteractingActor->Implements<UCouchPickable>() && IsHoldingItem)
 		{
 			OnInputHold(InputActionValue);
+			SetCanMove(true);
 		}
 		else
 		{
 			StateMachine->ChangeState(ECouchCharacterStateID::Idle);
 		}
+		SetCanMove(true);
 		IsInteracting = false;
 		InteractingActor = nullptr;
 		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
@@ -654,12 +656,16 @@ bool ACouchCharacter::GetIsHoldingItem() const
 	return IsHoldingItem;
 }
 
-void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue)
+void ACouchCharacter::InputHold(const FInputActionValue& InputActionValue)
+{
+	if (IsInteracting) OnInputHold(InputActionValue);
+}
+
+void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue, bool UnHoldDirectly)
 {
 	
 	if (!IsHoldingItem || !InteractingActor) return;
-	
-	if (InputActionValue.Get<float>() <= 0.1f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
+	if (!UnHoldDirectly && InputActionValue.Get<float>() <= 0.1f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
 		&& !InteractingActor.IsA(ACouchUmbrella::StaticClass()))) return;
 	
 	if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)

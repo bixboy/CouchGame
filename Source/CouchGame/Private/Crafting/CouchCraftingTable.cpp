@@ -357,7 +357,7 @@ void ACouchCraftingTable::UpdateCraftSuggestion()
 
 void ACouchCraftingTable::Interact_Implementation(ACouchCharacter* Player)
 {
-	Super::Interact_Implementation(Player);
+	// Super::Interact_Implementation(Player);
 }
 
 

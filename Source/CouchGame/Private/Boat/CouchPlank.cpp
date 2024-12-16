@@ -58,13 +58,17 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 	}
-	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing)
+	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing && APlayer && APlayer->IsInteracting)
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-		IsPlayerRepairing = false;
-		if (APlayer) APlayer->AnimationManager->IsRepairing = false;
-		FInputActionValue ActionValue;
-		APlayer->OnInputHold(ActionValue);
+		if (APlayer)
+		{
+			APlayer->AnimationManager->IsRepairing = false;
+			
+			FInputActionValue ActionValue;
+			APlayer->SetCanMove(true);
+			APlayer->OnInputHold(ActionValue, true);
+		}
 	}
 }
 
@@ -83,9 +87,12 @@ void ACouchPlank::Tick(float DeltaTime)
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 			// APlayer->IsInteracting = false;
-			if (APlayer) APlayer->AnimationManager->IsRepairing = false;
-			FInputActionValue ActionValue;
-			APlayer->OnInputHold(ActionValue);
+			if (APlayer)
+			{
+				APlayer->AnimationManager->IsRepairing = false;
+				FInputActionValue ActionValue;
+				APlayer->OnInputHold(ActionValue, true);
+			}
 			SetActorTickEnabled(false);
 			Destroy();
 		}
@@ -105,8 +112,6 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 		return;
 	}
 
-	ICouchInteractable::Interact_Implementation(Player);
-
 	// Démarrer ou arrêter l'interaction
 	if (!IsPlayerRepairing)
 	{
@@ -114,9 +119,9 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 		IsPlayerRepairing = true;
 		APlayer->AnimationManager->IsRepairing = true;
 		APlayer->SetCanMove(false);
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting");
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Player started interacting with plank");
 	}
-	else if (IsPlayerRepairing && Player == APlayer)
+	else if (IsPlayerRepairing)
 	{
 		APlayer->AnimationManager->IsRepairing = false;
 		APlayer->SetCanMove(true);
