@@ -6,6 +6,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Kismet/GameplayStatics.h"
 
 void UCouchWidgetWin::NativeConstruct()
 {
@@ -156,4 +157,5 @@ void UCouchWidgetWin::StartConfetti()
 	NSWidget_0->ActivateSystem(true);
 	NSWidget_1->ActivateSystem(true);
 	NSWidget_2->ActivateSystem(true);
+	UGameplayStatics::PlaySound2D(this, WinSound);
 }
