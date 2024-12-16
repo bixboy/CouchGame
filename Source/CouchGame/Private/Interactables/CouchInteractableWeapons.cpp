@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactables/CouchInteractableWeapons.h"
-
 #include "Kismet/GameplayStatics.h"
 #include "Widget/CouchWidget3D.h"
 
@@ -115,6 +114,7 @@ void ACouchInteractableWeapons::StartMoveActor_Implementation(int InputDirection
 		PlayVibration(MoveVibrationEffect);
 		CanUse = true;
 		MovementComponent->StartMovement(Direction);
+		
 		if (Direction == 1)
 		{
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDraggingForward = true;
