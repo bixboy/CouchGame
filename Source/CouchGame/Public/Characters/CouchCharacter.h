@@ -197,9 +197,9 @@ private :
 
 public:
 	bool GetIsHoldingItem() const;
-
+	void InputHold(const FInputActionValue& InputActionValue);
 	UFUNCTION(BlueprintCallable)
-	void OnInputHold(const FInputActionValue& InputActionValue);
+	void OnInputHold(const FInputActionValue& InputActionValue, bool UnholdDirectly = false);
 private:
 	bool IsHoldingItem;
 #pragma endregion

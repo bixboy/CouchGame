@@ -253,6 +253,13 @@ void ACouchCraftingTable::CraftItem()
 		MoveTimeline.PlayFromStart();
 		AnimationManager->IsCooking = true;
 		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsCheckingChef = false;
+		if(ValidateWidgetLeft && ValidateWidgetRight)
+		{
+			ValidateWidgetLeft->SetIsValid(false);
+			ValidateWidgetLeft->SetActorHiddenInGame(true);
+			ValidateWidgetRight->SetIsValid(false);
+			ValidateWidgetRight->SetActorHiddenInGame(true);
+		}
 	} 
 }
 
@@ -357,7 +364,7 @@ void ACouchCraftingTable::UpdateCraftSuggestion()
 
 void ACouchCraftingTable::Interact_Implementation(ACouchCharacter* Player)
 {
-	Super::Interact_Implementation(Player);
+	// Super::Interact_Implementation(Player);
 }
 
 

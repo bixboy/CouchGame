@@ -23,8 +23,8 @@ void UCouchCharacterStateInteract::StateEnter(ECouchCharacterStateID PreviousSta
 	//	FColor::Green,
 	//	TEXT("Enter StateInteract")
 	//);
-	
 	ICouchInteractable::Execute_Interact(Character->InteractingActor, Character);
+	
 }
 
 void UCouchCharacterStateInteract::StateExit(ECouchCharacterStateID NextStateID)

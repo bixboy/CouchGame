@@ -94,5 +94,12 @@ private:
 	UFUNCTION()
 	void OnNewRoundPressed();
 
+#pragma endregion
+
+#pragma region Sounds
+private:
+	UPROPERTY(EditAnywhere, Category = DefaultValuesSound)
+	TObjectPtr<USoundBase> WinSound;
+	
 #pragma endregion	
 };
