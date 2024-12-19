@@ -499,7 +499,11 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	}
 	
 	bool bAlreadyUsed = ICouchInteractable::Execute_IsUsedByPlayer(InteractingActor);
-	
+	if (!IsInteracting && bAlreadyUsed)
+	{
+		InteractingActor = nullptr;
+		return;
+	}
 	if (!IsInteracting && !bAlreadyUsed)
 	{
 		IsInteracting = true;
@@ -553,7 +557,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 
 		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Stopped interacting.");
 	}
-	else if (bAlreadyUsed)
+	else if (IsInteracting && bAlreadyUsed)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
 	}
