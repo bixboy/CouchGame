@@ -20,7 +20,7 @@
 /ALTERNATENAME:__imp___std_init_once_complete=__imp_InitOnceComplete
 /DELAYLOAD:"d3d12.dll"
 /DELAYLOAD:"DBGHELP.DLL"
-/LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\lib\x64"
+/LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\lib\x64"
 /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.22621.0\ucrt\x64"
 /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.22621.0\um\x64"
 /NODEFAULTLIB:"LIBCMT"
@@ -34,9 +34,9 @@
 /NODEFAULTLIB:"LIBCD"
 /NODEFAULTLIB:"LIBCPD"
 /FUNCTIONPADMIN:6
-"C:\Apps\Unreal\Projects\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\Development\UnrealEd\SharedPCH.UnrealEd.Cpp20.h.obj"
-"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Module.LevelSelection.cpp.obj"
-"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Default.rc2.res"
+"C:\App\UE5\UnrealProject\CouchGame\Intermediate\Build\Win64\x64\CouchGameEditor\Development\UnrealEd\SharedPCH.UnrealEd.Cpp20.h.obj"
+"C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Module.LevelSelection.cpp.obj"
+"C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\Default.rc2.res"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\Projects\UnrealEditor-Projects.lib"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\InputCore\UnrealEditor-InputCore.lib"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\EditorFramework\UnrealEditor-EditorFramework.lib"
@@ -78,7 +78,7 @@
 "imm32.lib"
 "uiautomationcore.lib"
 "DXGI.lib"
-/OUT:"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Binaries\Win64\UnrealEditor-LevelSelection.dll"
-/IMPLIB:"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\UnrealEditor-LevelSelection.sup.lib"
-/PDB:"C:\Apps\Unreal\Projects\CouchGame\Plugins\LevelSelection\Binaries\Win64\UnrealEditor-LevelSelection.pdb"
+/OUT:"C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Binaries\Win64\UnrealEditor-LevelSelection.dll"
+/IMPLIB:"C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Intermediate\Build\Win64\x64\UnrealEditor\Development\LevelSelection\UnrealEditor-LevelSelection.sup.lib"
+/PDB:"C:\App\UE5\UnrealProject\CouchGame\Plugins\LevelSelection\Binaries\Win64\UnrealEditor-LevelSelection.pdb"
 /ignore:4078
