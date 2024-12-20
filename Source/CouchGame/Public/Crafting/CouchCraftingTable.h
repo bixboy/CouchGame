@@ -27,6 +27,7 @@ public:
 	// Sets default values for this actor's properties
 	ACouchCraftingTable();
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	virtual bool IsUsedByPlayer_Implementation() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCouchOctopusAnimationManager* AnimationManager;
