@@ -147,17 +147,17 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 
 void UCouchGameManagerSubSystem::OnRoundTimerEnd()
 {
-	if (Team1Health > Team2Health)
+	if (Team1Health > Team2Health && !EndMatch)
 	{
 		// Team 1 gagne la manche
 		CheckRoundWinCondition(1);
 	}
-	else if (Team2Health > Team1Health)
+	else if (Team2Health > Team1Health && !EndMatch)
 	{
 		// Team 2 gagne la manche
 		CheckRoundWinCondition(2);
 	}
-	else
+	else if(!EndMatch)
 	{
 		// Match null
 		CheckRoundWinCondition(0);
