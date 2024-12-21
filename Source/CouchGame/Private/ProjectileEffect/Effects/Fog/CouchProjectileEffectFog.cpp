@@ -3,6 +3,8 @@
 
 #include "ProjectileEffect/Effects/Fog/CouchProjectileEffectFog.h"
 #include "CouchCannonBall.h"
+#include "EngineUtils.h"
+#include "Boat/BoatFloor.h"
 #include "ProjectileEffect/Effects/Fog/Fog.h"
 
 
@@ -34,7 +36,26 @@ void ACouchProjectileEffectFog::ExecuteEffect()
 	Super::ExecuteEffect();
 	FTransform Transform = FTransform(FRotator::ZeroRotator, CouchCannonBall->GetActorLocation(), FVector(1.0f));
 	FogPtr = GetWorld()->SpawnActor<AFog>(Fog, Transform);
-	CouchCannonBall->Destroy();
+	ABoatFloor* ClosestBoatFloor = nullptr;
+	float ClosestDistance = TNumericLimits<float>::Max();
+	for (TActorIterator<ABoatFloor> It(GetWorld()); It; ++It)
+	{
+		ABoatFloor* BoatFloor = *It;
+		if (BoatFloor)
+		{
+			float Distance = FVector::Dist(BoatFloor->GetActorLocation(), FogPtr->GetActorLocation());
+			if (Distance < ClosestDistance)
+			{
+				ClosestDistance = Distance;
+				ClosestBoatFloor = BoatFloor;
+			}
+		}
+	}
+	if (ClosestBoatFloor)
+	{
+		FogPtr->AttachToActor(ClosestBoatFloor, FAttachmentTransformRules::KeepWorldTransform);
+	}
+	if (CouchCannonBall) CouchCannonBall->Destroy();
 }
 
 

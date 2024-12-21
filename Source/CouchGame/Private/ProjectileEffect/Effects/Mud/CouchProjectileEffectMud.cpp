@@ -4,6 +4,8 @@
 #include "ProjectileEffect/Effects/Mud/CouchProjectileEffectMud.h"
 
 #include "CouchCannonBall.h"
+#include "EngineUtils.h"
+#include "Boat/BoatFloor.h"
 #include "ProjectileEffect/Effects/Mud/Mud.h"
 
 
@@ -38,6 +40,25 @@ void ACouchProjectileEffectMud::ExecuteEffect()
 	if (MudPtr)
 	{
 		MudPtr->Init(PlayerSlowingSpeed, ItemsSlowingSpeed);
+		ABoatFloor* ClosestBoatFloor = nullptr;
+		float ClosestDistance = TNumericLimits<float>::Max();
+		for (TActorIterator<ABoatFloor> It(GetWorld()); It; ++It)
+		{
+			ABoatFloor* BoatFloor = *It;
+			if (BoatFloor)
+			{
+				float Distance = FVector::Dist(BoatFloor->GetActorLocation(), MudPtr->GetActorLocation());
+				if (Distance < ClosestDistance)
+				{
+					ClosestDistance = Distance;
+					ClosestBoatFloor = BoatFloor;
+				}
+			}
+		}
+		if (ClosestBoatFloor)
+		{
+			MudPtr->AttachToActor(ClosestBoatFloor, FAttachmentTransformRules::KeepWorldTransform);
+		}
 	}
 	if (CouchCannonBall) CouchCannonBall->Destroy();
 }
