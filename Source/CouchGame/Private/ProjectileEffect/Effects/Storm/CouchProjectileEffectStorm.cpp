@@ -3,9 +3,12 @@
 
 #include "ProjectileEffect/Effects/Storm/CouchProjectileEffectStorm.h"
 #include "CouchCannonBall.h"
+#include "EngineUtils.h"
+#include "Boat/BoatFloor.h"
 #include "ProjectileEffect/Effects/Storm/Storm.h"
 
 
+class ABoatFloor;
 // Sets default values
 ACouchProjectileEffectStorm::ACouchProjectileEffectStorm()
 {
@@ -39,6 +42,26 @@ void ACouchProjectileEffectStorm::ExecuteEffect()
 	{
 		StormPtr->Init(StormStrength, ForceRadius);
 		StormPtr->RadialForceComponent->Activate(true);
+		ABoatFloor* ClosestBoatFloor = nullptr;
+		float ClosestDistance = TNumericLimits<float>::Max();
+		for (TActorIterator<ABoatFloor> It(GetWorld()); It; ++It)
+		{
+			ABoatFloor* BoatFloor = *It;
+			if (BoatFloor)
+			{
+				float Distance = FVector::Dist(BoatFloor->GetActorLocation(), StormPtr->GetActorLocation());
+				if (Distance < ClosestDistance)
+				{
+					ClosestDistance = Distance;
+					ClosestBoatFloor = BoatFloor;
+				}
+			}
+		}
+		// Si un ABoatFloor est trouvé, attache la tempête
+		if (ClosestBoatFloor)
+		{
+			StormPtr->AttachToActor(ClosestBoatFloor, FAttachmentTransformRules::KeepWorldTransform);
+		}
 	}
 	if (CouchCannonBall) CouchCannonBall->Destroy();
 }

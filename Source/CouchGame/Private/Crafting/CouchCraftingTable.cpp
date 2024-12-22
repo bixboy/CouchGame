@@ -367,4 +367,9 @@ void ACouchCraftingTable::Interact_Implementation(ACouchCharacter* Player)
 	// Super::Interact_Implementation(Player);
 }
 
+bool ACouchCraftingTable::IsUsedByPlayer_Implementation()
+{
+	return true;
+}
+
 
