@@ -81,6 +81,7 @@ protected:
 	FTimerHandle RoundTimerHandle;
 	float CurrentRoundTimer;
 	bool EndMatch = false;
+	bool EndRound = false;
 
 	FTimerHandle UiTimerHandle;
 	void DecrementTimer();

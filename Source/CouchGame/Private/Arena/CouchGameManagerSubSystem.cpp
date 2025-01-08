@@ -65,6 +65,7 @@ void UCouchGameManagerSubSystem::StartNewRound()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	CurrentRound++;
+	EndRound = false;
 	
 	// Démarre un timer de 3 minutes pour la manche
 	int Hours = FMath::FloorToInt(RoundDurationMinutes);
@@ -84,6 +85,7 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 	int RoundsToWin = (MaxRounds / 2) + 1;
 	Team1WinTheGame = false;
+	EndRound = true;
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
@@ -147,6 +149,8 @@ void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 
 void UCouchGameManagerSubSystem::OnRoundTimerEnd()
 {
+	if (EndRound) return;
+	
 	if (Team1Health > Team2Health && !EndMatch)
 	{
 		// Team 1 gagne la manche
@@ -177,6 +181,8 @@ void UCouchGameManagerSubSystem::ResetRound()
 // Update Life
 void UCouchGameManagerSubSystem::UpdateCurrentLife(int CurrentTeam, float CurrentLife)
 {
+	if (EndRound) return;
+	
 	if (CurrentTeam == 1)
 	{
 		// Vie de la team 1
