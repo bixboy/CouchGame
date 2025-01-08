@@ -43,7 +43,7 @@ void ACouchPlank::Init(ABoatFloor* floor, float RepairingTime, float Scale)
 void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing && !CouchWidgetSpawn->GetCurrentWidget())
 	{
 		UClass* InteractWidget = InteractWidgetClass.Get();
 		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
@@ -51,16 +51,16 @@ void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 	}
-	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing && APlayer && APlayer->IsInteracting)
+	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing && APlayer == OtherActor && APlayer->IsInteracting)
 	{
 		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
+		
 		if (APlayer)
 		{
 			APlayer->AnimationManager->IsRepairing = false;

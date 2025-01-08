@@ -83,6 +83,7 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<ACouchCharacter> APlayer;
+	
 	bool IsPlayerRepairing;
 
 
@@ -95,7 +96,7 @@ private:
 	UPROPERTY()
 	ABoatFloor* Floor;
 	float Timer;
-
+	
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
 
 	UStaticMesh* GetRandomStaticMesh();
