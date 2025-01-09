@@ -75,6 +75,12 @@ void ACouchCharacterMenu::BindInputActions(UEnhancedInputComponent* EnhancedInpu
 			this,
 			&ACouchCharacterMenu::OnInputNavigate
 		);
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionNavigate,
+			ETriggerEvent::Completed,
+			this,
+			&ACouchCharacterMenu::OnInputNavigateCompleted
+		);
 	}
 	if (InputData->InputActionValidate)
 	{
@@ -156,6 +162,43 @@ void ACouchCharacterMenu::OnInputNavigate(const FInputActionValue& InputActionVa
 		else // Gauche
 		{
 			Lobby->Receive_Left(PlayerIndex);
+		}
+	}
+}
+
+void ACouchCharacterMenu::OnInputNavigateCompleted(const FInputActionValue& InputActionValue)
+{
+	FVector2D InputDirection = InputActionValue.Get<FVector2D>();
+	if (!Lobby)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Lobby not set");
+		return;
+	}
+	InputDirection.Normalize();
+	
+	const int PlayerIndex = GetPlayerIndex();
+	if (FMath::Abs(InputDirection.Y) > FMath::Abs(InputDirection.X))
+	{
+		// // Axe vertical dominant
+		// if (InputDirection.Y > 0) // Haut
+		// {
+		// 	Lobby->Receive_Up(PlayerIndex);
+		// }
+		// else // Bas
+		// {
+		// 	Lobby->Receive_Down(PlayerIndex);
+		// }
+	}
+	else
+	{
+		// Axe horizontal dominant
+		if (InputDirection.X > 0) // Droite
+		{
+			Lobby->Receive_Right_Completed(PlayerIndex);
+		}
+		else // Gauche
+		{
+			Lobby->Receive_Left_Completed(PlayerIndex);
 		}
 	}
 }

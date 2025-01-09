@@ -43,6 +43,10 @@ void ACouchPlank::Init(ABoatFloor* floor, float RepairingTime, float Scale)
 void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (ACouchCharacter* Player = Cast<ACouchCharacter>(OtherActor); Player && !PlayersInZone.Contains(Player)) // Ajout du joueur à la liste
+	{
+		PlayersInZone.Add(Player);
+	}
 	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing && !CouchWidgetSpawn->GetCurrentWidget())
 	{
 		UClass* InteractWidget = InteractWidgetClass.Get();
@@ -53,30 +57,48 @@ void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 
 void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing)
+	if (OtherActor->IsA(ACouchCharacter::StaticClass()))
 	{
-		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-	}
-	else if (OtherActor->IsA(ACouchCharacter::StaticClass()) && IsPlayerRepairing && APlayer == OtherActor && APlayer->IsInteracting)
-	{
-		if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-		
-		if (APlayer)
+		ACouchCharacter* Player = Cast<ACouchCharacter>(OtherActor);
+		if (Player)
 		{
-			APlayer->AnimationManager->IsRepairing = false;
+			PlayersInZone.Remove(Player);
 			
-			FInputActionValue ActionValue;
-			APlayer->SetCanMove(true);
-			APlayer->OnInputHold(ActionValue, true);
+			if (Player == APlayer && IsPlayerRepairing && Player->IsInteracting)
+			{
+				if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
+				FInputActionValue InputActionValue;
+				Player->OnInputHold(InputActionValue, true);
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Player stopped repairing and left the zone");
+			}
+		}
+		
+		if (PlayersInZone.IsEmpty() && !IsPlayerRepairing)
+		{
+			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 		}
 	}
 }
+
 
 #pragma endregion
 
 void ACouchPlank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Validation pour détecter un état bloqué
+	if (IsPlayerRepairing && (!APlayer || !PlayersInZone.Contains(APlayer)))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Player repairing but not in zone. Resetting...");
+		if (APlayer)
+		{
+			APlayer->AnimationManager->IsRepairing = false;
+			APlayer->SetCanMove(true);
+		}
+		APlayer = nullptr;
+		IsPlayerRepairing = false;
+	}
 
 	// Si le joueur est en train de réparer
 	if (IsPlayerRepairing)
@@ -86,7 +108,6 @@ void ACouchPlank::Tick(float DeltaTime)
 		{
 			Floor->RemoveHitFromArray(this);
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
-			// APlayer->IsInteracting = false;
 			if (APlayer)
 			{
 				APlayer->AnimationManager->IsRepairing = false;
@@ -102,6 +123,7 @@ void ACouchPlank::Tick(float DeltaTime)
 		Timer = FMath::Clamp(Timer - DeltaTime, 0, TimeToRepair);
 	}
 }
+	
 
 void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 {
@@ -123,7 +145,6 @@ void ACouchPlank::Interact_Implementation(ACouchCharacter* Player)
 	}
 	else if (IsPlayerRepairing)
 	{
-		APlayer->AnimationManager->IsRepairing = false;
 		APlayer->SetCanMove(true);
 		APlayer = nullptr;
 		IsPlayerRepairing = false;

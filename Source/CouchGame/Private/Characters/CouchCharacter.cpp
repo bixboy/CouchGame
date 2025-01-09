@@ -95,7 +95,14 @@ void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	TickStateMachine(DeltaTime);
-	if (!IsInteracting || IsHoldingItem) RotateMeshUsingOrient(DeltaTime);
+	if (!AnimationManager->IsCarryingItem && !AnimationManager->IsRepairing && CanMove && !IsInteracting && InteractingActors.IsEmpty())
+	{
+		IsHoldingItem = false;
+		IsInteracting = false;
+		InteractingActor = nullptr;
+		if (InteractingActors.Num() == 0) IsInInteractingRange = false;
+	}
+	if (CanMove) RotateMeshUsingOrient(DeltaTime);
 	if (!CanDashAgain)
 	{
 		DashTimer += DeltaTime;
@@ -211,7 +218,8 @@ void ACouchCharacter::RotateMeshUsingOrient(float DeltaTime) const
 
 void ACouchCharacter::SetCanMove(bool Value)
 {
-	CanMove = Value;
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("SetCanMove : %s"), CanMove ? TEXT("true") : TEXT("false")));
+	CanMove = Value; 
 	if (!CanMove)
 	{
 		InputMove = FVector2D::ZeroVector;
@@ -338,6 +346,10 @@ void ACouchCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 		{
 			InputMove = FVector2D::Zero();
 		}	
+	}
+	else 
+	{
+		InputMove = FVector2D::Zero();
 	}
 }
 #pragma endregion
@@ -511,8 +523,9 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& ICouchPickable::Execute_IsPickable(InteractingActor)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
+			//-
 			IsHoldingItem = true;
-			CraftTable->SpawnWidget();
+			if (!InteractingActor.IsA(ACouchPlank::StaticClass()) && !InteractingActor.IsA(ACouchPickableCannonBall::StaticClass()))  CraftTable->SpawnWidget();
 			UGameplayStatics::PlaySound2D(this, GrabItemSound);
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Holding Actor");
 			ICouchInteractable::Execute_Interact(InteractingActor, this);
@@ -646,8 +659,9 @@ void ACouchCharacter::OnInputMoveInteracting(const FInputActionValue& InputActio
 {
 	if (IsInInteractingRange && IsInteracting && InteractingActor && !FishingRod)
 	{
-			if (InputMove != FVector2D::Zero() && FMath::Abs(InputMove.Y) > .8f)
-				ICouchInteractable::Execute_StartMoveActor(InteractingActor,-InputMove.Y);
+		FVector2D InputMoveInteracting = InputActionValue.Get<FVector2D>();
+			if (InputMoveInteracting != FVector2D::Zero() && FMath::Abs(InputMoveInteracting.Y) > .8f)
+				ICouchInteractable::Execute_StartMoveActor(InteractingActor,-InputMoveInteracting.Y);
 			else ICouchInteractable::Execute_StopMoveActor(InteractingActor);	
 	}
 }
@@ -668,22 +682,27 @@ void ACouchCharacter::InputHold(const FInputActionValue& InputActionValue)
 void ACouchCharacter::OnInputHold(const FInputActionValue& InputActionValue, bool UnHoldDirectly)
 {
 	
-	if (!IsHoldingItem || !InteractingActor) return;
-	if (!UnHoldDirectly && InputActionValue.Get<float>() <= 0.1f && (!InteractingActor.IsA(ACouchPlank::StaticClass())
-		&& !InteractingActor.IsA(ACouchUmbrella::StaticClass()))) return;
-	
-	if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
+	if ((!IsHoldingItem || !InteractingActor) && !UnHoldDirectly) return;
+	if (!UnHoldDirectly && InputActionValue.Get<float>() <= 0.1f && (InteractingActor && !InteractingActor.IsA(ACouchPlank::StaticClass())
+		&& !InteractingActor.IsA(ACouchUmbrella::StaticClass())))
 	{
-		TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
-			PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
-		if (ItemToInteractWith)
-		{
-			ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UnHold Return");
+		return;
 	}
 
-	
-	ICouchInteractable::Execute_Interact(InteractingActor, this);
+	if (InteractingActor)
+	{
+		if (TObjectPtr<ACouchPickableMaster> PickableItem = Cast<ACouchPickableMaster>(InteractingActor); PickableItem)
+		{
+			TObjectPtr<ACouchInteractableMaster> ItemToInteractWith =
+				PickableItem->PlayerCanUsePickableItemToInteract(PickableItem, InteractingActors);
+			if (ItemToInteractWith)
+			{
+				ICouchPickable::Execute_InteractWithObject(PickableItem, ItemToInteractWith.Get());
+			}
+		}
+	}
+	if (InteractingActor) ICouchInteractable::Execute_Interact(InteractingActor, this);
 
 	CraftTable->DestroyWidget();
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "UnHold");
