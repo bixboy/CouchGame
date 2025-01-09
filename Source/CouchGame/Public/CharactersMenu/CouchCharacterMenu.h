@@ -55,6 +55,7 @@ public:
 	void BindInputActions(UEnhancedInputComponent* EnhancedInputComponent);
 	int GetPlayerIndex() const;
 	void OnInputNavigate(const FInputActionValue& InputActionValue);
+	void OnInputNavigateCompleted(const FInputActionValue& InputActionValue);
 	void OnInputValidate();
 	void OnInputCancel();
 	void OnInputCancelCompleted();

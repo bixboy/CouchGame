@@ -68,6 +68,7 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 			UGameplayStatics::PlaySound2D(this, EnterInSound);
 			SetPlayerIsIn(true);
 			CanUse = true;
+			CurrentPlayer->SetCanMove(false);
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = true;
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
 			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
@@ -91,6 +92,7 @@ void ACouchInteractableWeapons::DetachPlayer(ACouchCharacter* Player)
 		Player->AnimationManager->IsDraggingForward = false;
 		Player->AnimationManager->IsDraggingBackward = false;
 		Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Player->SetCanMove(true);
 	}
 			
 	RemoveCurrentPlayer();

@@ -18,8 +18,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent,  meta = (DisplayName = "Move To Left"))
 	void Receive_Left(int PlayerIndex = -1);
 
+	UFUNCTION(BlueprintImplementableEvent,  meta = (DisplayName = "Move To Left Completed"))
+	void Receive_Left_Completed(int PlayerIndex = -1);
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Move To Right"))
 	void Receive_Right(int PlayerIndex = -1);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Move To Right Completed"))
+	void Receive_Right_Completed(int PlayerIndex = -1);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Move To Up"))
 	void Receive_Up(int PlayerIndex = -1);
