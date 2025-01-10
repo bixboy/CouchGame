@@ -84,6 +84,23 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 	}
 }
 
+void ACouchInteractableWeapons::ShowInteractionWidget_Implementation()
+{
+	Super::ShowInteractionWidget_Implementation();
+	if (!Execute_IsUsedByPlayer(this) && !WidgetComponent->GetCurrentWidget())
+	{
+		// GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+		WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);	
+	}
+}
+
+void ACouchInteractableWeapons::HideInteractionWidget_Implementation()
+{
+	Super::HideInteractionWidget_Implementation();
+	if (!Execute_IsUsedByPlayer(this) && Players.IsEmpty()) WidgetComponent->DestroyWidget();
+}
+
+
 void ACouchInteractableWeapons::DetachPlayer(ACouchCharacter* Player)
 {
 	if (Player)
@@ -155,18 +172,25 @@ void ACouchInteractableWeapons::StopMoveActor_Implementation()
 void ACouchInteractableWeapons::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!Execute_IsUsedByPlayer(this))
+	if (ACouchCharacter* Character = Cast<ACouchCharacter>(OtherActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
-		WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);	
+		Players.Add(Character);
 	}
+	// if (!Execute_IsUsedByPlayer(this))
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Enter InteractingActor Zone");
+	// 	WidgetComponent->SpawnWidget(CurrentInteractWidget, WidgetPose);	
+	// }
 }
 
 void ACouchInteractableWeapons::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!Execute_IsUsedByPlayer(this))
-		WidgetComponent->DestroyWidget();
+	if (ACouchCharacter* Character = Cast<ACouchCharacter>(OtherActor))
+	{
+		Players.Remove(Character);
+	}
+	if (!Execute_IsUsedByPlayer(this) && Players.IsEmpty()) WidgetComponent->DestroyWidget();
 }
 
 #pragma endregion

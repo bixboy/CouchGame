@@ -39,5 +39,12 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsUsedByPlayer();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowInteractionWidget();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideInteractionWidget();
+
 };
 

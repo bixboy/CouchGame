@@ -95,6 +95,22 @@ void ACouchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	TickStateMachine(DeltaTime);
+	if (InteractingActors.Num() > 0 && !IsInteracting)
+	{
+		if (InteractingActor && !InteractingActor.IsA(ACouchPlank::StaticClass()))
+		{
+			ICouchInteractable::Execute_ShowInteractionWidget(InteractingActor);
+		}
+		else
+		{
+			ACouchInteractableMaster* Interactable = FindNearestInteractingActor();
+			if (Interactable && !Interactable->IsA(ACouchPlank::StaticClass()))
+			{
+				ICouchInteractable::Execute_ShowInteractionWidget(Interactable);
+				if (!IsInteracting) InteractingActor = Interactable;
+			}
+		}
+	}
 	if (!AnimationManager->IsCarryingItem && !AnimationManager->IsRepairing && CanMove && !IsInteracting && InteractingActors.IsEmpty())
 	{
 		IsHoldingItem = false;
@@ -377,8 +393,6 @@ void ACouchCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 	{
 		AnimationManager->HasPressedDashInput = false;
 	}
-	
-	
 }
 
 #pragma endregion
@@ -392,21 +406,25 @@ void ACouchCharacter::OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedCom
 		if (TObjectPtr<ACouchInteractableMaster> Actor = Cast<ACouchInteractableMaster>(OtherActor); Actor)
 		{
 			InteractingActors.Add(Actor);
+			if (InteractingActor) ICouchInteractable::Execute_ShowInteractionWidget(InteractingActor);
+			else
+			{
+				ACouchInteractableMaster* Interactable = FindNearestInteractingActor();
+				if (Interactable)
+				{
+					ICouchInteractable::Execute_ShowInteractionWidget(Interactable);
+					if (!IsInteracting) InteractingActor = Interactable;
+				}
+				
+				
+			}
+			
 			if (!IsInInteractingRange)
 			{
 				IsInInteractingRange = true;
-				//GEngine->AddOnScreenDebugMessage(
-				//	-1,
-				//	3.0f,
-				//	FColor::Red,
-				//	"Enter InteractingActor Zone"
-				//);
 			}
 		}
-
-
 	}
-	
 }
 
 void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -428,6 +446,19 @@ void ACouchCharacter::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedCompo
 					//	FColor::Red,
 					//	"Exit InteractingActor Zone"
 					//);
+				}
+				else
+				{
+					if (InteractingActor) ICouchInteractable::Execute_ShowInteractionWidget(InteractingActor);
+					else
+					{
+						ACouchInteractableMaster* Interactable = FindNearestInteractingActor();
+						if (Interactable)
+						{
+							ICouchInteractable::Execute_ShowInteractionWidget(Interactable);
+							if (!IsInteracting) InteractingActor = Interactable;
+						}
+					}
 				}
 			}
 		}

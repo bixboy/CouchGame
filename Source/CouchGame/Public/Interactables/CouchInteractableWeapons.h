@@ -27,6 +27,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	virtual void ShowInteractionWidget_Implementation() override;
+	virtual void HideInteractionWidget_Implementation() override;
 
 	UFUNCTION()
 	bool GetCanUse() const;
@@ -61,7 +63,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> WidgetPose;
-	
+
+	TArray<TObjectPtr<ACouchCharacter>> Players;
 	UFUNCTION()
 	void OnCharacterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 								int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

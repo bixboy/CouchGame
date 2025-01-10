@@ -37,7 +37,9 @@ public:
 	virtual bool IsPickable_Implementation() override;
 
 	virtual void SetIsPickable_Implementation(bool isPickable) override;
-	
+
+	virtual void ShowInteractionWidget_Implementation() override;
+	virtual void HideInteractionWidget_Implementation() override;
 
 	// Overlap
 	UPROPERTY()

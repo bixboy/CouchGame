@@ -17,6 +17,8 @@ public:
 
 	virtual bool IsUsedByPlayer_Implementation() override;
 	virtual void Interact_Implementation(ACouchCharacter* Player) override;
+	virtual void ShowInteractionWidget_Implementation() override;
+	virtual void HideInteractionWidget_Implementation() override;
 
 	UFUNCTION(BlueprintCallable)
 	ACouchCharacter* GetCurrentPlayer() const;
