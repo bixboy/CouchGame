@@ -72,7 +72,8 @@ void ACouchInteractableWeapons::Interact_Implementation(ACouchCharacter* Player)
 			if (CurrentPlayer) CurrentPlayer->AnimationManager->IsDragging = true;
 			FTransform PoseTransform = FTransform(PlayerPose->GetComponentRotation(), PlayerPose->GetComponentLocation(), GetCurrentPlayer()->GetActorScale());
 			GetCurrentPlayer()->SetActorTransform(PoseTransform, false);
-			GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);	
+			GetCurrentPlayer()->SetActorRotation(PoseTransform.Rotator());
+			GetCurrentPlayer()->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		}
 		else
 		{
@@ -116,6 +117,7 @@ void ACouchInteractableWeapons::DetachPlayer(ACouchCharacter* Player)
 	CanUse = false;
 	SetPlayerIsIn(false);
 	Execute_StopMoveActor(this);
+	WidgetComponent->DestroyWidget();
 }
 
 #pragma region MovementComponent

@@ -81,6 +81,9 @@ void ACouchFishingRod::StartChargeActor_Implementation()
          case 2:
             WidgetSpawner->SpawnWidget(PowerChargeWidgetTeam2, CurrentPlayer->WidgetPose, false);
             break;
+
+         default:
+            break;
       }
       
       if(WidgetSpawner->GetCurrentWidget())
@@ -134,7 +137,7 @@ void ACouchFishingRod::SpawnLure()
 
    // Spawn Lure
    FTransform SpawnTransform = FTransform(SuggestedVelocity.Rotation(), SkeletalMesh->GetSocketLocation(FName("barrel")));
-   if (LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform))
+   if ((LureRef = GetWorld()->SpawnActor<ACouchLure>(Lure, SpawnTransform)))
    {
       LureRef->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
       InitializeCable();
@@ -180,6 +183,7 @@ void ACouchFishingRod::InitializeCable()
       // Setup Cable
       Cable->SetRelativeScale3D(FVector(CableScale, CableScale, CableScale));
       Cable->SetMaterial(0, CableMaterial);
+      Cable->CableGravityScale = 3.0f;
       //Cable->NumSegments = 17.f;
       
       float Distance = FVector::Dist(SkeletalMesh->GetSocketLocation(FName("barrel")), ChargePower->TargetLocation);

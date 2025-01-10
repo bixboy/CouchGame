@@ -47,6 +47,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<ACouchWidget3D> PowerChargeWidget;
+	UPROPERTY(EditAnywhere, Category = DefaultValue)
+	TSubclassOf<ACouchWidget3D> ShootInputWidget;
 
 	UPROPERTY(EditAnywhere, Category = DefaultValue)
 	TSubclassOf<UCameraShakeBase> CameraShake;
