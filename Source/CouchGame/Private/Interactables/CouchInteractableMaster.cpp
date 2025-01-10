@@ -25,6 +25,16 @@ void ACouchInteractableMaster::Interact_Implementation(ACouchCharacter* Player)
 	}
 }
 
+void ACouchInteractableMaster::ShowInteractionWidget_Implementation()
+{
+	ICouchInteractable::ShowInteractionWidget_Implementation();
+}
+
+void ACouchInteractableMaster::HideInteractionWidget_Implementation()
+{
+	ICouchInteractable::HideInteractionWidget_Implementation();
+}
+
 ACouchCharacter* ACouchInteractableMaster::GetCurrentPlayer() const {return CurrentPlayer;}
 
 void ACouchInteractableMaster::SetCurrentPlayer(ACouchCharacter* Player) {CurrentPlayer = Player;}

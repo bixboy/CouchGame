@@ -8,6 +8,8 @@
 #include "Characters/CouchCharactersStateID.h"
 #include "Characters/CouchCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interactables/CouchInteractableMaster.h"
+#include "Interfaces/CouchInteractable.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ECouchCharacterStateID UCouchCharacterStateWalk::GetStateID()
@@ -59,6 +61,9 @@ void UCouchCharacterStateWalk::StateTick(float DeltaTime)
 	//	FColor::Blue,
 	//	TEXT("Tick StateWalk")
 	//);
+	// Met à jour l'interaction en temps réel
+	// Met à jour l'interaction en temps réel
+
 	if (FMath::Abs(Character->GetInputMove().Size()) < CharacterSettings->InputMoveThreshold)
 	{
 		StateMachine->ChangeState(ECouchCharacterStateID::Idle);

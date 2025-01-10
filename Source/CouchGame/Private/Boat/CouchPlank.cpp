@@ -47,12 +47,12 @@ void ACouchPlank::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		PlayersInZone.Add(Player);
 	}
-	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing && !CouchWidgetSpawn->GetCurrentWidget())
-	{
-		UClass* InteractWidget = InteractWidgetClass.Get();
-		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
-		InteractWidgetPtr = CouchWidgetSpawn->GetCurrentWidget();
-	}
+// 	if (OtherActor->IsA(ACouchCharacter::StaticClass()) && !IsPlayerRepairing && !CouchWidgetSpawn->GetCurrentWidget())
+// 	{
+// 		// UClass* InteractWidget = InteractWidgetClass.Get();
+// 		// CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+// 		// InteractWidgetPtr = CouchWidgetSpawn->GetCurrentWidget();
+// 	}
 }
 
 void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -64,7 +64,7 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 		{
 			PlayersInZone.Remove(Player);
 			
-			if (Player == APlayer && IsPlayerRepairing && Player->IsInteracting)
+			if (Player == APlayer && IsPlayerRepairing && Player->IsInteracting && PlayersInZone.IsEmpty())
 			{
 				if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 				FInputActionValue InputActionValue;
@@ -73,7 +73,7 @@ void ACouchPlank::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 			}
 		}
 		
-		if (PlayersInZone.IsEmpty() && !IsPlayerRepairing)
+		if (PlayersInZone.IsEmpty() && !IsPlayerRepairing && Player->InteractingActor != this)
 		{
 			if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
 		}
@@ -174,6 +174,26 @@ void ACouchPlank::SetIsPickable_Implementation(bool isPickable)
 {
 	ICouchPickable::SetIsPickable_Implementation(isPickable);
 }
+
+void ACouchPlank::ShowInteractionWidget_Implementation()
+{
+	if (!CouchWidgetSpawn->GetCurrentWidget() && !IsPlayerRepairing)
+	{
+		UClass* InteractWidget = InteractWidgetClass.Get();
+		CouchWidgetSpawn->SpawnWidget(InteractWidget, WidgetPos);
+		InteractWidgetPtr = CouchWidgetSpawn->GetCurrentWidget();
+	}
+}
+
+void ACouchPlank::HideInteractionWidget_Implementation()
+{
+	// Super::HideInteractionWidget_Implementation();
+	// if (PlayersInZone.IsEmpty() && !IsPlayerRepairing)
+	// {
+	// 	if (CouchWidgetSpawn->GetCurrentWidget()) CouchWidgetSpawn->DestroyWidget();
+	// }
+}
+
 
 bool ACouchPlank::IsPickable_Implementation()
 {
