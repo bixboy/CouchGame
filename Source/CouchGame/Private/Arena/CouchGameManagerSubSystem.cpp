@@ -82,6 +82,7 @@ void UCouchGameManagerSubSystem::StartNewRound()
 void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
 	if (EndMatch && !EndRound) return;
+	
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 	int RoundsToWin = (MaxRounds / 2) + 1;
 	
@@ -243,9 +244,16 @@ int UCouchGameManagerSubSystem::GetCurrentRound()
 	return CurrentRound;
 }
 
+// Get End Match
 bool UCouchGameManagerSubSystem::GetEndMatch()
 {
 	return EndMatch;
+}
+
+// Get End Round
+bool UCouchGameManagerSubSystem::GetEndRound()
+{
+	return EndRound;
 }
 
 // Get Rounds Winners

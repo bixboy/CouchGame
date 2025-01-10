@@ -56,6 +56,9 @@ bool ACouchBoat::GetIsRepaired()
 
 void ACouchBoat::BoatDamage(float DamageAmount)
 {
+	UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>();
+	if (GameManager->GetEndRound()) return;
+	
 	DamageAmount = FMath::Clamp(FMath::Abs(DamageAmount), BoatMinAndMaxDamagePerSecond.X, BoatMinAndMaxDamagePerSecond.Y);
 	BoatLife =  FMath::Clamp(BoatLife - DamageAmount, 0, BoatStartLife);
 	IsRepaired = false;
@@ -68,7 +71,7 @@ void ACouchBoat::BoatDamage(float DamageAmount)
 		return;
 	}
 
-	if (UCouchGameManagerSubSystem* GameManager = GetWorld()->GetGameInstance()->GetSubsystem<UCouchGameManagerSubSystem>())
+	if (GameManager)
 	{
 		switch (Team)
 		{
