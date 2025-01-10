@@ -81,11 +81,13 @@ void UCouchGameManagerSubSystem::StartNewRound()
 
 void UCouchGameManagerSubSystem::CheckRoundWinCondition(int TeamWin)
 {
-	if (EndMatch) return;
+	if (EndMatch && !EndRound) return;
 	TeamWin = FMath::Clamp(TeamWin, 0, 2);
 	int RoundsToWin = (MaxRounds / 2) + 1;
+	
 	Team1WinTheGame = false;
 	EndRound = true;
+	
 	if (TeamWin == 1)
 	{
 		// L'équipe A gagne la manche
