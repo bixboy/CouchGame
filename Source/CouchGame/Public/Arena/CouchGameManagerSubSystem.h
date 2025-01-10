@@ -114,6 +114,8 @@ public:
 	int GetCurrentRound();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetEndMatch();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetEndRound();
 
 	TArray<int> GetRoundsWinners();
 
