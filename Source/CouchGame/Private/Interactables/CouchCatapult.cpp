@@ -25,8 +25,13 @@ void ACouchCatapult::StartChargeActor_Implementation()
 	if(GetCanUse() && CurrentAmmo >= 1 && !IsInCharge)
 	{
 		PlayFx();
-		if (!WidgetComponent->PowerChargeActor) WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
+		WidgetComponent->DestroyWidget();
+		if (!WidgetComponent->PowerChargeActor)
+		{
+			WidgetComponent->SpawnWidget(PowerChargeWidget, WidgetPose);
+		}
 		PowerChargeComponent->StartCharging(SkeletalMesh, WidgetComponent, true);
+		
 		if (CurrentPlayer) CurrentPlayer->AnimationManager->IsChargingCatapult = true;
 		IsInCharge = true;
 		MovementComponent->SetCanMove(true);
@@ -58,6 +63,11 @@ void ACouchCatapult::Interact_Implementation(ACouchCharacter* Player)
 		Execute_StopChargeActor(this);
 	}
 	Super::Interact_Implementation(Player);
+
+	if (GetCurrentPlayer() == Player && CurrentAmmo == 1)
+	{
+		WidgetComponent->SpawnWidget(ShootInputWidget, WidgetPose, true);
+	}
 }
 
 #pragma endregion
