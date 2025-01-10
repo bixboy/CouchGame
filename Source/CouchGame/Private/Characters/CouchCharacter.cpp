@@ -523,7 +523,7 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 			&& ICouchPickable::Execute_IsPickable(InteractingActor)
 			&& !InteractingActor.IsA(ACouchUmbrella::ACouchUmbrella::StaticClass()))
 		{
-			//-
+			
 			IsHoldingItem = true;
 			if (!InteractingActor.IsA(ACouchPlank::StaticClass()) && !InteractingActor.IsA(ACouchPickableCannonBall::StaticClass()))  CraftTable->SpawnWidget();
 			UGameplayStatics::PlaySound2D(this, GrabItemSound);
@@ -573,10 +573,6 @@ void ACouchCharacter::OnInputInteract(const FInputActionValue& InputActionValue)
 	else if (IsInteracting && bAlreadyUsed)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Actor is already in use by another player.");
-	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Failed to interact: conditions not met.");
 	}
 }
 
